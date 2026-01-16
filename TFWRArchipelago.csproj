@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net46</TargetFramework>
+        <RootNamespace>com.seadoggie.TFWRArchipelago</RootNamespace>
+        <AssemblyName>TFWRArchipelago</AssemblyName>
+        <Description>Archipelago implementation</Description>
+        <Version>0.0.1</Version>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ImplicitUsings>true</ImplicitUsings>
+        <LangVersion>latest</LangVersion>
+        <RestoreAdditionalProjectSources>
+            https://api.nuget.org/v3/index.json;
+            https://nuget.bepinex.dev/v3/index.json;
+        </RestoreAdditionalProjectSources>
+
+        <!-- Paths to the game -->
+        <SteamPath>/home/seadoggie/.steam/steam</SteamPath>
+        <GamePath>$(SteamPath)/steamapps/common/The Farmer Was Replaced</GamePath>
+        <ManagedPath>$(GamePath)/TheFarmerWasReplaced_Data/Managed</ManagedPath>
+        <BepInExPath>$(GamePath)/BepInEx</BepInExPath>
+        <PluginsPath>$(BepInExPath)/plugins</PluginsPath>
+        <IsPackable>false</IsPackable>
+        <Authors>seadoggie</Authors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Archipelago.MultiClient.Net" Version="6.6.1" />
+        <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+        <PackageReference Include="BepInEx.Core" Version="5.*" />
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+        <PackageReference Include="UnityEngine.Modules" Version="2021.3.5" IncludeAssets="compile" />
+        <Reference Include="$(ManagedPath)/Core.dll" Publicize="true" />
+        <Reference Include="$(ManagedPath)/Utils.dll" Publicize="true" />
+        <Reference Include="UnityEngine.UI">
+            <HintPath>$(ManagedPath)\UnityEngine.UI.dll</HintPath>
+        </Reference>
+        <Reference Include="Unity.TextMeshPro">
+            <HintPath>$(ManagedPath)\Unity.TextMeshPro.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+    </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="/home/seadoggie/source/repos/TFWRArchipelago/publish.sh" />
+    </Target>
+</Project>

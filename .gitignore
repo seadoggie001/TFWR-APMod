@@ -52,3 +52,12 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Idea
+.idea/
+
+# User files
+*.user
+
+# Personal publish script
+publish.sh
