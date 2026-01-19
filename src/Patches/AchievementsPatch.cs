@@ -1,3 +1,4 @@
+using com.seadoggie.TFWRArchipelago.Constants;
 using HarmonyLib;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
@@ -19,12 +20,14 @@ public class AchievementsPatch
             {
                 case "CAUSE_A_RUNTIME_ERROR":
                     MainSim.Inst.UnlockHat(ResourceManager.GetHat(TFWRTypes.Hat.TrafficCone.Resource));
+                case Achievement.CauseARuntimeError:
+                    MainSim.Inst.UnlockHat(ResourceManager.GetHat(Constants.Hat.TrafficCone.Resource));
                     break;
-                case "STACK_OVERFLOW":
-                    MainSim.Inst.UnlockHat(ResourceManager.GetHat(TFWRTypes.Hat.TrafficConeStack.Resource));
+                case Achievement.StackOverflow:
+                    MainSim.Inst.UnlockHat(ResourceManager.GetHat(Constants.Hat.TrafficConeStack.Resource));
                     break;
-                case "HIGHER_ORDER_PROGRAMMING":
-                    MainSim.Inst.UnlockHat(ResourceManager.GetHat(TFWRTypes.Hat.Wizard.Resource));
+                case Achievement.HigherOrderProgramming:
+                    MainSim.Inst.UnlockHat(ResourceManager.GetHat(Constants.Hat.Wizard.Resource));
                     break;
             }
             // Do archipelago stuff here
