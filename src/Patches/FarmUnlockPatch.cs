@@ -1,7 +1,5 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using HarmonyLib;
-using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
@@ -22,6 +20,7 @@ public class FarmUnlockPatch
 
     public static void AddUnlock()
     {
+        
         // MainSim.Inst.storedSim.farm.GetUnlockCost()
     }
 }

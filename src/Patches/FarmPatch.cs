@@ -22,11 +22,6 @@ public class FarmPatch
         List<string> startUnlocks = (List<string>)startUnlocksField?.GetValue(null);
         if (startUnlocks is null) return;
         
-        // ToDo: Compare the startUnlocks to the unlocks param to determine if it's a new game?
-        // No, you likely will create a new game then connect to the server...
-        // I might-could compare the list of unlocked items against the list of "vanilla" unlock items though?
-        // I really don't remember why I needed all of this though... just use the vanilla unlocks and call it a day?
-        
         // Combine the startUnlocks with the unlocks param
         List<string> distinctUnlocks = startUnlocks.ToList();
         distinctUnlocks.AddRange(unlocks);

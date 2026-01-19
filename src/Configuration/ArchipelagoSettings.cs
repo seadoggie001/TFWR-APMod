@@ -1,4 +1,3 @@
-using System.Reflection;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Configuration;
@@ -25,7 +24,7 @@ public class ArchipelagoSettings : MonoBehaviour
     private bool _prevCursorVisible;
     private bool _displayingWindow;
     
-    private Task<bool> _archConnectTask = null;
+    private Task<bool> _archConnectTask;
     private bool _readyToConnect = true;
     
     /// <summary>

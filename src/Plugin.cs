@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
-using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Packets;
 using BepInEx;
 using BepInEx.Logging;
@@ -27,7 +26,7 @@ public class Plugin : BaseUnityPlugin
     /// <summary>
     /// Should any of the mod's features be running?
     /// </summary>
-    public bool Enabled { get; set; } = false;
+    public bool Enabled { get; set; }
 
     private void Awake()
     {
