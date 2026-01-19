@@ -7,7 +7,7 @@ namespace com.seadoggie.TFWRArchipelago;
 /// </summary>
 public static class Unlocks
 {
-    public static string Item(string name)
+    public static string ItemToUnlock(string name)
     {
         return name switch
         {
@@ -49,7 +49,7 @@ public static class Unlocks
         };
     }
     
-    public static string Location(string name)
+    public static string AchievementToLocation(string name)
     {
         return name switch
         {

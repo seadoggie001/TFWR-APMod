@@ -6,6 +6,7 @@ using Archipelago.MultiClient.Net.Packets;
 using BepInEx;
 using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Configuration;
+using com.seadoggie.TFWRArchipelago.Helpers;
 using HarmonyLib;
 
 namespace com.seadoggie.TFWRArchipelago;
@@ -19,7 +20,9 @@ public class Plugin : BaseUnityPlugin
     private readonly Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
     public readonly APConnectionConfig ConnectionSettings = new();
     
-    private static ArchipelagoSession Session { get; set; } = null;
+    public ItemHelper ItemHelper = new();
+    
+    public ArchipelagoSession Session { get; set; }
 
     /// <summary>
     /// Should any of the mod's features be running?
@@ -38,7 +41,11 @@ public class Plugin : BaseUnityPlugin
         ConnectionSettings.SetupConfig(Config);
     }
 
-    // ToDo: Return a Login object? Use the SlotData?
+    private void Update()
+    {
+        ItemHelper.Update();
+    }
+
     public async Task<bool> TryEnableAsync()
     {
         // Only attempt to connect if not connected already
@@ -51,8 +58,7 @@ public class Plugin : BaseUnityPlugin
         // Create the session
         Session = ArchipelagoSessionFactory.CreateSession(ConnectionSettings.Url, ConnectionSettings.Port);
         
-        //
-        Session.Items.ItemReceived += OnItemReceived;
+        Session.Items.ItemReceived += ItemHelper.OnItemReceived;
         
         RoomInfoPacket roomInfoPacket = await ConnectAsync();
         if (roomInfoPacket == null)
@@ -84,28 +90,10 @@ public class Plugin : BaseUnityPlugin
             
             // Give the player the location... somehow...
             // Maybe I'll log it for now to see what's here
-            Log.LogInfo($"Found location: {locationName}");
+            Log.LogInfo($"Found location- ID: {newCheckedLocation} Name: {locationName}");
         }
     }
 
-    private void OnItemReceived(ReceivedItemsHelper helper)
-    {
-        string itemReceivedName = helper.PeekItem().ItemDisplayName;
-        Log.LogInfo($"Found item: {itemReceivedName}");
-        // Do stuff to get the item (!)
-        GivePlayerItem(itemReceivedName);
-        helper.DequeueItem();
-    }
-
-    private void GivePlayerItem(string itemName)
-    {
-        string unlockName = Unlocks.Item(itemName);
-        Farm farm = MainSim.Inst.storedSim.farm; 
-        int count = farm.NumUnlocked(unlockName);
-        // Hopefully we do not allow for "too many" items... but I think the game handles that internally
-        farm.Unlock(unlockName, count + 1);
-    }
-    
     private async Task<RoomInfoPacket> ConnectAsync()
     {
         RoomInfoPacket roomInfoPacket;
@@ -159,5 +147,15 @@ public class Plugin : BaseUnityPlugin
             Log.LogInfo(error);
         }
         return loginResult;
+    }
+
+    public static void LogError(string message, Exception ex = null)
+    {
+        Log.LogError(message);
+        if (ex == null) return;
+        Log.LogError(ex.Message);
+        Log.LogInfo(ex.StackTrace);
+        if (ex.InnerException == null) return;
+        Log.LogError(ex.InnerException.Message);
     }
 }
