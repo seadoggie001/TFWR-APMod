@@ -1,4 +1,5 @@
 using HarmonyLib;
+using UnityEngine.UI;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
@@ -19,4 +20,16 @@ public class UnlockBoxPatch
         // Check if the unlock name is currently allowed by archipelago
     }
     
+    [HarmonyPostfix]
+    [HarmonyPatch(nameof(UnlockBox.SetupRec),
+        [typeof(bool), typeof(HashSet<string>), typeof(ItemBlock), typeof(Dictionary<string, int>), typeof(bool)],
+        [ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Out]
+    )]
+    public static void SetupRec(UnlockBox __instance, ref Image ___image)
+    {
+        if ((UnityEngine.Object)__instance.unlockSO.mesh != (UnityEngine.Object)null)
+        {
+            ___image.sprite = Resources.Archipelago();
+        }
+    }
 }

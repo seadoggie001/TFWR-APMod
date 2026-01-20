@@ -49,7 +49,7 @@ public class ResourceManagerPatch
         option.importance = importance;
         option.options = options;
         option.defaultValue = defaultValue;
-        OptionSO[] existingOptions = Resources.LoadAll<OptionSO>("Options/");
+        OptionSO[] existingOptions = UnityEngine.Resources.LoadAll<OptionSO>("Options/");
         OptionSO cycleOption = existingOptions.FirstOrDefault(m => m is CycleOptionSO);
         if(cycleOption != null && cycleOption.optionUI != null) option.optionUI = cycleOption.optionUI;
         if(OptionHolder.GetOption(name, null) == null) OptionHolder.SetOption(name, defaultValue);
