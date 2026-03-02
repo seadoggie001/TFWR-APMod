@@ -1,16 +1,18 @@
+using System.Diagnostics.CodeAnalysis;
 using HarmonyLib;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
 [HarmonyPatch(typeof(ResourceManager))]
+[SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony forces the use of some variable names")]
 public class ResourceManagerPatch
 {
     public const string Name = "Archipelago";
     public const string DefaultValue = "Click to Open";
     private static readonly string[] Options = ["Click to Open", "Closed"];
     
-    private static CycleOptionSO _openArchipelagoOption = null;
+    private static CycleOptionSO _openArchipelagoOption;
     
     /// <summary>
     /// Load custom options
@@ -18,7 +20,6 @@ public class ResourceManagerPatch
     /// <param name="__result"></param>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(ResourceManager.GetAllOptions))]
-    // ReSharper disable once InconsistentNaming
     public static void GetAllOptions(ref IEnumerable<OptionSO> __result)
     {
         _openArchipelagoOption ??= AddOption(Name, "Open Archipelago settings", "general", 0f, Options.ToList(), DefaultValue);
@@ -49,10 +50,11 @@ public class ResourceManagerPatch
         option.importance = importance;
         option.options = options;
         option.defaultValue = defaultValue;
+        // ReSharper disable once Unity.UnknownResource -- This will load from TFWR's resources
         OptionSO[] existingOptions = UnityEngine.Resources.LoadAll<OptionSO>("Options/");
         OptionSO cycleOption = existingOptions.FirstOrDefault(m => m is CycleOptionSO);
         if(cycleOption != null && cycleOption.optionUI != null) option.optionUI = cycleOption.optionUI;
-        if(OptionHolder.GetOption(name, null) == null) OptionHolder.SetOption(name, defaultValue);
+        if(OptionHolder.GetOption(name) == null) OptionHolder.SetOption(name, defaultValue);
         return option;
     }
 }

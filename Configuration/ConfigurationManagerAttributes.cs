@@ -1,3 +1,4 @@
+// ReSharper disable All -- This is not my file, it was copied and pasted. See BepInEx.ConfigurationManager on GitHub
 namespace com.seadoggie.TFWRArchipelago.Configuration;
 
 /// <summary>

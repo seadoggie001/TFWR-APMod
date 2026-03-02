@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using HarmonyLib;
 using UnityEngine.UI;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
 [HarmonyPatch(typeof(UnlockBox))]
+[SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony forces the use of some variable names")]
 public class UnlockBoxPatch
 {
     /// <summary>
@@ -13,7 +15,6 @@ public class UnlockBoxPatch
     /// <param name="__result"></param>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(UnlockBox.GetTooltipInfo))]
-    // ReSharper disable twice InconsistentNaming
     public static void GetTooltipInfo(UnlockBox __instance, ref TooltipInfo __result)
     {
         if(!Plugin.Instance.Enabled) return;
@@ -27,9 +28,9 @@ public class UnlockBoxPatch
     )]
     public static void SetupRec(UnlockBox __instance, ref Image ___image)
     {
-        if ((UnityEngine.Object)__instance.unlockSO.mesh != (UnityEngine.Object)null)
+        if (__instance.unlockSO.mesh)
         {
-            ___image.sprite = Resources.Archipelago();
+            ___image.sprite = Resources.Archipelago;
         }
     }
 }
