@@ -13,10 +13,7 @@ public class ItemHelper
     public void Update()
     {
         if(_itemQueue.Count == 0 || Plugin.Instance.Session == null) return;
-        foreach (string item in _itemQueue)
-        {
-            TryGivePlayerItem(item);
-        }
+        TryGivePlayerItem(_itemQueue[0]);
     }
 
     public void OnItemReceived(ReceivedItemsHelper helper)
