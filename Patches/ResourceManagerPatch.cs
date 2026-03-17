@@ -8,11 +8,30 @@ namespace com.seadoggie.TFWRArchipelago.Patches;
 [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony forces the use of some variable names")]
 public class ResourceManagerPatch
 {
-    public const string Name = "Archipelago";
-    public const string DefaultValue = "Click to Open";
-    private static readonly string[] Options = ["Click to Open", "Closed"];
+    public const string ArchipelagoOptionToggle = "Archipelago";
+    public const string ArchipelagoOptionToggleValue = "Click to Open";
+    public static string[] CustomOptions = [];
     
     private static CycleOptionSO _openArchipelagoOption;
+
+    [HarmonyPostfix]
+    [HarmonyPatch(nameof(ResourceManager.LoadAll))]
+    public static void LoadAll(ref ItemSO[] ___items)
+    {
+        // Install the Archipelago item
+        ItemSO item = new()
+        {
+            itemId = StringIdsPatch.ArchipelagoItem,
+            itemName = StringIdsPatch.ArchipelagoItemName,
+            // The rest of this is all nonsense?
+            description = "Archipelago Stuff",
+            docs = "I got some docs!?",
+            enabled = true,
+            name = "Some other Archipelago name?",
+            trackStats = true,
+        };
+        ___items = ___items.AddItem(item).ToArray();
+    }
     
     /// <summary>
     /// Load custom options
@@ -20,11 +39,12 @@ public class ResourceManagerPatch
     /// <param name="__result"></param>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(ResourceManager.GetAllOptions))]
+    // ReSharper disable once InconsistentNaming
     public static void GetAllOptions(ref IEnumerable<OptionSO> __result)
     {
-        _openArchipelagoOption ??= AddOption(Name, "Open Archipelago settings", "general", 0f, Options.ToList(), DefaultValue);
+        if(!Plugin.Instance.Loaded) return;
         List<OptionSO> options = __result.ToList();
-        Plugin.Log.LogInfo(string.Join(", ", options.Select(m => m.name)));
+        _openArchipelagoOption ??= AddOption(ArchipelagoOptionToggle, "Open Archipelago settings", "general", 0f, [ArchipelagoOptionToggleValue, "Closed"], ArchipelagoOptionToggleValue);
         options.Add(_openArchipelagoOption);
         __result = options;
     }
@@ -57,4 +77,19 @@ public class ResourceManagerPatch
         if(OptionHolder.GetOption(name) == null) OptionHolder.SetOption(name, defaultValue);
         return option;
     }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(nameof(ResourceManager.GetUnlock))]
+    public static void GetUnlock(string name, ref UnlockSO __result)
+    {
+        if (Plugin.Instance.Enabled)
+        {
+            // Everything costs an Archipelago item
+            __result.unlockCost = new ItemBlock(StringIdsPatch.ArchipelagoItem, 1);
+            // ToDo: Someday, check if there's a hint for this item. If there is a hint, display it here...
+            // __result.description = "Text describing a hint for this item";
+        }
+    }
+    
+    
 }

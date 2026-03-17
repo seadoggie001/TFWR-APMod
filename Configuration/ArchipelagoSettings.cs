@@ -70,6 +70,7 @@ public class ArchipelagoSettings : MonoBehaviour
     
     public void Awake()
     {
+        if (!Plugin.Instance.Loaded) Plugin.Log.LogWarning("Not opening GUI; failed to load properly.");
         _archUrl = Plugin.Instance.ConnectionSettings.Url;
         _archPort = Plugin.Instance.ConnectionSettings.Port.ToString();
         _archUsername = Plugin.Instance.ConnectionSettings.Username;

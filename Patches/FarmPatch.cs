@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using HarmonyLib;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
 [HarmonyPatch(typeof(Farm))]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class FarmPatch
 {
     /// <summary>

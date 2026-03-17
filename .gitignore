@@ -55,6 +55,7 @@ nunit-*.xml
 
 # Idea
 .idea/
+global.json
 
 # User files
 *.user

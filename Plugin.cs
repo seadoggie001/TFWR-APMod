@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using Archipelago.MultiClient.Net;
+﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
 using BepInEx;
@@ -7,6 +6,7 @@ using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Configuration;
 using com.seadoggie.TFWRArchipelago.Helpers;
 using HarmonyLib;
+using JetBrains.Annotations;
 
 namespace com.seadoggie.TFWRArchipelago;
 
@@ -16,10 +16,16 @@ public class Plugin : BaseUnityPlugin
     public const string GameName = "The Farmer Was Replaced";
     public static Plugin Instance { get; private set; } = null!;
     public static ManualLogSource Log { get; private set; } = null!;
-    private readonly Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
-    public readonly APConnectionConfig ConnectionSettings = new();
+
+    public const bool HarmonySkipFunction = false;
+
+    public bool Loaded { get; private set; }= true;
     
-    public ItemHelper ItemHelper = new();
+    public readonly APConnectionConfig ConnectionSettings = new();
+    public readonly LocationHelper LocationHelper = new();
+    public readonly ItemHelper ItemHelper = new();
+
+    private readonly Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
     
     public ArchipelagoSession Session { get; set; }
 
@@ -33,16 +39,31 @@ public class Plugin : BaseUnityPlugin
         Instance = this;
         Log = Logger;
 
-        // Plugin startup logic
-        Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
-        _harmony.PatchAll();
+        try
+        {
+            _harmony.PatchAll();
+        }
+        catch (Exception e)
+        {
+            LogError("Failed to load properly! Harmony patch issues.", e);
+            Loaded = false;
+        }
         
         ConnectionSettings.SetupConfig(Config);
+        
+        Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running v{MyPluginInfo.PLUGIN_VERSION}");
     }
 
     private void Update()
     {
-        ItemHelper.Update();
+        try
+        {
+            ItemHelper.Update();
+        }
+        catch (Exception e)
+        {
+            LogError("Failed to update item list!", e);
+        }
     }
 
     public async Task<bool> TryEnableAsync()
@@ -69,7 +90,7 @@ public class Plugin : BaseUnityPlugin
         LoginResult loginResult = await LoginAsync();
         if (loginResult.Successful)
         {
-            Log.LogInfo($"Successfully logged in.");
+            Log.LogInfo("Successfully logged in.");
             Enabled = true;
             Session.Locations.CheckedLocationsUpdated += OnCheckedLocationsUpdated;
             return true;
@@ -148,13 +169,12 @@ public class Plugin : BaseUnityPlugin
         return loginResult;
     }
 
-    public static void LogError(string message, Exception ex = null)
+    public static void LogError(string message, [CanBeNull] Exception ex = null)
     {
-        Log.LogError(message);
-        if (ex == null) return;
-        Log.LogError(ex.Message);
-        Log.LogInfo(ex.StackTrace);
-        if (ex.InnerException == null) return;
-        Log.LogError(ex.InnerException.Message);
+        string exceptionMessage = $"{message}";
+        if (ex != null) exceptionMessage = $" [Exception] Message: {ex.Message}\n{ex.StackTrace}";
+        if (ex is { InnerException: not null }) exceptionMessage += $"\n\t[InnerException] Message: {ex.InnerException.Message}\n{ex.InnerException.StackTrace}";
+        Log.LogError(exceptionMessage);
     }
+    
 }
