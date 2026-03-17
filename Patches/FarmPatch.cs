@@ -40,19 +40,20 @@ public class FarmPatch
         }
         startUnlocksField.SetValue(null, startUnlocks);
     }
-    
-    // /// <summary>
-    // /// Can use this to override more the of the unlocking of things in the farm
-    // /// </summary>
-    // /// <param name="__instance"></param>
-    // /// <param name="s"></param>
-    // /// <param name="__result"></param>
-    // /// <returns></returns>
-    // [HarmonyPatch(nameof(Farm.IsUnlocked), typeof(string))]
-    // [HarmonyPrefix]
-    // public static bool IsUnlocked_Prefix(Farm __instance, string s, ref bool __result)
-    // {
-    //     
-    //     return true;
-    // }
+
+    /// <summary>
+    /// Used to make everything cost an Archipelago Item
+    /// </summary>
+    /// <param name="unlockSO"></param>
+    /// <param name="numUnlocked"></param>
+    /// <param name="__result"></param>
+    /// <returns></returns>
+    [HarmonyPatch(nameof(Farm.GetUnlockCost), typeof(UnlockSO), typeof(int))]
+    [HarmonyPrefix]
+    public static bool GetUnlockCost(UnlockSO unlockSO, int numUnlocked, ref ItemBlock __result)
+    {
+        if (!Plugin.Instance.Enabled) return !Plugin.HarmonySkipFunction;
+        __result = new ItemBlock(StringIdsPatch.ArchipelagoItem, 1);
+        return Plugin.HarmonySkipFunction;
+    }
 }

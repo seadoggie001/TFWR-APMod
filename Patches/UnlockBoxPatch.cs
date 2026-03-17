@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using HarmonyLib;
+using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
@@ -26,11 +28,17 @@ public class UnlockBoxPatch
         [typeof(bool), typeof(HashSet<string>), typeof(ItemBlock), typeof(Dictionary<string, int>), typeof(bool)],
         [ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Out]
     )]
-    public static void SetupRec(UnlockBox __instance, ref Image ___image)
+    public static void SetupRec(UnlockBox __instance, ref Image ___image, ref TextMeshProUGUI ___codeText, ref ItemBlock ___currentCost)
     {
-        if (__instance.unlockSO.mesh)
-        {
-            ___image.sprite = Resources.Archipelago;
-        }
+        if (!Plugin.Instance.Enabled) return;
+        ___image.gameObject.SetActive(true);
+        ___image.sprite = Resources.Archipelago;
+        ___image.color = new Color(1f, 1f, 1f, 0.5f);
+        ___codeText.text = __instance.unlockSO.unlockName;
+        ___codeText.color = new Color(1f, 1f, 1f, 1f);
+        ___codeText.alignment = TextAlignmentOptions.Baseline;
+        ___codeText.fontSize = 24f;
+        ___codeText.verticalAlignment = VerticalAlignmentOptions.Baseline;
+        ___currentCost = new ItemBlock(StringIdsPatch.ArchipelagoItem, 1);
     }
 }
