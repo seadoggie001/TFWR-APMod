@@ -59,6 +59,7 @@ public class Plugin : BaseUnityPlugin
         try
         {
             ItemHelper.Update();
+            LocationHelper.Update();
         }
         catch (Exception e)
         {

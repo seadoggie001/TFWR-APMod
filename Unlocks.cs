@@ -7,6 +7,38 @@ namespace com.seadoggie.TFWRArchipelago;
 /// </summary>
 public static class Unlocks
 {
+    private static readonly Dictionary<string, string> AchievementLocation = new()
+    {
+        {Achievement.RunYourFirstCode , APLocation.RunYourFirstCode},
+        {Achievement.InfiniteLoop , APLocation.InfiniteLoop},
+        {Achievement.Flip , APLocation.Flip},
+        {Achievement.PlantBush , APLocation.PlantBush},
+        {Achievement.Hay1K , APLocation.Hay1K},
+        {Achievement.PlantCarrot , APLocation.PlantCarrot},
+        {Achievement.Wood1K , APLocation.Wood1K},
+        {Achievement.PlantTree , APLocation.PlantTree},
+        {Achievement.PlantPumpkin , APLocation.PlantPumpkin},
+        {Achievement.Pumpkin1K , APLocation.Pumpkin1K},
+        {Achievement.PetThePiggy , APLocation.PetThePiggy},
+        {Achievement.HigherOrderProgramming , APLocation.HigherOrderProgramming},
+        {Achievement.PlantSunflower , APLocation.PlantSunflower},
+        {Achievement.MudFarmer , APLocation.MudFarmer},
+        {Achievement.Power1K , APLocation.Power1K},
+        {Achievement.PlantCactus , APLocation.PlantCactus},
+        {Achievement.Cacti1K , APLocation.Cacti1K},
+        {Achievement.LongDino , APLocation.LongDino},            
+        {Achievement.StackOverflow , APLocation.StackOverflow},
+        // {Achievement.SpawnMaze , APLocation.SpawnMaze},
+        {Achievement.WrongOrder , APLocation.WrongOrder},
+        {Achievement.CircularImport , APLocation.CircularImport},
+        {Achievement.CauseARuntimeError , APLocation.CauseARuntimeError},
+        {Achievement.SizeMatters , APLocation.SizeMatters},
+        {Achievement.Healer , APLocation.Healer},
+        {Achievement.Chaos , APLocation.Chaos},
+        {Achievement.EquipHat , APLocation.EquipHat},
+        {Achievement.DinoHat , APLocation.DinoHat},
+        {Achievement.FashionShow , APLocation.FashionShow},
+    };
     public static string ItemToUnlock(string name)
     {
         return name switch
@@ -51,38 +83,13 @@ public static class Unlocks
     
     public static string AchievementToLocation(string name)
     {
-        return name switch
-        {
-            Achievement.RunYourFirstCode => APLocation.RunYourFirstCode,
-            Achievement.InfiniteLoop => APLocation.InfiniteLoop,
-            Achievement.Flip => APLocation.Flip,
-            Achievement.PlantBush => APLocation.PlantBush,
-            Achievement.Hay1K => APLocation.Hay1K,
-            Achievement.PlantCarrot => APLocation.PlantCarrot,
-            Achievement.Wood1K => APLocation.Wood1K,
-            Achievement.PlantTree => APLocation.PlantTree,
-            Achievement.PlantPumpkin => APLocation.PlantPumpkin,
-            Achievement.Pumpkin1K => APLocation.Pumpkin1K,
-            Achievement.PetThePiggy => APLocation.PetThePiggy,
-            Achievement.HigherOrderProgramming => APLocation.HigherOrderProgramming,
-            Achievement.PlantSunflower => APLocation.PlantSunflower,
-            Achievement.MudFarmer => APLocation.MudFarmer,
-            Achievement.Power1K => APLocation.Power1K,
-            Achievement.PlantCactus => APLocation.PlantCactus,
-            Achievement.Cacti1K => APLocation.Cacti1K,
-            Achievement.LongDino => APLocation.LongDino,            
-            Achievement.StackOverflow => APLocation.StackOverflow,
-            Achievement.SpawnMaze => throw new NotImplementedException(APLocation.SpawnMaze),
-            Achievement.WrongOrder => APLocation.WrongOrder,
-            Achievement.CircularImport => APLocation.CircularImport,
-            Achievement.CauseARuntimeError => APLocation.CauseARuntimeError,
-            Achievement.SizeMatters => APLocation.SizeMatters,
-            Achievement.Healer => APLocation.Healer,
-            Achievement.Chaos => APLocation.Chaos,
-            Achievement.EquipHat => APLocation.EquipHat,
-            Achievement.DinoHat => APLocation.DinoHat,
-            Achievement.FashionShow => APLocation.FashionShow,
-            _ => null
-        };
+        if (AchievementLocation.TryGetValue(name, out string location)) return location;
+        Plugin.Log.LogError($"Failed to locate a location for {name}");
+        return string.Empty;
+    }
+
+    public static string LocationToAchievement(string name)
+    {
+        return AchievementLocation.FirstOrDefault(m => m.Value == name).Key ?? "";
     }
 }

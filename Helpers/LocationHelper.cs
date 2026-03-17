@@ -12,10 +12,7 @@ public class LocationHelper
     public void Update()
     {
         if(_locationQueue.Count == 0 || Plugin.Instance.Session == null) return;
-        foreach (string item in _locationQueue)
-        {
-            TryGivePlayerLocation(item);
-        }
+        TryGivePlayerLocation(_locationQueue[0]);
     }
 
     public void OnLocationsReceived(ReadOnlyCollection<long> locations)
@@ -24,9 +21,7 @@ public class LocationHelper
         {
             string locationName = Plugin.Instance.Session.Locations.GetLocationNameFromId(location, Plugin.GameName);
             
-            // Give the player the location... somehow...
-            // Maybe I'll log it for now to see what's here
-            Plugin.Log.LogInfo($"Found location- ID: {location} Name: {locationName}");
+            _locationQueue.Add(locationName);
         }
     }
     
@@ -59,32 +54,28 @@ public class LocationHelper
         }
     }
     
-    private bool GivePlayerLocation(string itemName)
+    private bool GivePlayerLocation(string locationName)
     {
         try
         {
             Farm farm = MainSimPatch.GetMainSim()?.farm;
             if (farm is null) return false;
-            int apItemCount = farm.NumUnlocked(APItems);
-            Plugin.Log.LogInfo($"Unlocked AP Items: {apItemCount}");
-            if (_locationsReceived < apItemCount)
+            int apLocationCount = farm.NumUnlocked(APItems);
+            Plugin.Log.LogInfo($"Unlocked AP Locations: {apLocationCount}");
+            if (_locationsReceived < apLocationCount)
             {
                 _locationsReceived++;
                 return true;
             }
-            string unlockName = Unlocks.ItemToUnlock(itemName);
+            string unlockName = Unlocks.LocationToAchievement(locationName);
             if (string.IsNullOrWhiteSpace(unlockName))
             {
-                Plugin.Log.LogWarning($"Failed to find unlock item: {itemName}");
+                Plugin.Log.LogWarning($"Failed to find location: {locationName}");
                 return true; // Don't keep it in the queue
             }
             
-            int count = farm.NumUnlocked(unlockName);
-            Plugin.Log.LogInfo($"Found {count} unlocked {unlockName}");
+            // ToDo: Figure out how to give achievements
             
-            // Hopefully we do not allow for "too many" items... but I think the game handles that internally
-            farm.Unlock(unlockName, count + 1);
-            farm.Unlock(APItems, ++_locationsReceived);
             return true;
         }
         catch (Exception e)
