@@ -31,12 +31,7 @@ public class AchievementsPatch
                     MainSim.Inst.UnlockHat(ResourceManager.GetHat(Constants.Hat.Wizard.Resource));
                     break;
             }
-            // Convert TFWR achievement into AP location name
-            string locationName = Unlocks.AchievementToLocation(achievement);
-            // AP Location name to ID
-            long locationId = Plugin.Instance.Session.Locations.GetLocationIdFromName(Plugin.GameName, locationName);
-            // Send the location to the server
-            Plugin.Instance.Session.Locations.CompleteLocationChecks(locationId);
+            Plugin.Instance.LocationHelper.SubmitLocation(achievement);
         }
     }
 

@@ -92,7 +92,7 @@ public class Plugin : BaseUnityPlugin
         {
             Log.LogInfo("Successfully logged in.");
             Enabled = true;
-            Session.Locations.CheckedLocationsUpdated += OnCheckedLocationsUpdated;
+            Session.Locations.CheckedLocationsUpdated += LocationHelper.OnLocationsReceived;
             return true;
         }
         Log.LogError(
@@ -101,19 +101,7 @@ public class Plugin : BaseUnityPlugin
             $"Password? {!string.IsNullOrWhiteSpace(ConnectionSettings.Password)}}}");
         return false;
     }
-
-    private void OnCheckedLocationsUpdated(ReadOnlyCollection<long> newCheckedLocations)
-    {
-        foreach (long newCheckedLocation in newCheckedLocations)
-        {
-            string locationName = Session.Locations.GetLocationNameFromId(newCheckedLocation, GameName);
-            
-            // Give the player the location... somehow...
-            // Maybe I'll log it for now to see what's here
-            Log.LogInfo($"Found location- ID: {newCheckedLocation} Name: {locationName}");
-        }
-    }
-
+    
     private async Task<RoomInfoPacket> ConnectAsync()
     {
         RoomInfoPacket roomInfoPacket;
