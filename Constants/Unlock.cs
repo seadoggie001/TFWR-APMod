@@ -17,7 +17,7 @@ public static class Unlock
     public const string Grass = "grass";
     public const string Hats = "hats";
     public const string Import = "import";
-    public const string Leaderboard = "leaderboard";
+    // public const string Leaderboard = "leaderboard";
     public const string Lists = "lists";
     public const string Loops = "loops";
     public const string Mazes = "mazes";
