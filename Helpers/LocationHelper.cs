@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using com.seadoggie.TFWRArchipelago.Constants;
 using com.seadoggie.TFWRArchipelago.Patches;
 
 namespace com.seadoggie.TFWRArchipelago.Helpers;
@@ -7,59 +8,64 @@ public class LocationHelper
 {
     private int _locationsReceived;
     private const string APItems = "aplocations";
-    private readonly List<string> _locationQueue = [];
+    private readonly List<long> _locationQueue = [];
 
     public void Update()
     {
-        if(_locationQueue.Count == 0 || Plugin.Instance.Session == null) return;
+        if (_locationQueue.Count == 0 || Plugin.Instance.Session == null) return;
         TryGivePlayerLocation(_locationQueue[0]);
     }
 
-    public void OnLocationsReceived(ReadOnlyCollection<long> locations)
+    public void OnLocationsReceived(ReadOnlyCollection<long> locations) => _locationQueue.AddRange(locations);
+
+    public void TryGivePlayerLocation(long item)
     {
-        foreach (long location in locations)
-        {
-            string locationName = Plugin.Instance.Session.Locations.GetLocationNameFromId(location, Plugin.GameName);
-            
-            _locationQueue.Add(locationName);
-        }
-    }
-    
-    public void TryGivePlayerLocation(string itemName)
-    {
-        if (GivePlayerLocation(itemName)) _locationQueue.Remove(itemName);
+        if (GivePlayerLocation(item)) _locationQueue.Remove(item);
     }
 
     public void SubmitLocation(string achievement)
     {
         try
         {
-            // Convert TFWR achievement into AP location name
-            string locationName = Unlocks.AchievementToLocation(achievement);
-            if (locationName == null)
+            if (APLocation.APLocations == null)
             {
-                Plugin.Log.LogError($"Achievement isn't tracked(!): {achievement}");
+                Plugin.LogError("APLocations is null, not submitting location");
                 return;
             }
-            // AP Location name to ID
-            long locationId = Plugin.Instance.Session.Locations.GetLocationIdFromName(Plugin.GameName, locationName);
-            Plugin.Log.LogInfo(
-                $"Submitting: Achievement: {achievement} Location: {locationName} LocationId: {locationId}");
+
+            // Find the first location with that achievement mentioned
+            APLocation apLocation = APLocation.APLocations.FirstOrDefault(m => m.achievement == achievement);
+            if (apLocation is null)
+            {
+                Plugin.LogError($"Failed to find AP Location: {achievement}");
+                return;
+            }
+
             // Send the location to the server
-            Plugin.Instance.Session.Locations.CompleteLocationChecks(locationId);
+            Plugin.Instance.Session.Locations.CompleteLocationChecks(apLocation.id);
         }
         catch (Exception e)
         {
             Plugin.LogError("Submit location", e);
         }
     }
-    
-    private bool GivePlayerLocation(string locationName)
+
+    private bool GivePlayerLocation(long location)
     {
         try
         {
+            APLocation apLocation = APLocation.APLocations.FirstOrDefault(m => m.id == location);
+            if (apLocation is null)
+            {
+                Plugin.LogError($"Failed to find AP Location with ID: {location}");
+                return false;
+            }
+
+            // Find the farm
             Farm farm = MainSimPatch.GetMainSim()?.farm;
             if (farm is null) return false;
+
+            // Check if we've received too many locations already
             int apLocationCount = farm.NumUnlocked(APItems);
             Plugin.Log.LogInfo($"Unlocked AP Locations: {apLocationCount}");
             if (_locationsReceived < apLocationCount)
@@ -67,15 +73,28 @@ public class LocationHelper
                 _locationsReceived++;
                 return true;
             }
-            string unlockName = Unlocks.LocationToAchievement(locationName);
-            if (string.IsNullOrWhiteSpace(unlockName))
+
+            if (apLocation.statistic != null)
             {
-                Plugin.Log.LogWarning($"Failed to find location: {locationName}");
-                return true; // Don't keep it in the queue
+                // ToDo: find the statistic and mark it as triggered
             }
-            
-            // ToDo: Figure out how to give achievements
-            
+            else if (apLocation.timed != null)
+            {
+                // ToDo: find the timed statistic and mark it as triggered
+            }
+            else if (apLocation.achievement != null)
+            {
+                // ToDo: validate this works
+                int count = farm.NumUnlocked(apLocation.achievement);
+                farm.Unlock(apLocation.achievement, count + 1);
+            }
+            else
+            {
+                Plugin.LogError($"Invalid APLocation. Not an achievement, statistic, or timed statistic."
+                                + $" Name: {apLocation.name} ID: {apLocation.id}");
+                return false;
+            }
+
             return true;
         }
         catch (Exception e)
@@ -85,6 +104,7 @@ public class LocationHelper
             {
                 Plugin.Log.LogError(e.InnerException.Message);
             }
+
             Plugin.Log.LogInfo(e.StackTrace);
             return false;
         }

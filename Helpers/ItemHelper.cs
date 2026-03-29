@@ -1,6 +1,7 @@
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
 using com.seadoggie.TFWRArchipelago.Patches;
+using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Helpers;
 
@@ -27,7 +28,18 @@ public class ItemHelper
     
     public void TryGivePlayerItem(string itemName)
     {
-        if (GivePlayerItem(itemName)) _itemQueue.Remove(itemName);
+        if (ProcessItem(itemName)) _itemQueue.Remove(itemName);
+    }
+
+    private bool ProcessItem(string itemName)
+    {
+        switch (itemName)
+        {
+            case "RickRoll":
+                Application.OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+                return true;
+        }
+        return GivePlayerItem(itemName);
     }
     
     private bool GivePlayerItem(string itemName)
@@ -37,12 +49,12 @@ public class ItemHelper
             Farm farm = MainSimPatch.GetMainSim()?.farm;
             if (farm is null) return false;
             int apItemCount = farm.NumUnlocked(APItems);
-            Plugin.Log.LogInfo($"Unlocked AP Items: {apItemCount}");
             if (_itemsReceived < apItemCount)
             {
                 _itemsReceived++;
                 return true;
             }
+            Plugin.Log.LogInfo($"Unlocked AP Items: {apItemCount}");
             string unlockName = Unlocks.ItemToUnlock(itemName);
             if (string.IsNullOrWhiteSpace(unlockName))
             {
@@ -55,6 +67,12 @@ public class ItemHelper
             
             // Hopefully we do not allow for "too many" items... but I think the game handles that internally
             farm.Unlock(unlockName, count + 1);
+            UnlockSO unlock = farm.GetUnlockOf(unlockName);
+            foreach (string unlockItemName in unlock.unlocks)
+            {
+                Plugin.Log.LogDebug("  - and unlocks " + unlockItemName);
+            }
+            farm.UnlockAllIn(unlock);
             farm.Unlock(APItems, ++_itemsReceived);
             return true;
         }
