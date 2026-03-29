@@ -19,18 +19,23 @@ public class ResourceManagerPatch
     public static void LoadAll(ref ItemSO[] ___items)
     {
         // Install the Archipelago item
-        ItemSO item = new()
-        {
-            itemId = StringIdsPatch.ArchipelagoItem,
-            itemName = StringIdsPatch.ArchipelagoItemName,
-            // The rest of this is all nonsense?
-            description = "Archipelago Stuff",
-            docs = "I got some docs!?",
-            enabled = true,
-            name = "Some other Archipelago name?",
-            trackStats = true,
-        };
+        ItemSO item = ScriptableObject.CreateInstance<ItemSO>();
+        item.itemId = StringIdsPatch.ArchipelagoItem;
+        item.itemName = StringIdsPatch.ArchipelagoItemName;
+        // The rest of this is all nonsense?
+        item.description = "Archipelago Stuff";
+        item.docs = "I got some docs!?";
+        item.enabled = true;
+        item.name = "Some other Archipelago name?";
+        item.trackStats = true;
+        // Now tell the game about it
         ___items = ___items.AddItem(item).ToArray();
+        
+        // Track stats for all items
+        foreach (ItemSO itemSo in ___items)
+        {
+            itemSo.trackStats = true;
+        }
     }
     
     /// <summary>
@@ -82,7 +87,7 @@ public class ResourceManagerPatch
     [HarmonyPatch(nameof(ResourceManager.GetUnlock))]
     public static void GetUnlock(string name, ref UnlockSO __result)
     {
-        if (Plugin.Instance.Enabled)
+        if (Plugin.Instance.Enabled && __result is not null && __result)
         {
             // Everything costs an Archipelago item
             __result.unlockCost = new ItemBlock(StringIdsPatch.ArchipelagoItem, 1);
