@@ -4,7 +4,9 @@ using Archipelago.MultiClient.Net.Packets;
 using BepInEx;
 using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Configuration;
+using com.seadoggie.TFWRArchipelago.Constants;
 using com.seadoggie.TFWRArchipelago.Helpers;
+using com.seadoggie.TFWRArchipelago.Patches;
 using HarmonyLib;
 using JetBrains.Annotations;
 
@@ -20,6 +22,7 @@ public class Plugin : BaseUnityPlugin
     public const bool HarmonySkipFunction = false;
 
     public bool Loaded { get; private set; }= true;
+    public ModSaveGame SaveGame { get; set; }
     
     public readonly APConnectionConfig ConnectionSettings = new();
     public readonly LocationHelper LocationHelper = new();
@@ -47,11 +50,15 @@ public class Plugin : BaseUnityPlugin
         {
             LogError("Failed to load properly! Harmony patch issues.", e);
             Loaded = false;
+            return;
         }
         
         ConnectionSettings.SetupConfig(Config);
+        APLocation.Load();
+        UserStats.InitializeStatistics();
         
         Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running v{MyPluginInfo.PLUGIN_VERSION}");
+        
     }
 
     private void Update()
@@ -165,5 +172,33 @@ public class Plugin : BaseUnityPlugin
         if (ex is { InnerException: not null }) exceptionMessage += $"\n\t[InnerException] Message: {ex.InnerException.Message}\n{ex.InnerException.StackTrace}";
         Log.LogError(exceptionMessage);
     }
-    
+
+    public void WriteUnlocks()
+    {
+        string file = SaverPatch.GetFilePath(SaverPatch.SaveName()).Replace(SaverPatch.FileName, "unlocks.txt");
+        File.WriteAllText(file, string.Join("\n", ResourceManager.GetAllUnlocks().Select(m =>
+        {
+            string text = $"[Unlock] {m.unlockName}";
+            text += $"\n\tParent: {m.parentUnlock}";
+            text += $"\n\tDescription: {m.description}";
+            foreach (string unlock in m.unlocks)
+            {
+                text += $"\n\t\t- {unlock}";
+            }
+            return text;
+        })));
+    }
+
+    public void WriteItems()
+    {
+        string file = SaverPatch.GetFilePath(SaverPatch.SaveName()).Replace(SaverPatch.FileName, "items.txt");
+        File.WriteAllText(file, string.Join("\n", ResourceManager.GetAllItems().Select(m =>
+        {
+            string text = $"[Item] {m.itemName}";
+            text += $"\n\tTrackStats: {m.trackStats}";
+            text += $"\n\tDescription: {m.description}";
+            text += $"\n\tenabled: {m.enabled}";
+            return text;
+        })));
+    }
 }

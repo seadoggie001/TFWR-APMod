@@ -1,0 +1,464 @@
+locations:
+  - id: 10000
+    name: Hello World!
+    description: Run your first code
+    region: Start
+    achievement: RUN_YOUR_FIRST_CODE
+  - id: 10001
+    name: Infinite Loop
+    description: Create an infinite loop
+    region: Loops
+    achievement: INFINITE_LOOP
+  - id: 10002
+    name: It Grew
+    description: Expand the farm
+    region: Start
+    achievement: EXPAND
+    requirements:
+      - Expand
+  - id: 10003
+    name: Error
+    description: Cause a runtime error
+    region: Start
+    achievement: CAUSE_A_RUNTIME_ERROR
+  - id: 10004
+    name: Acrobat
+    description: Do a flip!
+    achievement: DO_A_FLIP
+    region: Start
+  - id: 10005
+    name: Bushes
+    description: Plant a bush
+    region: Loops
+    achievement: PLANT_BUSH
+    requirements:
+      - Trees
+  - id: 10006
+    name: Hay Farmer
+    description: Farm 1K Hay
+    region: Start
+    statistic:
+      key: hay
+      value: 1000
+    requirements:
+      - Drone Speed
+      - Grass
+  - id: 10007
+    name: Carrots
+    description: (Plant a carrot?)
+    region: Loops
+    achievement: PLANT_CARROTS
+    requirements:
+      - Carrot
+      - Plant
+  - id: 10008
+    name: Wood Farmer
+    description: Farm 1K Wood
+    region: Loops
+    statistic:
+      key: wood
+      value: 1000
+    requirements:
+      - Trees
+  - id: 10009
+    name: Pumpkins
+    description: (Plant a pumpkin?)
+    region: Pumpkins
+    achievement: PLANT_PUMPKIN
+  - id: 10010
+    name: Pumpkin Farmer
+    region: Pumpkins
+    statistic:
+      key: pumpkin
+      value: 1000
+  - id: 10011
+    name: Feels Good
+    description: Pet the piggy
+    region: Start
+    achievement: PET_THE_PIGGY
+  - id: 10012
+    name: Higher-Order Programming
+    description: Pass a function to a function
+    region: Start
+    achievement: HIGHER_ORDER_PROGRAMMING
+    requirements:
+      - Functions
+  - id: 10013
+    name: Sunflowers
+    description: Plant a sunflower
+    region: Sunflower
+    achievement: PLANT_SUNFLOWER
+  - id: 10014
+    name: Mud Farm
+    description: Make the entire farm have a water level > 0.5 (I think... gotta double check)
+    region: Loops
+    achievement: MUD_FARMER
+    requirements:
+      - Watering
+  - id: 10015
+    name: Power Farmer
+    description: Farm 1K Power
+    region: Sunflower
+    achievement: POWER_FARMER
+  - id: 10016
+    name: Cacti
+    description: Plant a cactus
+    region: Cactus
+    achievement: PLANT_CACTUS
+  - id: 10017
+    name: Cactus Farmer
+    description: Farm 1K Cacti
+    region: Cactus
+    statistic:
+      key: cactus
+      value: 1000
+  - id: 10018
+    name: Gold Farmer
+    description: Farm 1K Gold
+    region: Maze
+    statistic:
+      key: gold
+      value: 1000
+  - id: 10019
+    name: Treasure Hunter
+    description: Solve a maze that fills the whole farm
+    region: Maze
+    achievement: TREASURE_HUNTER
+  - id: 10020
+    name: Megafarm
+    description: Use multiple drones
+    region: Drones
+    achievement: USE_MULTIPLE_DRONES
+  - id: 10021
+    name: Fashionable
+    description: Wear a hat
+    region: Start
+    achievement: EQUIP_A_NEW_HAT
+    requirements:
+      - AnyHatItems
+  - id: 10022
+    name: Ancient Lizard Hat
+    description: Equip the dinosaur hat
+    region: Dinos
+    achievement: EQUIP_DINO_HAT
+  - id: 10023
+    name: Healer
+    description: Heal an infected plant
+    region: Maze
+    achievement: HEALER
+  - id: 10024
+    name: Big Farm
+    description: Reach the maximum farm size
+    region: EndGame
+    achievement: BIG_FARM
+  - id: 10025
+    name: Bone Farmer
+    description: Farm 1K Bones
+    region: Dinos
+    statistic:
+      key: bone
+      value: 1000
+  - id: 10026
+    name: Chaos
+    description: Open 20 windows at once. You monster.
+    region: Start
+    achievement: CHAOS
+  - id: 10027
+    name: Wrong Order
+    description: Sort a full field of cactus the wrong way round
+    region: Cactus
+    achievement: WRONG_ORDER
+  - id: 10028
+    name: Master Acrobat
+    description: Flip 1K times
+    region: Loops
+    statistic:
+      key: flips
+      value: 1000
+    requirements:
+      - Megafarm
+      - Functions
+  - id: 10029
+    name: Long Dinosaur
+    description: Have a dinosaur that fills the entire farm
+    region: Dinos
+    achievement: LONG_DINOSAUR
+  - id: 10030
+    name: Big Power Farmer
+    description: Farm 100K Power
+    region: EndGame
+    statistic:
+      key: power
+      value: 100000
+    requirements:
+      - Sunflowers
+  - id: 10031
+    name: Swarm
+    description: Have 32 drones at once
+    region: Drones
+    achievement: SWARM
+  - id: 10032
+    name: Stack Overflow
+    description: Stack overflow. Not the website.
+    region: EndGame
+    achievement: STACK_OVERFLOW
+  - id: 10033
+    name: Circular Import
+    description: Import a file from another file that imports from...
+    region: Maze
+    achievement: CIRCULAR_IMPORT
+    requirements:
+      - Import
+  - id: 10034
+    name: Giant Pumpkin
+    description: Harvest a 32x32 pumpkin
+    region: EndGame
+    achievement: GIANT_PUMPKIN
+    requirements:
+      - Really Big Farm
+  - id: 10035
+    name: Big Wood Farmer
+    description: Farm 1B wood
+    region: EndGame
+    statistic:
+      key: wood
+      value: 1000000000
+    requirements:
+      - Trees
+  - id: 10036
+    name: Size Matters
+    description: Get a dinosaur to length 1K
+    region: Dinos
+    achievement: SIZE_MATTERS
+  - id: 10037
+    name: Big Cactus Farmer
+    description: Farm 1M cacti
+    region: EndGame
+    statistic:
+      key: cactus
+      value: 1M
+    requirements:
+      - Cactus
+  - id: 10038
+    name: Big Pumpkin Farmer
+    description: Farm 100M pumpkins
+    region: EndGame
+    statistic:
+      key: pumpkin
+      value: 100M
+    requirements:
+      - Pumpkins
+  - id: 10039
+    name: Big Hay Farmer
+    description: Farm 1B hay
+    region: EndGame
+    statistic:
+      key: hay
+      value: 1B
+    requirements:
+      - Grass
+  - id: 10040
+    name: Sunflower Master
+    description: Farm 12K power in 1 minute
+    region: EndGame
+    timed:
+      key: power
+      value: 12K
+      time: 1m
+    requirements:
+      - Sunflowers
+  - id: 10041
+    name: Orange you glad you're done with carrots?
+    description: Farm 1B carrots
+    region: EndGame
+    statistic:
+      key: carrot
+      value: 1B
+    requirements:
+      - Carrot
+  - id: 10042
+    name: Cactus Master
+    description: Farm 20M cacti in 1 minute
+    region: EndGame
+    timed:
+      key: cacti
+      value: 20M
+      time: 1m
+    requirements:
+      - Cactus
+  - id: 10043
+    name: Big Bone Farmer
+    region: EndGame
+    requirements:
+      - Dinosaurs
+  - id: 10044
+    name: Dino Master
+    description: Farm 100M bones
+    region: EndGame
+    statistic:
+      key: bone
+      value: 100M
+    requirements:
+      - Dinosaurs
+  - id: 10045
+    name: Recycling
+    description: Reuse the same maze 300 times
+    region: Maze
+    achievement: RECYCLING
+  - id: 10046
+    name: Big Gold Farmer
+    description: Farm 100M gold
+    region: EndGame
+    statistic:
+      key: gold
+      value: 100M
+  - id: 10047
+    name: Fashion Show
+    description: Equip 5 different hats on 5 drones
+    region: Drones
+    achievement: FASHION_SHOW
+  - id: 10048
+    name: What now
+    description: Unlock the entire game
+    region: EndGame
+    achievement: UNLOCK_EVERYTHING
+  - id: 10049
+    name: Hay Master
+    description: Farm 1M hay
+    region: EndGame
+    statistic:
+      key: hay
+      value: 1M
+    requirements:
+      - Grass
+  - id: 10050
+    name: Maze Master
+    description: Farm 2M gold in 1 minute
+    region: EndGame
+    timed:
+      key: gold
+      value: 2M
+      time: 1m
+    requirements:
+      - Mazes
+  - id: 10051
+    name: Pumpkin Master
+    description: Farm 20M pumpkins in 1 minute
+    region: EndGame
+    timed:
+      key: pumpkin
+      value: 20M
+      time: 1m
+    requirements:
+      - Pumpkins
+  - id: 10052
+    name: Wood Master
+    description: Farm 1B wood in 1 minute
+    region: EndGame
+    timed:
+      key: wood
+      value: 1B
+      time: 1m
+    requirements:
+      - Trees
+  - id: 10053
+    name: Trees
+    description: Plant a tree
+    region: Loops
+    achievement: PLANT_TREE
+    requirements:
+      - Trees
+  - id: 10054
+    name: Carrot Farmer
+    description: Farm 1K carrots
+    region: Loops
+    statistic:
+      key: carrot
+      value: 1K
+    requirements:
+      - Carrot
+      - Plant
+      - Expand
+  - id: 10055
+    name: Maze
+    description: Spawn a maze
+    region: Maze
+    achievement: SPAWN_MAZE
+  - id: 10056
+    name: HAY_FEVER
+    description: Farm 100 hay
+    region: Loops
+    statistic:
+      key: hay
+      value: 100
+  - id: 10057
+    name: Bring us a shrubbery
+    description: Farm 100 wood
+    region: Loops
+    statistic:
+      key: wood
+      value: 100
+    requirements:
+      - Plant
+  - id: 10058
+    name: Flipping Awesome
+    description: Flip 100 times
+    region: Loops
+    statistic:
+      key: flips
+      value: 100
+  - id: 10059
+    name: Must be a bunny
+    description: Farm 100 carrots
+    region: Loops
+    statistic:
+      key: carrot
+      value: 100
+    requirements:
+      - Carrot
+      - Plant
+  - id: 10060
+    name: A_LITTLE_POKEY
+    description: Farm 100 cacti
+    region: Cactus
+    statistic:
+      key: cactus
+      value: 100
+    requirements:
+      - Plant
+  - id: 10061
+    name: KINDA_PRICKLY
+    description: Farm 100K cacti
+    region: Cactus
+    statistic:
+      key: cactus
+      value: 100K
+    requirements:
+      - Plant
+  - id: 10062
+    name: JACK_COLLECTOR
+    description: Farm 100 pumpkins
+    region: Pumpkins
+    statistic:
+      key: pumpkin
+      value: 100
+    requirements:
+      - Plant
+  - id: 10063
+    name: Flower Power
+    description: Farm 100 power
+    region: Sunflower
+    statistic:
+      key: power
+      value: 100
+    requirements:
+      - Plant
+  - id: 10064
+    name: Over 9000!
+    description: Farm 9001 power
+    region: Drones
+    statistic:
+      key: power
+      value: 9001
+    requirements:
+      - Sunflowers

@@ -30,6 +30,7 @@
         <PackageReference Include="BepInEx.Core" Version="5.*" />
         <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
         <PackageReference Include="UnityEngine.Modules" Version="2021.3.5" IncludeAssets="compile" />
+        <PackageReference Include="YamlDotNet" Version="13.7.1" />
         <Reference Include="$(ManagedPath)/Core.dll" Publicize="true" />
         <Reference Include="$(ManagedPath)/Utils.dll" Publicize="true" />
         <Reference Include="UnityEngine.UI">
@@ -51,6 +52,13 @@
       <EmbeddedResource Include="Resources\archipelago.manifest">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="data.yaml" />
+      <Content Include="data.yaml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">

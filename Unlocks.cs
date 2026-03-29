@@ -3,52 +3,20 @@ using com.seadoggie.TFWRArchipelago.Constants;
 namespace com.seadoggie.TFWRArchipelago;
 
 /// <summary>
-/// This class converts from AP/Human-readable item/location names to internal item/location names
+/// This class converts from AP/Human-readable item names to internal item names
 /// </summary>
 public static class Unlocks
-{
-    private static readonly Dictionary<string, string> AchievementLocation = new()
-    {
-        {Achievement.RunYourFirstCode , APLocation.RunYourFirstCode},
-        {Achievement.InfiniteLoop , APLocation.InfiniteLoop},
-        {Achievement.Flip , APLocation.Flip},
-        {Achievement.PlantBush , APLocation.PlantBush},
-        {Achievement.Hay1K , APLocation.Hay1K},
-        {Achievement.PlantCarrot , APLocation.PlantCarrot},
-        {Achievement.Wood1K , APLocation.Wood1K},
-        {Achievement.PlantTree , APLocation.PlantTree},
-        {Achievement.PlantPumpkin , APLocation.PlantPumpkin},
-        {Achievement.Pumpkin1K , APLocation.Pumpkin1K},
-        {Achievement.PetThePiggy , APLocation.PetThePiggy},
-        {Achievement.HigherOrderProgramming , APLocation.HigherOrderProgramming},
-        {Achievement.PlantSunflower , APLocation.PlantSunflower},
-        {Achievement.MudFarmer , APLocation.MudFarmer},
-        {Achievement.Power1K , APLocation.Power1K},
-        {Achievement.PlantCactus , APLocation.PlantCactus},
-        {Achievement.Cacti1K , APLocation.Cacti1K},
-        {Achievement.LongDino , APLocation.LongDino},            
-        {Achievement.StackOverflow , APLocation.StackOverflow},
-        // {Achievement.SpawnMaze , APLocation.SpawnMaze},
-        {Achievement.WrongOrder , APLocation.WrongOrder},
-        {Achievement.CircularImport , APLocation.CircularImport},
-        {Achievement.CauseARuntimeError , APLocation.CauseARuntimeError},
-        {Achievement.SizeMatters , APLocation.SizeMatters},
-        {Achievement.Healer , APLocation.Healer},
-        {Achievement.Chaos , APLocation.Chaos},
-        {Achievement.EquipHat , APLocation.EquipHat},
-        {Achievement.DinoHat , APLocation.DinoHat},
-        {Achievement.FashionShow , APLocation.FashionShow},
-    };
+{   
     public static string ItemToUnlock(string name)
     {
         return name switch
         {
-            APItem.AutoUnlock => Unlock.AutoUnlock,
+            APItem.Unlock => Unlock.AutoUnlock,
             APItem.Cactus => Unlock.Cactus,
-            APItem.Carrots => Unlock.Carrots,
+            APItem.Carrot => Unlock.Carrots,
             APItem.Costs => Unlock.Costs,
             APItem.Debug => Unlock.Debug,
-            APItem.Debug2 => Unlock.Debug2,
+            APItem.MoreDebug => Unlock.Debug2,
             APItem.Dictionaries => Unlock.Dictionaries,
             APItem.Dinosaurs => Unlock.Dinosaurs,
             APItem.Expand => Unlock.Expand,
@@ -57,9 +25,8 @@ public static class Unlocks
             APItem.Grass => Unlock.Grass,
             APItem.Hats => Unlock.Hats,
             APItem.Import => Unlock.Import,
-            APItem.Leaderboard => Unlock.Leaderboard,
             APItem.Lists => Unlock.Lists,
-            APItem.Loops => Unlock.Loops,
+            APItem.Loop => Unlock.Loops,
             APItem.Mazes => Unlock.Mazes,
             APItem.Megafarm => Unlock.Megafarm,
             APItem.Operators => Unlock.Operators,
@@ -68,7 +35,7 @@ public static class Unlocks
             APItem.Pumpkins => Unlock.Pumpkins,
             APItem.Senses => Unlock.Senses,
             APItem.Simulation => Unlock.Simulation,
-            APItem.Speed => Unlock.Speed,
+            APItem.DroneSpeed => Unlock.Speed,
             APItem.Sunflowers => Unlock.Sunflowers,
             APItem.Timing => Unlock.Timing,
             APItem.Trees => Unlock.Trees,
@@ -77,19 +44,9 @@ public static class Unlocks
             APItem.Utilities => Unlock.Utilities,
             APItem.Variables => Unlock.Variables,
             APItem.Watering => Unlock.Watering,
+            // Leaderboard is intentionally disabled because mods.
+            // APItem.Leaderboard => Unlock.Leaderboard,
             _ => null
         };
-    }
-    
-    public static string AchievementToLocation(string name)
-    {
-        if (AchievementLocation.TryGetValue(name, out string location)) return location;
-        Plugin.Log.LogError($"Failed to locate a location for {name}");
-        return string.Empty;
-    }
-
-    public static string LocationToAchievement(string name)
-    {
-        return AchievementLocation.FirstOrDefault(m => m.Value == name).Key ?? "";
     }
 }
