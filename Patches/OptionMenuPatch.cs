@@ -30,8 +30,9 @@ public class OptionMenuPatch
             case ResourceManagerPatch.ArchipelagoOptionToggle:
                 try
                 {
-                    Plugin.Log.LogInfo("Opening Archipelago connection settings");
-                    new GameObject().AddComponent<ArchipelagoSettings>();
+                    Plugin.Log.LogInfo("Opening Archipelago statistics gui");
+                    StatisticsGUI statisticsGUI = new GameObject().AddComponent<StatisticsGUI>();
+                    statisticsGUI.enabled = true;
                 }
                 catch (Exception e)
                 {

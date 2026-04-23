@@ -1,29 +1,54 @@
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace com.seadoggie.TFWRArchipelago;
 
 public static class Resources
 {
     private const string BundleName = "com.seadoggie.TFWRArchipelago.Resources.archipelago";
-    
-    private static AssetBundle _bundle;
-    private static Sprite _archipelago;
 
     public static Sprite Archipelago
     {
         get
         {
-            _archipelago ??= LoadAsset<Sprite>("archipelago");
-            return _archipelago;
+            field ??= LoadAsset<Sprite>("archipelago");
+            return field;
         }
     }
 
     public static AssetBundle Bundle
     {
         get {
-            _bundle ??= LoadBundle(BundleName);
-            return _bundle;
+            field ??= LoadBundle(BundleName);
+            return field;
+        }
+    }
+
+    public static PanelSettings PanelSettings
+    {
+        get
+        {
+            field ??= LoadAsset<PanelSettings>("DefaultPanelSettings");
+            return field;
+        }
+    }
+    
+    public static ThemeStyleSheet ThemeStyleSheet
+    {
+        get
+        {
+            field ??= LoadAsset<ThemeStyleSheet>("DefaultThemeStyleSheet");
+            return field;
+        }
+    }
+    
+    public static StyleSheet AchievementStyleSheet
+    {
+        get
+        {
+            field ??= LoadAsset<StyleSheet>("Achievement");
+            return field;
         }
     }
 
