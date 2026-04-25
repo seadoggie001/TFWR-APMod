@@ -142,6 +142,11 @@ public static class UserStats
             }
         }
     }
+    
+    public static Dictionary<string, List<Milestone>> MilestoneCopy()
+    {
+        return new Dictionary<string, List<Milestone>>(Milestones.ToDictionary(m => m.Key, m => m.Value));
+    }
 }
 
 public record Milestone

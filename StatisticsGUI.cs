@@ -11,6 +11,8 @@ public class StatisticsGUI : MonoBehaviour
 
     void Awake()
     {
+        Plugin.Log.LogWarning("Initializing Statistics GUI");
+        
         // 1. Create the GameObject
         GameObject root = new("TFWRAPStatisticsGUI");
         DontDestroyOnLoad(root);
@@ -41,7 +43,7 @@ public class StatisticsGUI : MonoBehaviour
     private VisualElement CreateLayout()
     {
         VisualElement root = _uiDocument.rootVisualElement;
-
+        root.style.top = 50;
         // Main Container
         VisualElement container = new();
         container.AddToClassList("achievement-container");
@@ -60,39 +62,65 @@ public class StatisticsGUI : MonoBehaviour
         // Add Achievements
         // container.Add(new Label("--- ACHIEVEMENTS ---")
         //     { style = { unityTextAlign = TextAnchor.MiddleCenter, marginBottom = 10 } });
+        bool first = true;
         foreach (KeyValuePair<string, List<Milestone>> statistic in UserStats.MilestoneCopy())
         {
             foreach (Milestone milestone in statistic.Value)
             {
                 string title = $"{milestone.Achievement}";
                 string description = $"Collect {milestone.Target:N0} {statistic.Key}";
-                container.Add(CreateAchievementRow(title, description, milestone.Triggered));
+                Plugin.Log.LogInfo(title);
+                container.Add(CreateAchievementRow(title, description, milestone.Triggered, first));
+                first = false;
             }
         }
 
-        root.Add(container);
+        ScrollView scrollView = new()
+        {
+            style =
+            {
+                maxWidth = 300,
+                maxHeight = new StyleLength(Length.Percent(100))
+            }
+        };
+        scrollView.AddToClassList("scroll");
+        scrollView.Add(container);
+        root.Add(scrollView);
         return root;
     }
     
-    private VisualElement CreateAchievementRow(string title, string description, bool isComplete)
+    private VisualElement CreateAchievementRow(string title, string description, bool isComplete, bool first)
     {
         GroupBox row = new();
-        row.AddToClassList("achievement");
+        row.AddToClassList("statistic");
         row.AddToClassList("border");
+        if(first) row.AddToClassList("border-first");
 
-        // Uneditable Checkbox
+        // Title row
+        VisualElement titleRow = new();
+        titleRow.AddToClassList("row");
         Toggle toggle = new()
         {
             value = isComplete,
-            label = title,
         };
         toggle.SetEnabled(false);
-
-        // Description label
+        toggle.AddToClassList("toggle");
+        Label titleLabel = new("Location Title");
+        titleLabel.AddToClassList("title");
+        
+        titleRow.Add(toggle);
+        titleRow.Add(titleLabel);
+        
+        // Description row
+        VisualElement descriptionRow = new();
+        descriptionRow.AddToClassList("row");
         Label descLabel = new(description);
-        descLabel.AddToClassList("achievement-desc");
-
-        // optional progress bar
+        descLabel.AddToClassList("statistic-desc");
+        descriptionRow.Add(descLabel);
+        
+        // Progress row
+        VisualElement progressRow = new();
+        progressRow.AddToClassList("row");
         ProgressBar progressBar = new()
         {
             value = 22,
@@ -100,10 +128,12 @@ public class StatisticsGUI : MonoBehaviour
             lowValue = 0,
             highValue = 100,
         };
-
-        row.Add(progressBar);
-        row.Add(descLabel);
-        row.Add(toggle);
+        progressBar.AddToClassList("progress-bar");
+        progressRow.Add(progressBar);
+        
+        row.Add(titleRow);
+        row.Add(descriptionRow);
+        row.Add(progressRow);
         return row;
     }
 

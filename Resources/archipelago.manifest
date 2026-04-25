@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
-UnityVersion: 6000.3.4f1
-CRC: 1069039738
+UnityVersion: 6000.0.43f1
+CRC: 147255955
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 3bb202dae8c2614eb1fde2d78ea404d8
+    Hash: be424ccec6b7e2022ea74a58d635dca3
   TypeTreeHash:
     serializedVersion: 2
-    Hash: ac71264ce139981ff91b0cacb72d57f9
+    Hash: 7078da8278dc582e62a1cbf3fd999cad
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 92e35ef1b90bae7459df8d449aa009ca
+    Hash: b7ccb9f2209557257ea3012521b7d2dd
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -19,41 +19,19 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 48
   Script: {instanceID: 0}
-- Class: 49
-  Script: {instanceID: 0}
-- Class: 114
-  Script: {fileID: 19001, guid: 0000000000000000e000000000000000, type: 0}
-- Class: 114
-  Script: {fileID: 19101, guid: 0000000000000000e000000000000000, type: 0}
-- Class: 114
-  Script: {fileID: 19103, guid: 0000000000000000e000000000000000, type: 0}
 - Class: 114
   Script: {fileID: 11998, guid: 0000000000000000e000000000000000, type: 0}
 - Class: 114
   Script: {fileID: 19202, guid: 0000000000000000e000000000000000, type: 0}
+- Class: 114
+  Script: {fileID: 19101, guid: 0000000000000000e000000000000000, type: 0}
+- Class: 114
+  Script: {fileID: 19103, guid: 0000000000000000e000000000000000, type: 0}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 128
   Script: {instanceID: 0}
-- Class: 213
-  Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers:
-- AssemblyName: UnityEngine.TextCoreFontEngineModule
-  ClassName: UnityEngine.TextCore.FaceInfo
-- AssemblyName: UnityEngine.TextCoreFontEngineModule
-  ClassName: UnityEngine.TextCore.Glyph
-- AssemblyName: UnityEngine.TextCoreFontEngineModule
-  ClassName: UnityEngine.TextCore.GlyphMetrics
-- AssemblyName: UnityEngine.TextCoreFontEngineModule
-  ClassName: UnityEngine.TextCore.GlyphRect
-- AssemblyName: UnityEngine.TextCoreTextEngineModule
-  ClassName: UnityEngine.TextCore.Text.Character
-- AssemblyName: UnityEngine.TextCoreTextEngineModule
-  ClassName: UnityEngine.TextCore.Text.FontAssetCreationEditorSettings
-- AssemblyName: UnityEngine.TextCoreTextEngineModule
-  ClassName: UnityEngine.TextCore.Text.FontFeatureTable
-- AssemblyName: UnityEngine.TextCoreTextEngineModule
-  ClassName: UnityEngine.TextCore.Text.FontWeightPair
 - AssemblyName: UnityEngine.TextCoreTextEngineModule
   ClassName: UnityEngine.TextCore.Text.UnicodeLineBreakingRules
 - AssemblyName: UnityEngine.UIElementsModule
@@ -77,8 +55,8 @@ SerializeReferenceClassIdentifiers:
 - AssemblyName: UnityEngine.UIElementsModule
   ClassName: UnityEngine.UIElements.StyleValueHandle
 Assets:
-- Assets/Scenes/Achievement.uss
-- Assets/Scenes/DefaultThemeStyleSheet.tss
-- Assets/Scenes/DefaultPanelSettings.asset
+- Assets/Scenes/Statistics.uss
 - Assets/Scenes/archipelago.png
+- Assets/Scenes/DefaultPanelSettings.asset
+- Assets/Scenes/DefaultThemeStyleSheet.tss
 Dependencies: []

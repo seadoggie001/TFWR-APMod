@@ -47,7 +47,7 @@ public static class Resources
     {
         get
         {
-            field ??= LoadAsset<StyleSheet>("Achievement");
+            field ??= LoadAsset<StyleSheet>("Statistics");
             return field;
         }
     }

@@ -10,7 +10,7 @@ public class ResourceManagerPatch
 {
     public const string ArchipelagoOptionToggle = "Archipelago";
     public const string ArchipelagoOptionToggleValue = "Click to Open";
-    public static string[] CustomOptions = [];
+    public static readonly string[] CustomOptions = [ArchipelagoOptionToggle];
     
     private static CycleOptionSO _openArchipelagoOption;
 
