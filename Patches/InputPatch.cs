@@ -16,7 +16,7 @@ public class InputPatch
     [HarmonyPrefix]
     public static bool GetMouseButtonDown(ref bool __result) {
         // If the connection screen is not visible or the mouse is outside the window, process normally
-        if (!(ArchipelagoSettings.Instance?.DisplayingWindow ?? false) || !ArchipelagoSettings.Instance.IsMouseOverWindow()) return !Plugin.HarmonySkipFunction;
+        if (!(ArchipelagoSettingsGUI.Instance?.DisplayingWindow ?? false) || !ArchipelagoSettingsGUI.Instance.IsMouseOverWindow()) return !Plugin.HarmonySkipFunction;
         // the mouse click was handled. Skip the rest of the function.
         __result = false;
         return Plugin.HarmonySkipFunction;
