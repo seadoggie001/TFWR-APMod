@@ -94,13 +94,13 @@ public class Plugin : BaseUnityPlugin
             Log.LogError($"Failed to connect to room. Connection Details: {{URL: {ConnectionSettings.Url}:{ConnectionSettings.Port}}}");
             return false;
         }
+        Session.Locations.CheckedLocationsUpdated += LocationHelper.OnLocationsReceived;
 
         LoginResult loginResult = await LoginAsync();
         if (loginResult.Successful)
         {
             Log.LogInfo("Successfully logged in.");
             Enabled = true;
-            Session.Locations.CheckedLocationsUpdated += LocationHelper.OnLocationsReceived;
             return true;
         }
         Log.LogError(
@@ -173,6 +173,9 @@ public class Plugin : BaseUnityPlugin
         Log.LogError(exceptionMessage);
     }
 
+    /// <summary>
+    /// Output some helpful information for debugging about unlocks
+    /// </summary>
     public void WriteUnlocks()
     {
         string file = SaverPatch.GetFilePath(SaverPatch.SaveName()).Replace(SaverPatch.FileName, "unlocks.txt");
@@ -189,6 +192,9 @@ public class Plugin : BaseUnityPlugin
         })));
     }
 
+    /// <summary>
+    /// Output some helpful information for debugging about items
+    /// </summary>
     public void WriteItems()
     {
         string file = SaverPatch.GetFilePath(SaverPatch.SaveName()).Replace(SaverPatch.FileName, "items.txt");
