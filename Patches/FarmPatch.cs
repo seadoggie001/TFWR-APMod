@@ -36,7 +36,7 @@ public class FarmPatch
         foreach (string unlock in distinctUnlocks)
         {
             Plugin.Log.LogInfo("Requested unlock: " + unlock);
-            // startUnlocks.Add(unlock);
+            startUnlocks.Add(unlock);
         }
         startUnlocksField.SetValue(null, startUnlocks);
     }

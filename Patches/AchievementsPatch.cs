@@ -56,8 +56,6 @@ public class AchievementsPatch
     /// </summary>
     /// <param name="itemId"></param>
     /// <param name="number"></param>
-    /// <param name="_"></param>
-    /// <param name="__"></param>
     /// <param name="___total_stats"></param>
     [HarmonyPatch(nameof(Achievements.CollectItem), typeof(int), typeof(double), typeof(Duration), typeof(Duration))]
     [HarmonyPrefix]
@@ -66,6 +64,7 @@ public class AchievementsPatch
         ItemBlock ___total_stats)
     {
         ___total_stats.AddItem(itemId, number);
+        if(!Plugin.Instance.Enabled) return;
         UserStats.Add(StringIds.GetItemName(itemId), number);
     }
 }
