@@ -10,8 +10,8 @@ public class ResourceManagerPatch
 {
     public const string ArchipelagoOptionToggle = "Archipelago";
     public const string ArchipelagoOptionToggleValue = "Click to Open";
-    public static readonly string[] CustomOptions = [ArchipelagoOptionToggle];
-    
+    public static string[] CustomOptions = [];
+
     private static CycleOptionSO _openArchipelagoOption;
 
     [HarmonyPostfix]
@@ -30,14 +30,14 @@ public class ResourceManagerPatch
         item.trackStats = true;
         // Now tell the game about it
         ___items = ___items.AddItem(item).ToArray();
-        
+
         // Track stats for all items
         foreach (ItemSO itemSo in ___items)
         {
             itemSo.trackStats = true;
         }
     }
-    
+
     /// <summary>
     /// Load custom options
     /// </summary>
@@ -47,10 +47,14 @@ public class ResourceManagerPatch
     // ReSharper disable once InconsistentNaming
     public static void GetAllOptions(ref IEnumerable<OptionSO> __result)
     {
-        if(!Plugin.Instance.Loaded) return;
+        if (!Plugin.Instance.Loaded) return;
         List<OptionSO> options = __result.ToList();
-        _openArchipelagoOption ??= AddOption(ArchipelagoOptionToggle, "Open Archipelago settings", "general", 0f, [ArchipelagoOptionToggleValue, "Closed"], ArchipelagoOptionToggleValue);
+        _openArchipelagoOption ??= AddOption(ArchipelagoOptionToggle, "Open Archipelago settings", "general", 0f,
+            [ArchipelagoOptionToggleValue, "Closed"], ArchipelagoOptionToggleValue);
         options.Add(_openArchipelagoOption);
+        options.Add(AddOption("DEBUG", "Cause debugging is hard", "general", 0f, ["Send location", "done"],
+            "Send location"));
+        CustomOptions = [ArchipelagoOptionToggle, "DEBUG"];
         __result = options;
     }
 
@@ -78,8 +82,8 @@ public class ResourceManagerPatch
         // ReSharper disable once Unity.UnknownResource -- This will load from TFWR's resources
         OptionSO[] existingOptions = UnityEngine.Resources.LoadAll<OptionSO>("Options/");
         OptionSO cycleOption = existingOptions.FirstOrDefault(m => m is CycleOptionSO);
-        if(cycleOption != null && cycleOption.optionUI != null) option.optionUI = cycleOption.optionUI;
-        if(OptionHolder.GetOption(name) == null) OptionHolder.SetOption(name, defaultValue);
+        if (cycleOption != null && cycleOption.optionUI != null) option.optionUI = cycleOption.optionUI;
+        if (OptionHolder.GetOption(name) == null) OptionHolder.SetOption(name, defaultValue);
         return option;
     }
 
@@ -95,6 +99,4 @@ public class ResourceManagerPatch
             // __result.description = "Text describing a hint for this item";
         }
     }
-    
-    
 }
