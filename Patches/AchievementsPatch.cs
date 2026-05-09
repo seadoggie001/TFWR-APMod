@@ -15,6 +15,7 @@ public class AchievementsPatch
     public static void UnlockAchievement(string achievement)
     {
         if (!Plugin.Instance.Enabled) return;
+        // This is a mod, don't allow for Steam Achievements
         Achievements.enabled = false;
         // ToDo: Lock object might only be needed when dealing with Steam Achievements... need to check on this. 
         lock (LockObject)
@@ -32,7 +33,7 @@ public class AchievementsPatch
                     MainSim.Inst.UnlockHat(ResourceManager.GetHat(Constants.Hat.Wizard.Resource));
                     break;
             }
-            Plugin.Instance.LocationHelper.SubmitLocation(achievement);
+            Plugin.Instance.LocationHelper.SubmitAchievement(achievement);
         }
     }
 

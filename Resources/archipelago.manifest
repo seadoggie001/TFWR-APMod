@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.0.43f1
-CRC: 147255955
+CRC: 2180524557
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: be424ccec6b7e2022ea74a58d635dca3
+    Hash: 9dc86a4338b36945b02cc1956f7f835d
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 7078da8278dc582e62a1cbf3fd999cad
+    Hash: 1febedb9e868784cb7248c044ae38be9
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: b7ccb9f2209557257ea3012521b7d2dd
+    Hash: 3bfb94e0a433ab6207c9ca022e9e8377
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -30,6 +30,8 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 - Class: 128
+  Script: {instanceID: 0}
+- Class: 213
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers:
 - AssemblyName: UnityEngine.TextCoreTextEngineModule

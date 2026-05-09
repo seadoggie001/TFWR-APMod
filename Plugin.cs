@@ -54,8 +54,8 @@ public class Plugin : BaseUnityPlugin
         }
         
         ConnectionSettings.SetupConfig(Config);
-        APLocation.Load();
-        UserStats.InitializeStatistics();
+        APLocation.Initialize();
+        UserStats.Initialize();
         
         Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running v{MyPluginInfo.PLUGIN_VERSION}");
         
@@ -70,7 +70,7 @@ public class Plugin : BaseUnityPlugin
         }
         catch (Exception e)
         {
-            LogError("Failed to update item list!", e);
+            LogError("[Plugin.cs] Failed to update item list!", e);
         }
     }
 

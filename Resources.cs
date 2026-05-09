@@ -71,6 +71,7 @@ public static class Resources
     
     private static T LoadAsset<T>(string assetName) where T : UnityEngine.Object
     {
+        if(Bundle == null) Plugin.Log.LogError($"No bundle named '{BundleName}'.");
         T asset = Bundle?.LoadAsset<T>(assetName);
         if (asset == null) Plugin.Log.LogError($"Failed to load {typeof(T)}: Asset {assetName} was not found");
         return asset;

@@ -23,7 +23,7 @@ public class LocationHelper
         if (GivePlayerLocation(item)) _locationQueue.Remove(item);
     }
 
-    public void SubmitLocation(string achievement)
+    public void SubmitAchievement(string achievement)
     {
         try
         {
@@ -37,7 +37,36 @@ public class LocationHelper
             APLocation apLocation = APLocation.APLocations.FirstOrDefault(m => m.achievement == achievement);
             if (apLocation is null)
             {
-                Plugin.LogError($"Failed to find AP Location: {achievement}");
+                Plugin.LogError($"Failed to find AP Location with achievement of {achievement}");
+                return;
+            }
+
+            // Send the location to the server
+            Plugin.Instance.Session.Locations.CompleteLocationChecks(apLocation.id);
+            
+            StatisticsGUI.Instance.MarkCompleted(apLocation.name);
+        }
+        catch (Exception e)
+        {
+            Plugin.LogError("Submit location", e);
+        }
+    }
+
+    public void SubmitLocation(string location)
+    {
+        try
+        {
+            if (APLocation.APLocations == null)
+            {
+                Plugin.LogError("APLocations is null, not submitting location");
+                return;
+            }
+
+            // Find the first location with that achievement mentioned
+            APLocation apLocation = APLocation.APLocations.FirstOrDefault(m => m.name == location);
+            if (apLocation is null)
+            {
+                Plugin.LogError($"Failed to find AP Location: {location}");
                 return;
             }
 
@@ -49,7 +78,7 @@ public class LocationHelper
             Plugin.LogError("Submit location", e);
         }
     }
-
+    
     private bool GivePlayerLocation(long location)
     {
         try
@@ -63,30 +92,36 @@ public class LocationHelper
 
             // Find the farm
             Farm farm = MainSimPatch.GetMainSim()?.farm;
-            if (farm is null) return false;
-
-            // Check if we've received too many locations already
-            int apLocationCount = farm.NumUnlocked(APItems);
-            Plugin.Log.LogInfo($"Unlocked AP Locations: {apLocationCount}");
-            if (_locationsReceived < apLocationCount)
+            if (farm is null)
             {
-                _locationsReceived++;
-                return true;
+                Plugin.LogError($"Failed to find Farm. Location ID: {location}");
+                return false;
             }
 
+            // Check if we've received too many locations already
+            // int apLocationCount = farm.NumUnlocked(APItems);
+            // Plugin.Log.LogInfo($"Unlocked AP Locations: {apLocationCount}");
+            // if (_locationsReceived < apLocationCount)
+            // {
+            //     _locationsReceived++;
+            //     return true;
+            // }
+            
             if (apLocation.statistic != null)
             {
-                // ToDo: find the statistic and mark it as triggered
+                // find the statistic and mark it as triggered
+                StatisticsGUI.Instance.MarkCompleted(apLocation.statistic.key, APLocation.Parse(apLocation.statistic.value));
             }
             else if (apLocation.timed != null)
             {
-                // ToDo: find the timed statistic and mark it as triggered
+                // find the timed statistic and mark it as triggered
+                StatisticsGUI.Instance.MarkCompleted(apLocation.timed.key, APLocation.Parse(apLocation.timed.value));
             }
             else if (apLocation.achievement != null)
             {
-                // ToDo: validate this works
                 int count = farm.NumUnlocked(apLocation.achievement);
                 farm.Unlock(apLocation.achievement, count + 1);
+                StatisticsGUI.Instance.MarkCompleted(apLocation.name);
             }
             else
             {
