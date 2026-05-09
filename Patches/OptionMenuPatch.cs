@@ -25,7 +25,7 @@ public class OptionMenuPatch
         switch (optionName)
         {
             case "DEBUG":
-                Plugin.Instance.LocationHelper.SubmitLocation("PET_THE_PIGGY");
+                Plugin.Instance.LocationHelper.SubmitAchievement("PET_THE_PIGGY");
                 break;
             case ResourceManagerPatch.ArchipelagoOptionToggle:
                 try
@@ -33,6 +33,8 @@ public class OptionMenuPatch
                     Plugin.Log.LogInfo("Opening Archipelago statistics gui");
                     StatisticsGUI statisticsGUI = new GameObject().AddComponent<StatisticsGUI>();
                     statisticsGUI.enabled = true;
+                    ArchipelagoSettingsGUI apSettings = new GameObject().AddComponent<ArchipelagoSettingsGUI>();
+                    apSettings.enabled = true;
                 }
                 catch (Exception e)
                 {
