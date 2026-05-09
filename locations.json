@@ -1,0 +1,1343 @@
+[
+  {
+    "id": 10000,
+    "name": "Hello World!",
+    "description": "Run your first code",
+    "region": "Start",
+    "achievement": "RUN_YOUR_FIRST_CODE"
+  },
+  {
+    "id": 10001,
+    "name": "Ouroboros",
+    "description": "Create an infinite loop",
+    "region": "Start",
+    "requirements": [
+      {
+        "name": "Loop",
+        "count": 1
+      }
+    ],
+    "achievement": "INFINITE_LOOP"
+  },
+  {
+    "id": 10002,
+    "name": "It's ALIVE!",
+    "description": "Expand the farm",
+    "region": "Start",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 1
+      }
+    ],
+    "achievement": "EXPAND"
+  },
+  {
+    "id": 10003,
+    "name": "Error 404 - Achievement not found",
+    "description": "Cause a runtime error",
+    "region": "Start",
+    "achievement": "CAUSE_A_RUNTIME_ERROR"
+  },
+  {
+    "id": 10004,
+    "name": "Not quite bacon...",
+    "description": "Pet the piggy",
+    "region": "Start",
+    "achievement": "PET_THE_PIGGY"
+  },
+  {
+    "id": 10005,
+    "name": "func(func(func(func(func))))",
+    "description": "Pass a function to a function",
+    "region": "Start",
+    "requirements": [
+      {
+        "name": "Functions",
+        "count": 1
+      }
+    ],
+    "achievement": "HIGHER_ORDER_PROGRAMMING"
+  },
+  {
+    "id": 10006,
+    "name": "What are you doing in my swamp!?",
+    "description": "Make the entire farm have a water level > 0.5",
+    "region": "Start",
+    "requirements": [
+      {
+        "name": "Watering",
+        "count": 1
+      }
+    ],
+    "achievement": "MUD_FARM"
+  },
+  {
+    "id": 10007,
+    "name": "Treasure Hunter",
+    "description": "Solve a maze that fills the whole farm",
+    "region": "Maze",
+    "achievement": "TREASURE_HUNTER"
+  },
+  {
+    "id": 10008,
+    "name": "Parallel Processing",
+    "description": "Use multiple drones",
+    "region": "Drones",
+    "achievement": "USE_MULTIPLE_DRONES"
+  },
+  {
+    "id": 10009,
+    "name": "Fashionable",
+    "description": "Wear a hat",
+    "region": "Start",
+    "requirements": [
+      {
+        "name": "AnyHatItems",
+        "count": 1
+      }
+    ],
+    "achievement": "EQUIP_A_NEW_HAT"
+  },
+  {
+    "id": 10010,
+    "name": "Ancient Lizard Hat",
+    "description": "Equip the dinosaur hat",
+    "region": "Dinos",
+    "achievement": "EQUIP_DINO_HAT"
+  },
+  {
+    "id": 10011,
+    "name": "Healer",
+    "description": "Heal an infected plant",
+    "region": "Start",
+    "achievement": "HEALER"
+  },
+  {
+    "id": 10012,
+    "name": "Big Farm",
+    "description": "Reach the maximum farm size",
+    "region": "EndGame",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 9
+      }
+    ],
+    "achievement": "BIG_FARM"
+  },
+  {
+    "id": 10013,
+    "name": "Chaos",
+    "description": "Open 20 windows at once. You monster.",
+    "region": "Start",
+    "achievement": "CHAOS"
+  },
+  {
+    "id": 10014,
+    "name": "sutcaC",
+    "description": "Sort a full field of cactus the wrong way round",
+    "region": "Cactus",
+    "achievement": "WRONG_ORDER"
+  },
+  {
+    "id": 10015,
+    "name": "Patagotitan",
+    "description": "Have a dinosaur that fills the entire farm",
+    "region": "Dinos",
+    "achievement": "LONG_DINOSAUR"
+  },
+  {
+    "id": 10016,
+    "name": "Swarm",
+    "description": "Have 32 drones at once",
+    "region": "Drones",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 5
+      }
+    ],
+    "achievement": "SWARM"
+  },
+  {
+    "id": 10017,
+    "name": "Stack Overflow",
+    "description": "Stack overflow. Not the website.",
+    "region": "Start",
+    "requirements": [
+      {
+        "name": "Functions",
+        "count": 1
+      }
+    ],
+    "achievement": "STACK_OVERFLOW"
+  },
+  {
+    "id": 10018,
+    "name": "Circular Import",
+    "description": "Import a file from another file that imports from...",
+    "region": "Start",
+    "requirements": [
+      {
+        "name": "Import",
+        "count": 1
+      }
+    ],
+    "achievement": "CIRCULAR_IMPORT"
+  },
+  {
+    "id": 10019,
+    "name": "Prize Pumpkin",
+    "description": "Harvest a 32x32 pumpkin",
+    "region": "Pumpkins",
+    "requirements": [
+      {
+        "name": "Really Big Farm",
+        "count": 1
+      }
+    ],
+    "achievement": "GIANT_PUMPKIN"
+  },
+  {
+    "id": 10020,
+    "name": "Size Matters",
+    "description": "Get a dinosaur to length 1K",
+    "region": "Dinos",
+    "achievement": "SIZE_MATTERS"
+  },
+  {
+    "id": 10021,
+    "name": "Recycling",
+    "description": "Reuse the same maze 300 times",
+    "region": "Maze",
+    "requirements": [
+      {
+        "name": "Fertilizer",
+        "count": 3
+      }
+    ],
+    "achievement": "RECYCLING"
+  },
+  {
+    "id": 10022,
+    "name": "Fashion Show",
+    "description": "Equip 5 different hats on 5 drones",
+    "region": "Drones",
+    "requirements": [
+      {
+        "name": "Hats",
+        "count": 1
+      },
+      {
+        "name": "Megafarm",
+        "count": 3
+      }
+    ],
+    "achievement": "FASHION_SHOW"
+  },
+  {
+    "id": 10023,
+    "name": "What now",
+    "description": "Unlock the entire game",
+    "region": "EndGame",
+    "achievement": "UNLOCK_EVERYTHING"
+  },
+  {
+    "id": 10024,
+    "name": "Maze",
+    "description": "Spawn a maze",
+    "region": "Maze",
+    "achievement": "SPAWN_MAZE"
+  },
+  {
+    "id": 11000,
+    "name": "Acrobat",
+    "description": "Do a flip!",
+    "region": "Flip",
+    "achievement": "DO_A_FLIP",
+    "statistic": {
+      "key": "flips",
+      "value": "1"
+    }
+  },
+  {
+    "id": 11001,
+    "name": "Flipping Awesome",
+    "description": "Flip 100 times",
+    "region": "Flip",
+    "statistic": {
+      "key": "flips",
+      "value": "100"
+    }
+  },
+  {
+    "id": 11002,
+    "name": "Master Acrobat",
+    "description": "Flip 1K times",
+    "region": "Flip",
+    "requirements": [
+      {
+        "name": "Functions",
+        "count": 1
+      },
+      {
+        "name": "Megafarm",
+        "count": 1
+      },
+      {
+        "name": "Loop",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "flips",
+      "value": "1K"
+    }
+  },
+  {
+    "id": 11003,
+    "name": "All the flips",
+    "description": "Flip 10K times",
+    "region": "Flip",
+    "requirements": [
+      {
+        "name": "Functions",
+        "count": 1
+      },
+      {
+        "name": "Megafarm",
+        "count": 3
+      },
+      {
+        "name": "Loop",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "flips",
+      "value": "10K"
+    }
+  },
+  {
+    "id": 11004,
+    "name": "Just keep flipping, just keep flipping",
+    "description": "Flip 100K times",
+    "region": "Flip",
+    "requirements": [
+      {
+        "name": "Functions",
+        "count": 1
+      },
+      {
+        "name": "Megafarm",
+        "count": 5
+      },
+      {
+        "name": "Loop",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "flips",
+      "value": "100K"
+    }
+  },
+  {
+    "id": 12001,
+    "name": "Bring Me a shrubbery!",
+    "description": "Plant a bush",
+    "region": "Crop",
+    "achievement": "PLANT_BUSH"
+  },
+  {
+    "id": 12002,
+    "name": "Carrots",
+    "description": "Plant a carrot",
+    "region": "Crop",
+    "requirements": [
+      {
+        "name": "Carrot",
+        "count": 1
+      }
+    ],
+    "achievement": "PLANT_CARROTS"
+  },
+  {
+    "id": 12003,
+    "name": "Pumpkins",
+    "description": "Plant a pumpkin",
+    "region": "Crop",
+    "requirements": [
+      {
+        "name": "Pumpkins",
+        "count": 1
+      },
+      {
+        "name": "Carrot",
+        "count": 1
+      }
+    ],
+    "achievement": "PLANT_PUMPKIN"
+  },
+  {
+    "id": 12004,
+    "name": "Sunflowers",
+    "description": "Plant a sunflower",
+    "region": "Crop",
+    "requirements": [
+      {
+        "name": "Sunflowers",
+        "count": 1
+      }
+    ],
+    "achievement": "PLANT_SUNFLOWER"
+  },
+  {
+    "id": 12005,
+    "name": "Cacti",
+    "description": "Plant a cactus",
+    "region": "Crop",
+    "requirements": [
+      {
+        "name": "Cactus",
+        "count": 1
+      },
+      {
+        "name": "Pumpkins",
+        "count": 1
+      },
+      {
+        "name": "Carrot",
+        "count": 1
+      }
+    ],
+    "achievement": "PLANT_CACTUS"
+  },
+  {
+    "id": 12006,
+    "name": "Trees",
+    "description": "Plant a tree",
+    "region": "Crop",
+    "requirements": [
+      {
+        "name": "Trees",
+        "count": 1
+      }
+    ],
+    "achievement": "PLANT_TREE"
+  },
+  {
+    "id": 13000,
+    "name": "Hay Fever",
+    "description": "Farm 100 hay",
+    "region": "Hay",
+    "statistic": {
+      "key": "hay",
+      "value": "100"
+    }
+  },
+  {
+    "id": 13001,
+    "name": "Hey, Farmer!",
+    "description": "Farm 1K Hay",
+    "region": "Hay",
+    "requirements": [
+      {
+        "name": "Grass",
+        "count": 2
+      }
+    ],
+    "statistic": {
+      "key": "hay",
+      "value": "1K"
+    }
+  },
+  {
+    "id": 13002,
+    "name": "Cause I have farmed 10K Hay",
+    "description": "Farm 10K hay",
+    "region": "Hay",
+    "requirements": [
+      {
+        "name": "Grass",
+        "count": 3
+      },
+      {
+        "name": "Megafarm",
+        "count": 1
+      },
+      {
+        "name": "Functions",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "hay",
+      "value": "10K"
+    }
+  },
+  {
+    "id": 13003,
+    "name": "Hay Master",
+    "description": "Farm 100K hay",
+    "region": "Hay",
+    "requirements": [
+      {
+        "name": "Grass",
+        "count": 4
+      },
+      {
+        "name": "Megafarm",
+        "count": 2
+      },
+      {
+        "name": "Functions",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "hay",
+      "value": "100K"
+    }
+  },
+  {
+    "id": 13004,
+    "name": "Hay Master",
+    "description": "Farm 1M hay",
+    "region": "Hay",
+    "requirements": [
+      {
+        "name": "Grass",
+        "count": 6
+      },
+      {
+        "name": "Megafarm",
+        "count": 3
+      },
+      {
+        "name": "Functions",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "hay",
+      "value": "1M"
+    }
+  },
+  {
+    "id": 13005,
+    "name": "10M Hay",
+    "description": "Farm 10M hay",
+    "region": "Hay",
+    "requirements": [
+      {
+        "name": "Grass",
+        "count": 7
+      },
+      {
+        "name": "Megafarm",
+        "count": 3
+      },
+      {
+        "name": "Functions",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "hay",
+      "value": "10M"
+    }
+  },
+  {
+    "id": 13006,
+    "name": "Hay Master",
+    "description": "Farm 100M hay",
+    "region": "Hay",
+    "requirements": [
+      {
+        "name": "Grass",
+        "count": 8
+      },
+      {
+        "name": "Megafarm",
+        "count": 4
+      },
+      {
+        "name": "Functions",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "hay",
+      "value": "100M"
+    }
+  },
+  {
+    "id": 13007,
+    "name": "Big Hay Farmer",
+    "description": "Farm 1B hay",
+    "region": "Hay",
+    "requirements": [
+      {
+        "name": "Grass",
+        "count": 10
+      },
+      {
+        "name": "Megafarm",
+        "count": 5
+      },
+      {
+        "name": "Functions",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "hay",
+      "value": "1B"
+    }
+  },
+  {
+    "id": 15000,
+    "name": "Must be a bunny",
+    "description": "Farm 100 carrots",
+    "region": "Carrot",
+    "statistic": {
+      "key": "carrot",
+      "value": "100"
+    }
+  },
+  {
+    "id": 15001,
+    "name": "Carrot Farmer",
+    "description": "Farm 1K carrots",
+    "region": "Carrot",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "carrot",
+      "value": "1K"
+    }
+  },
+  {
+    "id": 15002,
+    "name": "10K carrots",
+    "description": "Farm 10K carrots",
+    "region": "Carrot",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 2
+      },
+      {
+        "name": "Carrot",
+        "count": 2
+      }
+    ],
+    "statistic": {
+      "key": "carrot",
+      "value": "10K"
+    }
+  },
+  {
+    "id": 15003,
+    "name": "100K Carrots",
+    "description": "Farm 100K carrots",
+    "region": "Carrot",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 1
+      },
+      {
+        "name": "Expand",
+        "count": 3
+      },
+      {
+        "name": "Carrot",
+        "count": 4
+      }
+    ],
+    "statistic": {
+      "key": "carrot",
+      "value": "100K"
+    }
+  },
+  {
+    "id": 15004,
+    "name": "All the carrots",
+    "description": "Farm 1M carrots",
+    "region": "Carrot",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 2
+      },
+      {
+        "name": "Expand",
+        "count": 4
+      },
+      {
+        "name": "Carrot",
+        "count": 6
+      }
+    ],
+    "statistic": {
+      "key": "carrots",
+      "value": "1M"
+    }
+  },
+  {
+    "id": 15005,
+    "name": "10M Carrots",
+    "description": "Farm 10M carrots",
+    "region": "Carrot",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 3
+      },
+      {
+        "name": "Expand",
+        "count": 4
+      },
+      {
+        "name": "Carrot",
+        "count": 7
+      }
+    ],
+    "statistic": {
+      "key": "carrots",
+      "value": "10M"
+    }
+  },
+  {
+    "id": 15006,
+    "name": "100M Carrots",
+    "description": "Farm 100M carrots",
+    "region": "Carrot",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 3
+      },
+      {
+        "name": "Expand",
+        "count": 5
+      },
+      {
+        "name": "Carrot",
+        "count": 8
+      }
+    ],
+    "statistic": {
+      "key": "carrots",
+      "value": "100M"
+    }
+  },
+  {
+    "id": 15007,
+    "name": "Orange you glad you're done with carrots?",
+    "description": "Farm 1B carrots",
+    "region": "Carrot",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 5
+      },
+      {
+        "name": "Expand",
+        "count": 9
+      },
+      {
+        "name": "Carrot",
+        "count": 10
+      }
+    ],
+    "statistic": {
+      "key": "carrot",
+      "value": "1B"
+    }
+  },
+  {
+    "id": 16000,
+    "name": "100 Wood",
+    "description": "Farm 100 wood",
+    "region": "Wood",
+    "statistic": {
+      "key": "wood",
+      "value": "100"
+    }
+  },
+  {
+    "id": 16001,
+    "name": "Deforestation",
+    "description": "Farm 1K Wood",
+    "region": "Wood",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "wood",
+      "value": "1K"
+    }
+  },
+  {
+    "id": 16002,
+    "name": "10K Wood",
+    "description": "Farm 10K Wood",
+    "region": "Wood",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 1
+      },
+      {
+        "name": "Expand",
+        "count": 2
+      },
+      {
+        "name": "Trees",
+        "count": 2
+      }
+    ],
+    "statistic": {
+      "key": "wood",
+      "value": "10K"
+    }
+  },
+  {
+    "id": 16003,
+    "name": "100K Wood",
+    "description": "Farm 100K Wood",
+    "region": "Wood",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 2
+      },
+      {
+        "name": "Expand",
+        "count": 3
+      },
+      {
+        "name": "Trees",
+        "count": 3
+      }
+    ],
+    "statistic": {
+      "key": "wood",
+      "value": "100K"
+    }
+  },
+  {
+    "id": 16004,
+    "name": "1M Wood",
+    "description": "Farm 1M Wood",
+    "region": "Wood",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 3
+      },
+      {
+        "name": "Expand",
+        "count": 5
+      },
+      {
+        "name": "Trees",
+        "count": 5
+      }
+    ],
+    "statistic": {
+      "key": "wood",
+      "value": "1M"
+    }
+  },
+  {
+    "id": 16005,
+    "name": "100M Wood",
+    "description": "Farm 100M Wood",
+    "region": "Wood",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 4
+      },
+      {
+        "name": "Expand",
+        "count": 7
+      },
+      {
+        "name": "Trees",
+        "count": 8
+      }
+    ],
+    "statistic": {
+      "key": "wood",
+      "value": "100M"
+    }
+  },
+  {
+    "id": 16006,
+    "name": "Big Wood Farmer",
+    "description": "Farm 1B wood",
+    "region": "Wood",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 5
+      },
+      {
+        "name": "Expand",
+        "count": 9
+      },
+      {
+        "name": "Trees",
+        "count": 10
+      }
+    ],
+    "statistic": {
+      "key": "wood",
+      "value": "1B"
+    }
+  },
+  {
+    "id": 17000,
+    "name": "Jack Collector",
+    "description": "Farm 100 pumpkins",
+    "region": "Pumpkins",
+    "statistic": {
+      "key": "pumpkin",
+      "value": "100"
+    }
+  },
+  {
+    "id": 17001,
+    "name": "Pumpkin Farmer",
+    "description": "Farm 1K Pumpkins",
+    "region": "Pumpkins",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 3
+      },
+      {
+        "name": "Pumpkins",
+        "count": 2
+      }
+    ],
+    "statistic": {
+      "key": "pumpkin",
+      "value": "1K"
+    }
+  },
+  {
+    "id": 17002,
+    "name": "Big Pumpkin Farmer",
+    "description": "Farm 100M pumpkins",
+    "region": "Pumpkins",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 4
+      },
+      {
+        "name": "Pumpkins",
+        "count": 6
+      }
+    ],
+    "statistic": {
+      "key": "pumpkin",
+      "value": "100M"
+    }
+  },
+  {
+    "id": 18000,
+    "name": "Flower Power",
+    "description": "Farm 100 power",
+    "region": "Sunflower",
+    "statistic": {
+      "key": "power",
+      "value": "100"
+    }
+  },
+  {
+    "id": 18001,
+    "name": "Power Farmer",
+    "description": "Farm 1K Power",
+    "region": "Sunflower",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 3
+      }
+    ],
+    "achievement": "POWER_FARMER",
+    "statistic": {
+      "key": "power",
+      "value": "1K"
+    }
+  },
+  {
+    "id": 18002,
+    "name": "Over 9000!",
+    "description": "Farm 9001 power",
+    "region": "Sunflower",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 3
+      }
+    ],
+    "statistic": {
+      "key": "power",
+      "value": "9001"
+    }
+  },
+  {
+    "id": 18003,
+    "name": "Unlimited Power Farmer",
+    "description": "Farm 100K Power",
+    "region": "Sunflower",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 3
+      }
+    ],
+    "statistic": {
+      "key": "power",
+      "value": "100K"
+    }
+  },
+  {
+    "id": 19000,
+    "name": "A Little Pokey",
+    "description": "Farm 100 cacti",
+    "region": "Cactus",
+    "requirements": [
+      {
+        "name": "Plant",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "cactus",
+      "value": "100"
+    }
+  },
+  {
+    "id": 19001,
+    "name": "Can't touch this (ow!)",
+    "description": "Farm 1K Cacti",
+    "region": "Cactus",
+    "statistic": {
+      "key": "cactus",
+      "value": "1K"
+    }
+  },
+  {
+    "id": 19002,
+    "name": "Kinda Prickly",
+    "description": "Farm 100K cacti",
+    "region": "Cactus",
+    "requirements": [
+      {
+        "name": "Plant",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "cactus",
+      "value": "100K"
+    }
+  },
+  {
+    "id": 19003,
+    "name": "Big Cactus Farmer",
+    "description": "Farm 1M cacti",
+    "region": "EndGame",
+    "requirements": [
+      {
+        "name": "Cactus",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "cactus",
+      "value": "1M"
+    }
+  },
+  {
+    "id": 20000,
+    "name": "Gold Farmer",
+    "description": "Farm 1K Gold",
+    "region": "Maze",
+    "statistic": {
+      "key": "gold",
+      "value": "1K"
+    }
+  },
+  {
+    "id": 20001,
+    "name": "Big Gold Farmer",
+    "description": "Farm 100M gold",
+    "region": "EndGame",
+    "statistic": {
+      "key": "gold",
+      "value": "100M"
+    }
+  },
+  {
+    "id": 21000,
+    "name": "Bone Farmer",
+    "description": "Farm 1K Bones",
+    "region": "Dinos",
+    "statistic": {
+      "key": "bone",
+      "value": "1K"
+    }
+  },
+  {
+    "id": 21001,
+    "name": "10K Bones",
+    "description": "Farm 10K Bones",
+    "region": "Dinos",
+    "requirements": [
+      {
+        "name": "Dinosaurs",
+        "count": 2
+      }
+    ],
+    "statistic": {
+      "key": "bone",
+      "value": "10K"
+    }
+  },
+  {
+    "id": 21002,
+    "name": "1M Bones",
+    "description": "Farm 1M Bones",
+    "region": "Dinos",
+    "requirements": [
+      {
+        "name": "Dinosaurs",
+        "count": 3
+      }
+    ],
+    "statistic": {
+      "key": "bone",
+      "value": "1M"
+    }
+  },
+  {
+    "id": 21003,
+    "name": "Big Bone Farmer",
+    "description": "Farm",
+    "region": "Dinos",
+    "requirements": [
+      {
+        "name": "Dinosaurs",
+        "count": 5
+      }
+    ],
+    "statistic": {
+      "key": "bone",
+      "value": "100M"
+    }
+  },
+  {
+    "id": 22000,
+    "name": "A bit weird",
+    "description": "Farm 1 weird substance",
+    "region": "WeirdSubstance",
+    "statistic": {
+      "key": "weird_substance",
+      "value": "1"
+    }
+  },
+  {
+    "id": 22001,
+    "name": "That's kinda weird",
+    "description": "Farm 100 weird substance",
+    "region": "WeirdSubstance",
+    "statistic": {
+      "key": "weird_substance",
+      "value": "100"
+    }
+  },
+  {
+    "id": 22002,
+    "name": "That's really weird",
+    "description": "Farm 1K weird substance",
+    "region": "WeirdSubstance",
+    "requirements": [
+      {
+        "name": "Megafarm",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "weird_substance",
+      "value": "1K"
+    }
+  },
+  {
+    "id": 22003,
+    "name": "10K Weird Substance",
+    "description": "Farm 10K weird substance",
+    "region": "WeirdSubstance",
+    "requirements": [
+      {
+        "name": "Fertilizer",
+        "count": 2
+      },
+      {
+        "name": "Expand",
+        "count": 2
+      },
+      {
+        "name": "Megafarm",
+        "count": 2
+      }
+    ],
+    "statistic": {
+      "key": "weird_substance",
+      "value": "10K"
+    }
+  },
+  {
+    "id": 22004,
+    "name": "100K Weird Substance",
+    "description": "Farm 100K weird substance",
+    "region": "WeirdSubstance",
+    "requirements": [
+      {
+        "name": "Fertilizer",
+        "count": 3
+      },
+      {
+        "name": "Expand",
+        "count": 3
+      },
+      {
+        "name": "Megafarm",
+        "count": 3
+      }
+    ],
+    "statistic": {
+      "key": "weird_substance",
+      "value": "100K"
+    }
+  },
+  {
+    "id": 99000,
+    "name": "Sunflower Master",
+    "description": "Farm 12K power in 1 minute",
+    "region": "EndGame",
+    "requirements": [
+      {
+        "name": "Sunflowers",
+        "count": 1
+      }
+    ],
+    "timed": {
+      "key": "power",
+      "value": "12K",
+      "time": "1m"
+    }
+  },
+  {
+    "id": 99001,
+    "name": "Cactus Master",
+    "description": "Farm 20M cacti in 1 minute",
+    "region": "EndGame",
+    "requirements": [
+      {
+        "name": "Cactus",
+        "count": 1
+      }
+    ],
+    "timed": {
+      "key": "cacti",
+      "value": "20M",
+      "time": "1m"
+    }
+  },
+  {
+    "id": 99002,
+    "name": "Dino Master",
+    "description": "Farm 100M bones",
+    "region": "EndGame",
+    "requirements": [
+      {
+        "name": "Dinosaurs",
+        "count": 1
+      }
+    ],
+    "timed": {
+      "key": "bone",
+      "value": "1M",
+      "time": "1m"
+    }
+  },
+  {
+    "id": 99003,
+    "name": "Maze Master",
+    "description": "Farm 2M gold in 1 minute",
+    "region": "EndGame",
+    "requirements": [
+      {
+        "name": "Mazes",
+        "count": 1
+      }
+    ],
+    "timed": {
+      "key": "gold",
+      "value": "2M",
+      "time": "1m"
+    }
+  },
+  {
+    "id": 99004,
+    "name": "Pumpkin Master",
+    "description": "Farm 20M pumpkins in 1 minute",
+    "region": "EndGame",
+    "requirements": [
+      {
+        "name": "Pumpkins",
+        "count": 1
+      }
+    ],
+    "timed": {
+      "key": "pumpkin",
+      "value": "20M",
+      "time": "1m"
+    }
+  },
+  {
+    "id": 99005,
+    "name": "Wood Master",
+    "description": "Farm 1B wood in 1 minute",
+    "region": "EndGame",
+    "requirements": [
+      {
+        "name": "Trees",
+        "count": 1
+      }
+    ],
+    "timed": {
+      "key": "wood",
+      "value": "1B",
+      "time": "1m"
+    }
+  }
+]

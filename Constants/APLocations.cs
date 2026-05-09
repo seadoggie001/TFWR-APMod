@@ -1,5 +1,6 @@
 using System.Reflection;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace com.seadoggie.TFWRArchipelago.Constants;
 
@@ -9,9 +10,10 @@ public class APLocation
 	
 	public long id;
 	public string name;
+	public string description;
 	public string region;
 	[CanBeNull] public string achievement;
-	[CanBeNull] public string[] requirements;
+	[CanBeNull] public Requirement[] requirements;
 	[CanBeNull] public Statistic statistic;
 	[CanBeNull] public TimedStatistic timed;
 	
@@ -26,18 +28,24 @@ public class APLocation
 		public string value;
 	}
 
-	public static void Load()
+	public class Requirement
+	{
+		public string name;
+		public int count;
+	}
+	
+	/// <summary>
+	/// Loads all Locations from data.yaml
+	/// </summary>
+	public static void Initialize()
 	{
 		try
 		{
-			string yamlText =
+			string locationText =
 				File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-					"data.yaml"));
-			YamlDotNet.Serialization.IDeserializer deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
-				.IgnoreUnmatchedProperties()
-				.Build();
-			YamlData yamlData = deserializer.Deserialize<YamlData>(yamlText);
-			APLocations = yamlData.locations;
+					"locations.json"));
+			List<APLocation> locationData = JsonConvert.DeserializeObject<List<APLocation>>(locationText);
+			APLocations = locationData;
 		}
 		catch (Exception e)
 		{
@@ -66,9 +74,4 @@ public class APLocation
 		// Parse the double and multiply by the factor
 		return double.TryParse(value, out double result) ? result * Math.Pow(10, factor) : -1;
 	}
-}
-
-public class YamlData
-{
-	public IEnumerable<APLocation> locations;
 }
