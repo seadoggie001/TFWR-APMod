@@ -11,19 +11,23 @@ public class StatisticsGUI : MonoBehaviour
 {
     private UIDocument _uiDocument;
     private Dictionary<string, List<RowElements>> _statisticRows = new();
-    private Dictionary<string, Toggle> _achievementRows = new();
+    private Dictionary<string, RowElements> _achievementRows = new();
 
     private class RowElements
     {
+        public GroupBox Row;
         public ProgressBar ProgressBar;
         public Toggle Toggle;
     }
-    
+
     public static StatisticsGUI Instance;
-    
+    public VisualElement RootElement;
+
     void Awake()
     {
         Plugin.Log.LogInfo("Initializing Statistics GUI");
+        Instance?.OnDisable();
+        Instance?.enabled = false;
         Instance = this;
 
         // Create the GUI and setup styles
@@ -36,7 +40,6 @@ public class StatisticsGUI : MonoBehaviour
     void OnEnable()
     {
         UserStats.OnStatChange += OnStatUpdate;
-
     }
 
     void OnDisable()
@@ -56,22 +59,26 @@ public class StatisticsGUI : MonoBehaviour
         {
             if (!(Math.Abs(rowElements.ProgressBar.highValue - (float)value) < 1)) continue;
             rowElements.Toggle.value = true;
+            rowElements.Row.AddToClassList("complete");
             return;
         }
+
         Plugin.LogError("There are no statistics matching: " + key);
     }
 
     public void MarkCompleted(string key)
     {
-        _achievementRows.TryGetValue(key, out Toggle toggle);
-        if (toggle is null)
+        _achievementRows.TryGetValue(key, out RowElements rowElements);
+        if (rowElements is null)
         {
             Plugin.Log.LogError("There are no achievements matching: " + key);
             return;
         }
-        toggle?.value = true;
+
+        rowElements.Toggle.value = true;
+        rowElements.Row.AddToClassList("complete");
     }
-    
+
     private void Initialize()
     {
         GameObject root = new("TFWRAPStatisticsGUI");
@@ -92,33 +99,62 @@ public class StatisticsGUI : MonoBehaviour
         if (styleSheet is null) Plugin.LogError("Failed to load StyleSheet!");
 
         _uiDocument.rootVisualElement.styleSheets.Add(styleSheet);
+        RootElement = _uiDocument.rootVisualElement;
     }
-    
+
     private void CreateLayout()
     {
         VisualElement root = _uiDocument.rootVisualElement;
         root.style.top = 75;
+        root.style.maxWidth = 300;
 
         // Button row
         VisualElement buttonRow = new();
         buttonRow.AddToClassList("row");
-        Button close = new Button
+        buttonRow.AddToClassList("btn-row");
+        
+        // ToDo: Move to .USS file (.btn-row)
+        buttonRow.style.flexGrow = 0;
+        
+        Button statBtn = new()
+        {
+            text = "Statistic",
+        };
+        statBtn.AddToClassList("btn");
+        statBtn.AddToClassList("btn-toggle");
+        
+        Button achievementBtn = new()
+        {
+            text = "Achievement",
+        };
+        achievementBtn.AddToClassList("btn");
+        achievementBtn.AddToClassList("btn-toggle");
+        
+        Button completedBtn = new()
+        {
+            text = "Completed",
+            tooltip = "Toggle completed",
+        };
+        completedBtn.AddToClassList("btn");
+        completedBtn.AddToClassList("btn-toggle");
+        
+        Button close = new()
         {
             text = "X",
-            style =
-            {
-                alignSelf = Align.FlexStart,
-            }
         };
-        close.AddToClassList("close");
+        close.AddToClassList("btn");
+        close.AddToClassList("btn-close");
         close.RegisterCallback<MouseUpEvent>(evt =>
         {
             Plugin.Log.LogInfo("Closing Stats GUI");
             _uiDocument.enabled = false;
         });
+        buttonRow.Add(statBtn);
+        buttonRow.Add(achievementBtn);
+        buttonRow.Add(completedBtn);
         buttonRow.Add(close);
         root.Add(buttonRow);
-        
+
         // Enable scrolling of the container
         ScrollView scrollView = new()
         {
@@ -144,19 +180,41 @@ public class StatisticsGUI : MonoBehaviour
                 first = false;
             }
         }
+
         foreach (APLocation apLocation in APLocation.APLocations.Where(m => m.statistic is null && m.timed is null))
         {
             container.Add(CreateActionRow(apLocation));
         }
+
         scrollView.Add(container);
         root.Add(scrollView);
+        
+        statBtn.RegisterCallback<MouseUpEvent>(evt =>
+        {
+            statBtn.ToggleInClassList("toggled");
+            container.ToggleInClassList("hide-progress");
+        });
+        
+        achievementBtn.RegisterCallback<MouseUpEvent>(evt =>
+        {
+            achievementBtn.ToggleInClassList("toggled");
+            container.ToggleInClassList("hide-achievement");
+        });
+        
+        completedBtn.RegisterCallback<MouseUpEvent>(evt =>
+        {
+            completedBtn.ToggleInClassList("toggled");
+            container.ToggleInClassList("hide-complete");
+        });
     }
 
     private VisualElement CreateMilestoneRow(string key, Milestone milestone, bool first)
     {
         GroupBox row = new();
         row.AddToClassList("statistic");
+        row.AddToClassList("progress");
         row.AddToClassList("border");
+        if(milestone.Triggered) row.AddToClassList("complete");
         if (first) row.AddToClassList("border-first");
 
         // Title row
@@ -200,6 +258,7 @@ public class StatisticsGUI : MonoBehaviour
 
         RowElements rowElements = new RowElements()
         {
+            Row = row,
             ProgressBar = progressBar,
             Toggle = toggle,
         };
@@ -211,16 +270,18 @@ public class StatisticsGUI : MonoBehaviour
         {
             _statisticRows[key] = [rowElements];
         }
+
         UpdateValues(rowElements, value);
         
+
         return row;
     }
-    
+
     private VisualElement CreateActionRow(APLocation apLocation)
     {
         GroupBox row = new();
         row.AddToClassList("statistic");
-        row.AddToClassList("statistic-basic");
+        row.AddToClassList("achievement");
         row.AddToClassList("border");
 
         // Title row
@@ -245,21 +306,22 @@ public class StatisticsGUI : MonoBehaviour
         Label descLabel = new(apLocation.description);
         descLabel.AddToClassList("statistic-desc");
         descriptionRow.Add(descLabel);
-        
+
         row.Add(titleRow);
         row.Add(descriptionRow);
-        _achievementRows.Add(apLocation.name, toggle);
+        _achievementRows.Add(apLocation.name, new RowElements(){ ProgressBar = null, Row = row, Toggle = toggle });
+                
         return row;
     }
-    
+
     private void UpdateValues(RowElements rowElements, double value)
     {
         rowElements.ProgressBar.value = (float)value;
         rowElements.ProgressBar.title = $"{value:N0} / {rowElements.ProgressBar.highValue:N0}";
-        
+
         rowElements.Toggle.value = value > rowElements.ProgressBar.highValue;
     }
-    
+
     private void OnStatUpdate(string item, double value)
     {
         if (_statisticRows.ContainsKey(item))
