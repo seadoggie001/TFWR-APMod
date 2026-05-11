@@ -110,7 +110,7 @@
     "id": 10011,
     "name": "Healer",
     "description": "Heal an infected plant",
-    "region": "Start",
+    "region": "WeirdSubstance",
     "achievement": "HEALER"
   },
   {
@@ -444,6 +444,10 @@
     "region": "Hay",
     "requirements": [
       {
+        "name": "Loop",
+        "count": 1
+      },
+      {
         "name": "Grass",
         "count": 2
       }
@@ -465,6 +469,10 @@
       },
       {
         "name": "Megafarm",
+        "count": 1
+      },
+      {
+        "name": "Loop",
         "count": 1
       },
       {
@@ -492,6 +500,10 @@
         "count": 2
       },
       {
+        "name": "Loop",
+        "count": 1
+      },
+      {
         "name": "Functions",
         "count": 1
       }
@@ -503,7 +515,7 @@
   },
   {
     "id": 13004,
-    "name": "Hay Master",
+    "name": "1M Hay",
     "description": "Farm 1M hay",
     "region": "Hay",
     "requirements": [
@@ -514,6 +526,10 @@
       {
         "name": "Megafarm",
         "count": 3
+      },
+      {
+        "name": "Loop",
+        "count": 1
       },
       {
         "name": "Functions",
@@ -540,6 +556,10 @@
         "count": 3
       },
       {
+        "name": "Loop",
+        "count": 1
+      },
+      {
         "name": "Functions",
         "count": 1
       }
@@ -551,7 +571,7 @@
   },
   {
     "id": 13006,
-    "name": "Hay Master",
+    "name": "100M Hay",
     "description": "Farm 100M hay",
     "region": "Hay",
     "requirements": [
@@ -562,6 +582,10 @@
       {
         "name": "Megafarm",
         "count": 4
+      },
+      {
+        "name": "Loop",
+        "count": 1
       },
       {
         "name": "Functions",
@@ -586,6 +610,10 @@
       {
         "name": "Megafarm",
         "count": 5
+      },
+      {
+        "name": "Loop",
+        "count": 1
       },
       {
         "name": "Functions",
@@ -1141,7 +1169,7 @@
   {
     "id": 21003,
     "name": "Big Bone Farmer",
-    "description": "Farm",
+    "description": "Farm 100M Bones",
     "region": "Dinos",
     "requirements": [
       {
