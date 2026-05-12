@@ -6,7 +6,6 @@ using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Configuration;
 using com.seadoggie.TFWRArchipelago.Constants;
 using com.seadoggie.TFWRArchipelago.Helpers;
-using com.seadoggie.TFWRArchipelago.Patches;
 using HarmonyLib;
 using JetBrains.Annotations;
 using UnityEngine.SceneManagement;
@@ -32,6 +31,8 @@ public class Plugin : BaseUnityPlugin
     private readonly Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
     
     public ArchipelagoSession Session { get; set; }
+    [CanBeNull] public event EventHandler APConnected;
+    [CanBeNull] public event EventHandler APDisconnected;
 
     /// <summary>
     /// Should any of the mod's features be running?
@@ -61,7 +62,6 @@ public class Plugin : BaseUnityPlugin
         SceneManager.sceneLoaded += (_, _) => FloatingActionButton.Show();
         
         Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running v{MyPluginInfo.PLUGIN_VERSION}");
-        
     }
 
     private void Update()
@@ -80,11 +80,7 @@ public class Plugin : BaseUnityPlugin
     public async Task<bool> TryEnableAsync()
     {
         // Only attempt to connect if not connected already
-        if (Session?.Socket?.Connected ?? false)
-        {
-            Enabled = true;
-            return true;
-        }
+        if (Session?.Socket?.Connected ?? false) return true;
         
         // Create the session
         Session = ArchipelagoSessionFactory.CreateSession(ConnectionSettings.Url, ConnectionSettings.Port);
@@ -103,7 +99,8 @@ public class Plugin : BaseUnityPlugin
         if (loginResult.Successful)
         {
             Log.LogInfo("Successfully logged in.");
-            Enabled = true;
+            APConnected?.Invoke(this, EventArgs.Empty);
+            Session.Socket.SocketClosed += reason => APDisconnected?.Invoke(this, EventArgs.Empty);
             return true;
         }
         Log.LogError(

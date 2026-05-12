@@ -21,14 +21,17 @@ public static class SaverPatch
         try
         {
             string filePath = GetFilePath(SaveName());
-            if (File.Exists(filePath))
+            if (!File.Exists(filePath))
             {
-                string json = File.ReadAllText(filePath);
-                if (!string.IsNullOrWhiteSpace(json))
-                {
-                    modSaveGame = JsonUtility.FromJson<ModSaveGame>(json);
-                    UserStats.Load(modSaveGame.Statistics);
-                }
+                Plugin.Instance.Enabled = false;
+                return;
+            }
+            
+            string json = File.ReadAllText(filePath);
+            if (!string.IsNullOrWhiteSpace(json))
+            {
+                modSaveGame = JsonUtility.FromJson<ModSaveGame>(json);
+                UserStats.Load(modSaveGame.Statistics);
             }
         }
         catch (Exception e)
@@ -36,6 +39,7 @@ public static class SaverPatch
             Plugin.LogError("Failed to load data", e);
         }
         Plugin.Instance.SaveGame = modSaveGame;
+        Plugin.Instance.Enabled = true;
         StatisticsGUI.Show();
     }
 
