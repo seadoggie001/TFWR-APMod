@@ -31,10 +31,8 @@ public class OptionMenuPatch
                 try
                 {
                     Plugin.Log.LogInfo("Opening Archipelago statistics gui");
-                    StatisticsGUI statisticsGUI = new GameObject().AddComponent<StatisticsGUI>();
-                    statisticsGUI.enabled = true;
-                    ArchipelagoSettingsGUI apSettings = new GameObject().AddComponent<ArchipelagoSettingsGUI>();
-                    apSettings.enabled = true;
+                    StatisticsGUI.Show();
+                    ArchipelagoSettingsGUI.Show();
                 }
                 catch (Exception e)
                 {

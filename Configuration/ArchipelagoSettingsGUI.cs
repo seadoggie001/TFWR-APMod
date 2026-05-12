@@ -11,6 +11,13 @@ public class ArchipelagoSettingsGUI : MonoBehaviour
 {
     public static ArchipelagoSettingsGUI Instance { get; private set; }
 
+    public static void Show()
+    {
+        Instance ??= new GameObject().AddComponent<ArchipelagoSettingsGUI>();
+        Instance.enabled = true;
+        Instance.DisplayingWindow = true;
+    }
+
     // Spacing constants
     private const int ControlHeight = 25, ControlWidth = 200;
     private const int LabelWidth = 100;
@@ -102,15 +109,10 @@ public class ArchipelagoSettingsGUI : MonoBehaviour
         _windowRect = GUILayout.Window(-619, _windowRect, DrawWindow, "Archipelago Settings");
     }
 
-    public bool IsMouseOverWindow()
-    {
-        return _windowRect.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
-    }
+    private void OnDisable() => Instance = null;
 
-    [HarmonyPatch(typeof(GraphicRaycaster), nameof(UnityEngine.UI.GraphicRaycaster.Raycast))]
-    [HarmonyPrefix]
-    public static bool GraphicRaycaster() => !ArchipelagoSettingsGUI.Instance.DisplayingWindow ||
-                                             !ArchipelagoSettingsGUI.Instance.IsMouseOverWindow();
+    public bool IsMouseOverWindow() =>
+        _windowRect.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
 
     // Draws the GUI in rows, reusing two rects
     public void DrawWindow(int windowID)

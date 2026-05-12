@@ -36,6 +36,7 @@ public static class SaverPatch
             Plugin.LogError("Failed to load data", e);
         }
         Plugin.Instance.SaveGame = modSaveGame;
+        StatisticsGUI.Show();
     }
 
     /// <summary>

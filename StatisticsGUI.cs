@@ -21,9 +21,15 @@ public class StatisticsGUI : MonoBehaviour
     }
 
     public static StatisticsGUI Instance;
+    public static void Show()
+    {
+        Instance ??= new GameObject().AddComponent<StatisticsGUI>();
+        Instance.enabled = true;
+    }
+    
     public VisualElement RootElement;
 
-    void Awake()
+    private void Awake()
     {
         Plugin.Log.LogInfo("Initializing Statistics GUI");
         Instance?.OnDisable();
@@ -37,15 +43,9 @@ public class StatisticsGUI : MonoBehaviour
         CreateLayout();
     }
 
-    void OnEnable()
-    {
-        UserStats.OnStatChange += OnStatUpdate;
-    }
+    private void OnEnable() => UserStats.OnStatChange += OnStatUpdate;
 
-    void OnDisable()
-    {
-        UserStats.OnStatChange -= OnStatUpdate;
-    }
+    private void OnDisable() => UserStats.OnStatChange -= OnStatUpdate;
 
     public void MarkCompleted(string key, double value)
     {
@@ -147,6 +147,7 @@ public class StatisticsGUI : MonoBehaviour
         close.RegisterCallback<MouseUpEvent>(evt =>
         {
             Plugin.Log.LogInfo("Closing Stats GUI");
+            Instance = null;
             _uiDocument.enabled = false;
         });
         buttonRow.Add(statBtn);
@@ -256,7 +257,7 @@ public class StatisticsGUI : MonoBehaviour
         row.Add(descriptionRow);
         row.Add(progressRow);
 
-        RowElements rowElements = new RowElements()
+        RowElements rowElements = new()
         {
             Row = row,
             ProgressBar = progressBar,
