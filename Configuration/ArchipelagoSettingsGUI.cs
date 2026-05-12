@@ -83,8 +83,6 @@ public class ArchipelagoSettingsGUI : MonoBehaviour
         _archPassword = Plugin.Instance.ConnectionSettings.Password;
 
         DisplayingWindow = true;
-        Plugin.Instance.WriteUnlocks();
-        Plugin.Instance.WriteItems();
     }
 
     public void OnGUI()

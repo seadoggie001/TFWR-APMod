@@ -9,6 +9,7 @@ using com.seadoggie.TFWRArchipelago.Helpers;
 using com.seadoggie.TFWRArchipelago.Patches;
 using HarmonyLib;
 using JetBrains.Annotations;
+using UnityEngine.SceneManagement;
 
 namespace com.seadoggie.TFWRArchipelago;
 
@@ -56,6 +57,8 @@ public class Plugin : BaseUnityPlugin
         ConnectionSettings.SetupConfig(Config);
         APLocation.Initialize();
         UserStats.Initialize();
+
+        SceneManager.sceneLoaded += (_, _) => FloatingActionButton.Show();
         
         Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running v{MyPluginInfo.PLUGIN_VERSION}");
         
@@ -171,40 +174,5 @@ public class Plugin : BaseUnityPlugin
         if (ex != null) exceptionMessage = $" [Exception] Message: {ex.Message}\n{ex.StackTrace}";
         if (ex is { InnerException: not null }) exceptionMessage += $"\n\t[InnerException] Message: {ex.InnerException.Message}\n{ex.InnerException.StackTrace}";
         Log.LogError(exceptionMessage);
-    }
-
-    /// <summary>
-    /// Output some helpful information for debugging about unlocks
-    /// </summary>
-    public void WriteUnlocks()
-    {
-        string file = SaverPatch.GetFilePath(SaverPatch.SaveName()).Replace(SaverPatch.FileName, "unlocks.txt");
-        File.WriteAllText(file, string.Join("\n", ResourceManager.GetAllUnlocks().Select(m =>
-        {
-            string text = $"[Unlock] {m.unlockName}";
-            text += $"\n\tParent: {m.parentUnlock}";
-            text += $"\n\tDescription: {m.description}";
-            foreach (string unlock in m.unlocks)
-            {
-                text += $"\n\t\t- {unlock}";
-            }
-            return text;
-        })));
-    }
-
-    /// <summary>
-    /// Output some helpful information for debugging about items
-    /// </summary>
-    public void WriteItems()
-    {
-        string file = SaverPatch.GetFilePath(SaverPatch.SaveName()).Replace(SaverPatch.FileName, "items.txt");
-        File.WriteAllText(file, string.Join("\n", ResourceManager.GetAllItems().Select(m =>
-        {
-            string text = $"[Item] {m.itemName}";
-            text += $"\n\tTrackStats: {m.trackStats}";
-            text += $"\n\tDescription: {m.description}";
-            text += $"\n\tenabled: {m.enabled}";
-            return text;
-        })));
     }
 }
