@@ -48,7 +48,7 @@ public class LocationHelper
         }
         catch (Exception e)
         {
-            Plugin.LogError("Submit location", e);
+            Plugin.LogError("Submit achievement", e);
         }
     }
 

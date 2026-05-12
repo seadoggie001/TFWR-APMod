@@ -50,11 +50,12 @@ public static class UserStats
             {
                 // Add the key and milestone
                 Milestones.Add(location.statistic.key, [milestone]);
-                Plugin.Log.LogInfo(" - " + location.statistic!.key);
             }
 
             Stats[location.statistic.key] = 0;
         }
+
+        Plugin.Log.LogInfo("Tracking stats for: " + string.Join(", ", Milestones.Keys));
 
         OnStatChange += GrantAchievements;
     }
