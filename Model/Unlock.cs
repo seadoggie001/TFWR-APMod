@@ -1,4 +1,4 @@
-namespace com.seadoggie.TFWRArchipelago.Constants;
+namespace com.seadoggie.TFWRArchipelago.Model;
 
 public static class Unlock
 {

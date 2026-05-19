@@ -1,4 +1,5 @@
-using System.Reflection;
+using com.seadoggie.TFWRArchipelago.Model;
+using com.seadoggie.TFWRArchipelago.Service;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,7 @@ namespace com.seadoggie.TFWRArchipelago.Patches;
 public class SaveChooserPatch
 {
     private const string NewApButton = "NewAPButton";
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(nameof(SaveChooser.Setup))]
     public static void Setup(SaveChooser __instance)
@@ -41,23 +42,23 @@ public class SaveChooserPatch
         apGameObject.name = NewApButton;
         apGameObject.transform.localPosition = new Vector3(40, yPos, 0);
         apGameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(-25, -6);
-        
-        ColoredButton cButton  = apGameObject.GetComponent<ColoredButton>();
+
+        ColoredButton cButton = apGameObject.GetComponent<ColoredButton>();
         cButton.Text = "New AP";
         cButton.onHeld.RemoveAllListeners();
         cButton.OnClick.RemoveAllListeners();
         cButton.tooltipName = "Archipela-gooooooo Game";
         cButton.tooltipDescription = "Create a new save specifically for an Archipelago slot";
-        
+
         Button button = apGameObject.GetComponent<Button>();
         button.onClick = new Button.ButtonClickedEvent();
         button.onClick.AddListener(() =>
         {
             Plugin.Log.LogInfo("SaveChooserPatch NewAPButton OnClick");
             string saveName = SaveChooser.GenerateUnusedSaveName();
-            string filePath = SaverPatch.GetFilePath(saveName);
+            string filePath = GameService.GetFilePath(saveName);
             FileInfo fileInfo = new(filePath);
-            if(!fileInfo.Exists && fileInfo.Directory is not null)
+            if (!fileInfo.Exists && fileInfo.Directory is not null)
                 Directory.CreateDirectory(fileInfo.Directory.FullName);
             File.WriteAllText(filePath, JsonUtility.ToJson(new ModSaveGame()));
             __instance.CreateNewSave();

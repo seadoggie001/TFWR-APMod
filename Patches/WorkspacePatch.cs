@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using com.seadoggie.TFWRArchipelago.Components;
+using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 using UnityEngine;
 
@@ -18,14 +20,14 @@ public class WorkspacePatch
     public static bool Scroll(float scroll)
     {
         // Ignore all of this if StatisticsGUI isn't around
-        if (StatisticsGUI.Instance is null) return !Plugin.HarmonySkipFunction;
+        if (UIManager.Instance?.StatGuiOpen() ?? false) return !BepInExHelper.HarmonySkipFunction;
         // If the current mouse position overlaps the StatisticsGUI
-        if (StatisticsGUI.Instance.RootElement.worldBound.Overlaps(new Rect((Vector2)Input.mousePosition, new Vector2(1,1))))
+        if (UIManager.Instance!.StatGuiBounds().Overlaps(new Rect(Input.mousePosition, new Vector2(1,1))))
         {
             // Skip the normal function. Our GUI handles the scroll
-            return Plugin.HarmonySkipFunction;
+            return BepInExHelper.HarmonySkipFunction;
         }
         // Continue as normal
-        return !Plugin.HarmonySkipFunction;
+        return !BepInExHelper.HarmonySkipFunction;
     }
 }

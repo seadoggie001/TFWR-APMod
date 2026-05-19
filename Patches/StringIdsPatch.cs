@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
@@ -20,7 +21,14 @@ public class StringIdsPatch
         // Find the next ID
         int index = items.Count();
         // Save the ID
-        ___itemIds[ArchipelagoItemName] = index;
+        try
+        {
+            ___itemIds.Add(ArchipelagoItemName, index);
+        }
+        catch (Exception e)
+        {
+            Plugin.Log.LogException("Failed to add ArchipelagoItem.", e);
+        }
         // Save the name
         ___itemNames = ___itemNames.AddItem(ArchipelagoItemName).ToArray();
         // Steal the ID

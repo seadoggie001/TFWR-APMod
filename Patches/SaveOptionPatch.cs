@@ -1,6 +1,9 @@
+using com.seadoggie.TFWRArchipelago.Service;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
+using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
+
 // ReSharper disable InconsistentNaming
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
@@ -13,11 +16,11 @@ public class SaveOptionPatch
     public static void Setup(SaveOption __instance, string fileName)
     {
         // Check if the custom mod file exists
-        string filePath = SaverPatch.GetFilePath(fileName);
+        string filePath = GameService.GetFilePath(fileName);
         if(!File.Exists(filePath)) return;
         
         // Create an image to show it exists
-        GameObject icon = new ("AP_Icon", typeof(RectTransform), typeof(CanvasRenderer), typeof(UnityEngine.UI.Image));
+        GameObject icon = new ("AP_Icon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         
         Transform transform = __instance.transform.Find("PlayButton");
         icon.transform.SetParent(transform, false);

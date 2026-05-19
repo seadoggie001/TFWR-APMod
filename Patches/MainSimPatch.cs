@@ -1,4 +1,5 @@
 using System.Reflection;
+using com.seadoggie.TFWRArchipelago.Utils;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
@@ -15,7 +16,7 @@ public static class MainSimPatch
         }
         catch (Exception e)
         {
-            Plugin.LogError("Failed to get MainSim.sim", e);
+            Plugin.Log.LogException("Failed to get MainSim.sim", e);
             return null;
         }
     }

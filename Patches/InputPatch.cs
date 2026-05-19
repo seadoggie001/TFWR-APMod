@@ -1,4 +1,5 @@
-using com.seadoggie.TFWRArchipelago.Configuration;
+using com.seadoggie.TFWRArchipelago.Components;
+using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 using UnityEngine;
 
@@ -14,11 +15,12 @@ public class InputPatch
     /// <returns></returns>
     [HarmonyPatch(typeof(Input), nameof(Input.GetMouseButtonDown))]
     [HarmonyPrefix]
-    public static bool GetMouseButtonDown(ref bool __result) {
-        // If the connection screen is not visible or the mouse is outside the window, process normally
-        if (!(ArchipelagoSettingsGUI.Instance?.DisplayingWindow ?? false) || !ArchipelagoSettingsGUI.Instance.IsMouseOverWindow()) return !Plugin.HarmonySkipFunction;
+    public static bool GetMouseButtonDown(ref bool __result)
+    {
+        // If the mouse is outside all windows, process normally
+        if (!UIManager.Instance?.MouseOverAnyWindow() ?? true) return !BepInExHelper.HarmonySkipFunction;
         // the mouse click was handled. Skip the rest of the function.
         __result = false;
-        return Plugin.HarmonySkipFunction;
+        return BepInExHelper.HarmonySkipFunction;
     }
 }

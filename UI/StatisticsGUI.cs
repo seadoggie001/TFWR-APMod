@@ -1,17 +1,21 @@
-using com.seadoggie.TFWRArchipelago.Constants;
-using HarmonyLib;
+using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Components;
+using com.seadoggie.TFWRArchipelago.Model;
+using com.seadoggie.TFWRArchipelago.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEngine.UIElements.Collections;
+using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
+namespace com.seadoggie.TFWRArchipelago.UI;
 
-namespace com.seadoggie.TFWRArchipelago;
-
-public class StatisticsGUI : MonoBehaviour
+public class StatisticsGUI : BaseGUI
 {
+    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.StatGUI");
     private UIDocument _uiDocument;
-    private Dictionary<string, List<RowElements>> _statisticRows = new();
-    private Dictionary<string, RowElements> _achievementRows = new();
+    private readonly Dictionary<string, List<RowElements>> _statisticRows = new();
+    private readonly Dictionary<string, RowElements> _goalRowsByLocation = new();
+    private bool _visible;
+    private Action _unregisterCallback = () => { };
 
     private class RowElements
     {
@@ -20,21 +24,11 @@ public class StatisticsGUI : MonoBehaviour
         public Toggle Toggle;
     }
 
-    public static StatisticsGUI Instance;
-    public static void Show()
-    {
-        Instance ??= new GameObject().AddComponent<StatisticsGUI>();
-        Instance.enabled = true;
-    }
-    
     public VisualElement RootElement;
 
     private void Awake()
     {
-        Plugin.Log.LogInfo("Initializing Statistics GUI");
-        Instance?.OnDisable();
-        Instance?.enabled = false;
-        Instance = this;
+        Log.LogInfo("Initializing Statistics GUI");
 
         // Create the GUI and setup styles
         Initialize();
@@ -43,35 +37,44 @@ public class StatisticsGUI : MonoBehaviour
         CreateLayout();
     }
 
-    private void OnEnable() => UserStats.OnStatChange += OnStatUpdate;
+    public void Show()
+    {
+        RootElement.style.display = DisplayStyle.Flex;
+        _visible = true;
+    }
 
-    private void OnDisable() => UserStats.OnStatChange -= OnStatUpdate;
+    public void Hide(MouseUpEvent e = null)
+    {
+        RootElement.style.display = DisplayStyle.None;
+        _visible = false;
+    }
+
+    public bool IsVisible() => _visible;
 
     public void MarkCompleted(string key, double value)
     {
-        if (!_statisticRows.ContainsKey(key))
+        if (!_statisticRows.TryGetValue(key, out List<RowElements> row))
         {
-            Plugin.LogError("There are no rows matching: " + key);
+            Log.LogError("There are no rows matching: " + key);
             return;
         }
 
-        foreach (RowElements rowElements in _statisticRows[key])
+        foreach (RowElements rowElements in row.Where(rowElements => Math.Abs(rowElements.ProgressBar.highValue - (float)value) < 1))
         {
-            if (!(Math.Abs(rowElements.ProgressBar.highValue - (float)value) < 1)) continue;
             rowElements.Toggle.value = true;
             rowElements.Row.AddToClassList("complete");
             return;
         }
 
-        Plugin.LogError("There are no statistics matching: " + key);
+        Log.LogWarning("There are no statistics matching: " + key);
     }
 
     public void MarkCompleted(string key)
     {
-        _achievementRows.TryGetValue(key, out RowElements rowElements);
+        _goalRowsByLocation.TryGetValue(key, out RowElements rowElements);
         if (rowElements is null)
         {
-            Plugin.Log.LogError("There are no achievements matching: " + key);
+            Log.LogError("There are no achievements matching: " + key);
             return;
         }
 
@@ -79,6 +82,33 @@ public class StatisticsGUI : MonoBehaviour
         rowElements.Row.AddToClassList("complete");
     }
 
+    public override bool IsMouseOverWindow() =>
+        RootElement.worldBound.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
+
+    public void StatUpdate(string item, double value)
+    {
+        if (!_statisticRows.TryGetValue(item, out List<RowElements> row)) return;
+        foreach (RowElements rowElements in row)
+        {
+            UpdateValues(rowElements, value);
+        }
+    }
+
+    public void LoadStats()
+    {
+        // Unregister all callbacks
+        _unregisterCallback?.Invoke();
+        // Reset unregister callback
+        _unregisterCallback = () => { };
+        // Remove all stats
+        _uiDocument.rootVisualElement.Clear();
+        // clear internal data
+        _statisticRows.Clear();
+        _goalRowsByLocation.Clear();
+        // Create the layout again
+        CreateLayout();
+    }
+    
     private void Initialize()
     {
         GameObject root = new("TFWRAPStatisticsGUI");
@@ -87,16 +117,16 @@ public class StatisticsGUI : MonoBehaviour
         _uiDocument = root.AddComponent<UIDocument>();
 
         PanelSettings settings = Resources.PanelSettings;
-        if (settings is null) Plugin.LogError("Failed to actually load PanelSettings!");
+        if (settings is null) Log.LogException("Failed to actually load PanelSettings!");
 
         ThemeStyleSheet themeStyleSheet = Resources.ThemeStyleSheet;
-        if (themeStyleSheet is null) Plugin.LogError("Failed to load ThemeStyleSheet!");
+        if (themeStyleSheet is null) Log.LogException("Failed to load ThemeStyleSheet!");
 
-        settings.themeStyleSheet = themeStyleSheet;
+        settings?.themeStyleSheet = themeStyleSheet;
         _uiDocument.panelSettings = settings;
 
         StyleSheet styleSheet = Resources.AchievementStyleSheet;
-        if (styleSheet is null) Plugin.LogError("Failed to load StyleSheet!");
+        if (styleSheet is null) Log.LogException("Failed to load StyleSheet!");
 
         _uiDocument.rootVisualElement.styleSheets.Add(styleSheet);
         RootElement = _uiDocument.rootVisualElement;
@@ -112,24 +142,24 @@ public class StatisticsGUI : MonoBehaviour
         VisualElement buttonRow = new();
         buttonRow.AddToClassList("row");
         buttonRow.AddToClassList("btn-row");
-        
+
         // ToDo: Move to .USS file (.btn-row)
         buttonRow.style.flexGrow = 0;
-        
+
         Button statBtn = new()
         {
             text = "Statistic",
         };
         statBtn.AddToClassList("btn");
         statBtn.AddToClassList("btn-toggle");
-        
+
         Button achievementBtn = new()
         {
             text = "Achievement",
         };
         achievementBtn.AddToClassList("btn");
         achievementBtn.AddToClassList("btn-toggle");
-        
+
         Button completedBtn = new()
         {
             text = "Completed",
@@ -137,19 +167,16 @@ public class StatisticsGUI : MonoBehaviour
         };
         completedBtn.AddToClassList("btn");
         completedBtn.AddToClassList("btn-toggle");
-        
+
         Button close = new()
         {
             text = "X",
         };
         close.AddToClassList("btn");
         close.AddToClassList("btn-close");
-        close.RegisterCallback<MouseUpEvent>(evt =>
-        {
-            Plugin.Log.LogInfo("Closing Stats GUI");
-            Instance = null;
-            _uiDocument.enabled = false;
-        });
+        close.RegisterCallback<MouseUpEvent>(Hide);
+        _unregisterCallback += () => close.UnregisterCallback<MouseUpEvent>(Hide);
+        
         buttonRow.Add(statBtn);
         buttonRow.Add(achievementBtn);
         buttonRow.Add(completedBtn);
@@ -172,7 +199,7 @@ public class StatisticsGUI : MonoBehaviour
         container.AddToClassList("statistic-container");
 
         bool first = true;
-        foreach (KeyValuePair<string, List<Milestone>> statistic in UserStats.MilestoneCopy())
+        foreach (KeyValuePair<string, List<Milestone>> statistic in GoalManager.Instance.MilestoneCopy())
         {
             List<Milestone> milestones = statistic.Value.OrderBy(milestone => milestone.Target).ToList();
             foreach (Milestone milestone in milestones)
@@ -182,31 +209,42 @@ public class StatisticsGUI : MonoBehaviour
             }
         }
 
-        foreach (APLocation apLocation in APLocation.APLocations.Where(m => m.statistic is null && m.timed is null))
+        foreach (APLocation apLocation in APManager.Instance?.GetLocations()
+                     ?.Where(m => m.statistic is null && m.timed is null) ?? [])
         {
             container.Add(CreateActionRow(apLocation));
         }
 
         scrollView.Add(container);
         root.Add(scrollView);
-        
-        statBtn.RegisterCallback<MouseUpEvent>(evt =>
-        {
-            statBtn.ToggleInClassList("toggled");
-            container.ToggleInClassList("hide-progress");
-        });
-        
-        achievementBtn.RegisterCallback<MouseUpEvent>(evt =>
-        {
-            achievementBtn.ToggleInClassList("toggled");
-            container.ToggleInClassList("hide-achievement");
-        });
-        
-        completedBtn.RegisterCallback<MouseUpEvent>(evt =>
+
+        statBtn.RegisterCallback<MouseUpEvent>(ToggleStatistics);
+        _unregisterCallback += () => statBtn.UnregisterCallback<MouseUpEvent>(ToggleStatistics);
+
+        achievementBtn.RegisterCallback<MouseUpEvent>(ToggleAchievements);
+        _unregisterCallback += () => achievementBtn.UnregisterCallback<MouseUpEvent>(ToggleAchievements);
+
+        completedBtn.RegisterCallback<MouseUpEvent>(ToggleCompleted);
+        _unregisterCallback += () => completedBtn.UnregisterCallback<MouseUpEvent>(ToggleCompleted);
+        return;
+
+        void ToggleCompleted(MouseUpEvent evt)
         {
             completedBtn.ToggleInClassList("toggled");
             container.ToggleInClassList("hide-complete");
-        });
+        }
+
+        void ToggleAchievements(MouseUpEvent evt)
+        {
+            achievementBtn.ToggleInClassList("toggled");
+            container.ToggleInClassList("hide-achievement");
+        }
+
+        void ToggleStatistics(MouseUpEvent evt)
+        {
+            statBtn.ToggleInClassList("toggled");
+            container.ToggleInClassList("hide-progress");
+        }
     }
 
     private VisualElement CreateMilestoneRow(string key, Milestone milestone, bool first)
@@ -215,7 +253,7 @@ public class StatisticsGUI : MonoBehaviour
         row.AddToClassList("statistic");
         row.AddToClassList("progress");
         row.AddToClassList("border");
-        if(milestone.Triggered) row.AddToClassList("complete");
+        if (milestone.Triggered) row.AddToClassList("complete");
         if (first) row.AddToClassList("border-first");
 
         // Title row
@@ -244,7 +282,7 @@ public class StatisticsGUI : MonoBehaviour
         // Progress row
         VisualElement progressRow = new();
         progressRow.AddToClassList("row");
-        if (!UserStats.TryGetValue(key, out double value)) value = 0;
+        if (!GoalManager.Instance.TryGetValue(key, out double value)) value = 0;
         ProgressBar progressBar = new()
         {
             lowValue = 0,
@@ -272,8 +310,9 @@ public class StatisticsGUI : MonoBehaviour
             _statisticRows[key] = [rowElements];
         }
 
+        _goalRowsByLocation.Add(milestone.Location, rowElements);
+
         UpdateValues(rowElements, value);
-        
 
         return row;
     }
@@ -310,27 +349,16 @@ public class StatisticsGUI : MonoBehaviour
 
         row.Add(titleRow);
         row.Add(descriptionRow);
-        _achievementRows.Add(apLocation.name, new RowElements(){ ProgressBar = null, Row = row, Toggle = toggle });
-                
+        _goalRowsByLocation.Add(apLocation.name, new RowElements() { ProgressBar = null, Row = row, Toggle = toggle });
+
         return row;
     }
 
-    private void UpdateValues(RowElements rowElements, double value)
+    private static void UpdateValues(RowElements rowElements, double value)
     {
         rowElements.ProgressBar.value = (float)value;
         rowElements.ProgressBar.title = $"{value:N0} / {rowElements.ProgressBar.highValue:N0}";
 
         rowElements.Toggle.value = value > rowElements.ProgressBar.highValue;
-    }
-
-    private void OnStatUpdate(string item, double value)
-    {
-        if (_statisticRows.ContainsKey(item))
-        {
-            foreach (RowElements rowElements in _statisticRows[item])
-            {
-                UpdateValues(rowElements, value);
-            }
-        }
     }
 }

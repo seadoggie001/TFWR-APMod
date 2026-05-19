@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
@@ -35,7 +36,7 @@ public class FarmPatch
         // ToDo: Check if Archipelago thinks the upgrades are valid
         foreach (string unlock in distinctUnlocks)
         {
-            Plugin.Log.LogInfo("Requested unlock: " + unlock);
+            // Plugin.Log.LogInfo("Requested unlock: " + unlock);
             startUnlocks.Add(unlock);
         }
         startUnlocksField.SetValue(null, startUnlocks);
@@ -52,8 +53,19 @@ public class FarmPatch
     [HarmonyPrefix]
     public static bool GetUnlockCost(UnlockSO unlockSO, int numUnlocked, ref ItemBlock __result)
     {
-        if (!Plugin.Instance.Enabled) return !Plugin.HarmonySkipFunction;
+        if (!Plugin.Instance.Enabled) return !BepInExHelper.HarmonySkipFunction;
         __result = new ItemBlock(StringIdsPatch.ArchipelagoItem, 1);
-        return Plugin.HarmonySkipFunction;
+        return BepInExHelper.HarmonySkipFunction;
+    }
+    
+    [HarmonyPatch(nameof(Farm.UnlockOrUpgrade), typeof(UnlockSO), typeof(bool))]
+    [HarmonyPostfix]
+    public static void UnlockOrUpgrade(UnlockSO unlockSO, bool requireParent, ref bool __result)
+    {
+        if(!Plugin.Instance.Enabled) return;
+        if (!__result) return;
+        // Something was unlocked or upgraded
+        Plugin.Log.LogInfo($"Unlocked or upgraded: [UnlockName: {unlockSO.unlockName}, Description: {unlockSO.description}, Parent: {unlockSO.parentUnlock}]");
+        Plugin.Log.LogInfo($"RequireParent: {requireParent}");
     }
 }

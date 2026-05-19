@@ -1,3 +1,4 @@
+using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
@@ -9,10 +10,10 @@ public static class CodeWindowPatch
     [HarmonyPrefix]
     public static bool PromptDelete(CodeWindow __instance)
     {
-        if (__instance.isExecuting) return Plugin.HarmonySkipFunction;
-        if (__instance.CodeInput.text != string.Empty) return !Plugin.HarmonySkipFunction;
+        if (__instance.isExecuting) return BepInExHelper.HarmonySkipFunction;
+        if (__instance.CodeInput.text != string.Empty) return !BepInExHelper.HarmonySkipFunction;
         // There's no code, just delete it
         __instance.GetComponent<Window>().Close();
-        return Plugin.HarmonySkipFunction;
+        return BepInExHelper.HarmonySkipFunction;
     }
 }

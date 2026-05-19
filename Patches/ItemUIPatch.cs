@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using HarmonyLib;
-using UnityEngine;
 using UnityEngine.UI;
+using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 

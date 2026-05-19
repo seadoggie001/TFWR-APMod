@@ -1,0 +1,188 @@
+using Archipelago.MultiClient.Net;
+using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.Packets;
+using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Components;
+using com.seadoggie.TFWRArchipelago.Model;
+using com.seadoggie.TFWRArchipelago.Utils;
+
+namespace com.seadoggie.TFWRArchipelago.Service;
+
+public class APService(IAPManager apManager) : IAPService
+{
+    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APMgr");
+
+    private readonly HashSet<string> _unlockedCache = [];
+
+    private ArchipelagoSession Session { get; set; }
+
+    public event EventHandler<string> APDisconnected;
+    public event EventHandler<bool> ConnectionResult;
+
+    // Reset the unlock cache
+    public void OnGameLoaded(object sender, ModSaveGame modSaveGame) => _unlockedCache.Clear();
+
+    public void UnlockAchievement(string achievementName)
+    {
+        // Skip already unlocked achievements
+        if (!_unlockedCache.Add(achievementName)) return;
+        // Don't allow for Steam Achievements
+        Achievements.enabled = false;
+        // Some achievements unlock hats
+        GameManager.Instance?.UnlockHat(AchievementToHat(achievementName));
+        // Find the relevant location for this achievement
+        APLocation location = apManager?.GetLocations()?.FirstOrDefault(m => m.achievement == achievementName);
+        if (location is null)
+        {
+            Log.LogWarning("Unable to locate location for achievement " + achievementName);
+            return;
+        }
+
+        SubmitLocationById(location.id);
+    }
+
+    // Send the location to the server
+    public void SubmitLocationById(long id) => Session?.Locations?.CompleteLocationChecks(id);
+
+    public async Task<bool> TryEnableAsync(
+        ConnectionInfo connectionSettings,
+        ILocationQueue locationQueue,
+        IItemQueue itemQueue)
+    {
+        Log.LogInfo("Attempting to sign in to Archipelago");
+
+        // Only attempt to connect if not connected already
+        if (Session?.Socket?.Connected ?? false)
+        {
+            Log.LogWarning("Already signed in");
+            return true;
+        }
+
+        Log.LogInfo($"Creating a session. URL: {connectionSettings.Url}:{connectionSettings.Port}");
+        // Create the session
+        Session = ArchipelagoSessionFactory.CreateSession(connectionSettings.Url, connectionSettings.Port);
+
+        Log.LogInfo("Setting up item queue");
+        Session.Items.ItemReceived += itemQueue.OnItemReceived;
+
+        Log.LogInfo("Connecting");
+        RoomInfoPacket roomInfoPacket = await ConnectAsync();
+        if (roomInfoPacket == null)
+        {
+            Log.LogError(
+                $"Failed to connect to room. Connection Details: {{URL: {connectionSettings.Url}:{connectionSettings.Port}}}");
+            ConnectionResult?.Invoke(this, false);
+            return false;
+        }
+
+        Log.LogInfo("Setting up location queue");
+        Session.Locations.CheckedLocationsUpdated += locationQueue.OnLocationsReceived;
+
+        Log.LogInfo("Logging in");
+        LoginResult loginResult = await LoginAsync(connectionSettings);
+        ConnectionResult?.Invoke(this, loginResult.Successful);
+        if (loginResult.Successful)
+        {
+            Log.LogInfo("Successfully logged in.");
+            Session.Socket.SocketClosed += reason => APDisconnected?.Invoke(this, reason);
+            return true;
+        }
+
+        Log.LogError(
+            $"Failed to connect. Connection Details: {{URL: {connectionSettings.Url}:{connectionSettings.Port}, " +
+            $"Username: {connectionSettings.Username}, " +
+            $"Password? {!string.IsNullOrWhiteSpace(connectionSettings.Password)}}}");
+        return false;
+    }
+
+    //ToDo: If auto-connect is ever set up, this will need to check (with event arguments)
+    // if this is the initial connection
+    public void Disconnect(object sender, EventArgs e)
+    {
+        Session?.Socket?.DisconnectAsync();
+        APDisconnected?.Invoke(this, null);
+    }
+
+    private static string AchievementToHat(string achievement) =>
+        achievement switch
+        {
+            Achievement.CauseARuntimeError => Model.Hat.TrafficCone.Resource,
+            Achievement.StackOverflow => Model.Hat.TrafficConeStack.Resource,
+            Achievement.HigherOrderProgramming => Model.Hat.Wizard.Resource,
+            _ => null
+        };
+
+    private async Task<RoomInfoPacket> ConnectAsync()
+    {
+        RoomInfoPacket roomInfoPacket;
+        try
+        {
+            roomInfoPacket = await Session.ConnectAsync();
+        }
+        catch (Exception e)
+        {
+            Plugin.Log.LogException("Session.ConnectAsync",e);
+            Log.LogError("Exception Type: " + e.GetType());
+            Log.LogError(e.Message);
+            Log.LogError(e.StackTrace);
+            if (e.InnerException == null) return null;
+            Log.LogError(e.GetBaseException().Message);
+            Log.LogError(e.InnerException.StackTrace);
+            return null;
+        }
+
+        Log.LogInfo($"[RoomInfo] " +
+                    $"{{ Seed: {roomInfoPacket.SeedName}; " +
+                    $"Games: {string.Join(", ", roomInfoPacket.Games)}; " +
+                    $"Tags: {string.Join(",", roomInfoPacket.Tags)}; " +
+                    $"Version: {roomInfoPacket.GeneratorVersion.ToVersion()} }}");
+
+        return roomInfoPacket;
+    }
+
+    private async Task<LoginResult> LoginAsync(ConnectionInfo connectionSettings)
+    {
+        LoginResult loginResult;
+        try
+        {
+            loginResult = await Session.LoginAsync(
+                Plugin.GameName,
+                connectionSettings.Username,
+                ItemsHandlingFlags.AllItems,
+                Version.Parse("0.6.7"),
+                [],
+                null,
+                connectionSettings.Password
+            );
+        }
+        catch (Exception e)
+        {
+            loginResult = new LoginFailure(e.GetBaseException().Message);
+            Log.LogError($"Exception Message: {e.Message}");
+            Log.LogError($"Base Exception Message: {e.GetBaseException().Message}");
+        }
+
+        if (loginResult.Successful) return loginResult;
+        Log.LogError($"Failed to connect to the server. All errors (if any?) to follow");
+        foreach (string error in ((LoginFailure)loginResult).Errors)
+        {
+            Log.LogInfo(error);
+        }
+
+        return loginResult;
+    }
+}
+
+public interface IAPService
+{
+    event EventHandler<string> APDisconnected;
+    event EventHandler<bool> ConnectionResult;
+    void OnGameLoaded(object sender, ModSaveGame modSaveGame);
+    void UnlockAchievement(string achievementName);
+    void SubmitLocationById(long id);
+
+    Task<bool> TryEnableAsync(ConnectionInfo connectionSettings, ILocationQueue locationQueue,
+        IItemQueue itemQueue);
+
+    void Disconnect(object sender, EventArgs e);
+}

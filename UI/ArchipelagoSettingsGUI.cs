@@ -1,22 +1,18 @@
-using HarmonyLib;
+using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Components;
+using com.seadoggie.TFWRArchipelago.Model;
+using com.seadoggie.TFWRArchipelago.Patches;
+using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace com.seadoggie.TFWRArchipelago.Configuration;
+namespace com.seadoggie.TFWRArchipelago.UI;
 
 /// <summary>
 /// A GUI for editing the APConnection settings in game
 /// </summary>
-public class ArchipelagoSettingsGUI : MonoBehaviour
+public class ArchipelagoSettingsGUI : BaseGUI
 {
-    public static ArchipelagoSettingsGUI Instance { get; private set; }
-
-    public static void Show()
-    {
-        Instance ??= new GameObject().AddComponent<ArchipelagoSettingsGUI>();
-        Instance.enabled = true;
-        Instance.DisplayingWindow = true;
-    }
+    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APConnGUI");
 
     // Spacing constants
     private const int ControlHeight = 25, ControlWidth = 200;
@@ -36,8 +32,26 @@ public class ArchipelagoSettingsGUI : MonoBehaviour
     private CursorLockMode _prevCursorLockMode;
     private bool _prevCursorVisible;
 
-    private Task<bool> _archConnectTask;
-    private bool _readyToConnect = true;
+    private Status _state = Status.None;
+    private string _disconnectedReason;
+
+    private enum Status
+    {
+        None,
+        Connecting,
+        ConnectionFailed,
+        Connected,
+        Disconnected,
+    }
+
+    public void Show(ConnectionInfo connectionSettings)
+    {
+        _archUrl = connectionSettings.Url;
+        _archPort = connectionSettings.Port.ToString();
+        _archUsername = connectionSettings.Username;
+        _archPassword = connectionSettings.Password;
+        DisplayingWindow = true;
+    }
 
     /// <summary>
     /// Is the config manager main window displayed on screen
@@ -80,19 +94,7 @@ public class ArchipelagoSettingsGUI : MonoBehaviour
         Cursor.visible = visible;
     }
 
-    public void Awake()
-    {
-        Instance = this;
-        if (!Plugin.Instance.Loaded) Plugin.Log.LogWarning("Not opening GUI; failed to load properly.");
-        _archUrl = Plugin.Instance.ConnectionSettings.Url;
-        _archPort = Plugin.Instance.ConnectionSettings.Port.ToString();
-        _archUsername = Plugin.Instance.ConnectionSettings.Username;
-        _archPassword = Plugin.Instance.ConnectionSettings.Password;
-
-        DisplayingWindow = true;
-    }
-
-    public void OnGUI()
+    private void OnGUI()
     {
         if (!DisplayingWindow || !enabled) return;
         if (_windowRect.Contains(Event.current.mousePosition))
@@ -109,13 +111,11 @@ public class ArchipelagoSettingsGUI : MonoBehaviour
         _windowRect = GUILayout.Window(-619, _windowRect, DrawWindow, "Archipelago Settings");
     }
 
-    private void OnDisable() => Instance = null;
-
-    public bool IsMouseOverWindow() =>
+    public override bool IsMouseOverWindow() =>
         _windowRect.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
 
     // Draws the GUI in rows, reusing two rects
-    public void DrawWindow(int windowID)
+    private void DrawWindow(int windowID)
     {
         GUILayout.BeginVertical();
         {
@@ -145,39 +145,51 @@ public class ArchipelagoSettingsGUI : MonoBehaviour
 
             labelRect.y += VerticalSpacing + ControlHeight;
             contRect.y += VerticalSpacing + ControlHeight;
-            if (GUI.Button(new Rect(HorizontalSpacing, contRect.y, 80, ControlHeight), "Submit") &&
-                _readyToConnect)
+            if (_state == Status.Connected)
+            {
+                if (GUI.Button(new Rect(HorizontalSpacing, contRect.y, 80, ControlHeight), "Disconnect"))
+                {
+                    // Request a disconnect from the server
+                    APManager.Instance?.APService.Disconnect(this, EventArgs.Empty);
+                }
+            }
+            else if (GUI.Button(new Rect(HorizontalSpacing, contRect.y, 80, ControlHeight), "Submit") &&
+                     _state != Status.Connecting)
             {
                 SaveChanges();
             }
 
             if (GUI.Button(new Rect(_windowRect.width - 80 - HorizontalSpacing, contRect.y, 80, ControlHeight),
-                    "Close"))
-            {
-                enabled = false;
-                DisplayingWindow = false;
-            }
+                    "Close")) DisplayingWindow = false;
 
-            if (_archConnectTask != null)
+            if (_state != Status.None)
             {
+                string text = _state switch
+                {
+                    Status.Connected => "Connected",
+                    Status.ConnectionFailed => "Failed to connect. Please review the connection settings.",
+                    Status.Connecting => "Connecting to Archipelago... please wait...",
+                    Status.None => "This is literally impossible",
+                    Status.Disconnected => _disconnectedReason ?? "Disconnected",
+                    _ => throw new ArgumentException("Unknown state")
+                };
+
                 labelRect.y += VerticalSpacing + ControlHeight;
-                string text;
-                if (_archConnectTask.IsCompleted)
-                {
-                    text = _archConnectTask.Result
-                        ? "Connected"
-                        : "Failed to connect, please check the logs for details";
-                    _readyToConnect = !_archConnectTask.Result;
-                }
-                else
-                {
-                    text = "Connecting to Archipelago... please wait...";
-                }
-
+                contRect.y += VerticalSpacing + ControlHeight;
                 // make this a larger label so it can display a longer message if needed
                 labelRect.width = WindowWidth - (HorizontalSpacing * 2);
                 labelRect.height = 100;
                 GUI.Label(labelRect, text);
+            }
+
+            if (GameManager.Instance?.TfwrConfig.Debug ?? false)
+            {
+                labelRect.y += VerticalSpacing + ControlHeight;
+                contRect.y += VerticalSpacing + ControlHeight;
+                if (GUI.Button(new Rect(HorizontalSpacing, contRect.y, 80, contRect.height), "Debug"))
+                {
+                    HatPopupPatch.ShowWithoutHat("Expand");
+                }
             }
         }
         GUI.DragWindow(new Rect(0, 0, WindowWidth, 20));
@@ -185,14 +197,21 @@ public class ArchipelagoSettingsGUI : MonoBehaviour
 
     private void SaveChanges()
     {
-        Plugin.Log.LogInfo("Saving changes to connection info");
+        Log.LogInfo("Saving changes to connection info");
 
-        Plugin.Instance.ConnectionSettings.Url = _archUrl;
-        Plugin.Instance.ConnectionSettings.Port = int.Parse(_archPort);
-        Plugin.Instance.ConnectionSettings.Username = _archUsername;
-        Plugin.Instance.ConnectionSettings.Password = _archPassword;
+        // Update the internal status
+        _state = Status.Connecting;
 
-        _archConnectTask = Plugin.Instance.TryEnableAsync();
-        _readyToConnect = false;
+        // Request the login attempt
+        UIManager.Instance?.RaiseConnectionAttemptEvent(new ConnectionInfo(_archUrl, int.Parse(_archPort),
+            _archUsername, _archPassword));
+    }
+
+    public void ConnectionAttempt(bool success) => _state = success ? Status.Connected : Status.ConnectionFailed;
+
+    public void Disconnected([CanBeNull] string reason = null)
+    {
+        _state = Status.Disconnected;
+        _disconnectedReason = reason;
     }
 }

@@ -1,4 +1,4 @@
-namespace com.seadoggie.TFWRArchipelago.Constants;
+namespace com.seadoggie.TFWRArchipelago.Model;
 
 /// <summary>
 /// Erm... all the hats. I don't remember why.

@@ -1,6 +1,6 @@
-using com.seadoggie.TFWRArchipelago.Constants;
+using com.seadoggie.TFWRArchipelago.Model;
 
-namespace com.seadoggie.TFWRArchipelago;
+namespace com.seadoggie.TFWRArchipelago.Utils;
 
 /// <summary>
 /// This class converts from AP/Human-readable item names to internal item names

@@ -45,16 +45,16 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Resources\archipelago">
+      <EmbeddedResource Include="Assets\archipelago">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Resources\archipelago.manifest">
+      <EmbeddedResource Include="Assets\archipelago.manifest">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Resources\StandaloneWindows64">
+      <EmbeddedResource Include="Assets\StandaloneWindows64">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Resources\StandaloneWindows64.manifest">
+      <EmbeddedResource Include="Assets\StandaloneWindows64.manifest">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
