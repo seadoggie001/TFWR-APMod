@@ -66,13 +66,27 @@ public class GameManager : BaseComponent
                 throw new ArgumentOutOfRangeException();
         }
 
-        if (itemName != "RickRoll") return GivePlayerItem(itemName);
+        if (itemName != "RickRoll")
+        {
+            ItemProcessed item = GivePlayerItem(itemName);
+            if (item.given) GameService.RaiseNewItemReceived(itemName);
+            return item.processed;
+        }
+        else
+        {
+            RickRoll();
+            return true;
+        }
 
-        RickRoll();
-        return true;
     }
 
-    private static bool GivePlayerItem(string itemName)
+    private class ItemProcessed(bool processed, bool given)
+    {
+        public bool processed { get; set; } = processed;
+        public bool given { get; set; } = given;
+    }
+    
+    private static ItemProcessed GivePlayerItem(string itemName)
     {
         try
         {
@@ -80,14 +94,15 @@ public class GameManager : BaseComponent
             if (string.IsNullOrWhiteSpace(unlockName))
             {
                 Log.LogWarning($"Failed to find unlock item: {itemName}");
-                return true; // Don't keep it in the queue
+                // Don't keep it in the queue
+                return new ItemProcessed(true, false);
             }
 
             Farm farm = MainSimPatch.GetMainSim()?.farm;
             if (farm is null)
             {
                 Log.LogError("[GivePlayerItem] Failed to find Farm.");
-                return false;
+                return new ItemProcessed(false, false);
             }
 
             int count = farm.NumUnlocked(unlockName);
@@ -102,7 +117,7 @@ public class GameManager : BaseComponent
             }
 
             farm.UnlockAllIn(unlock);
-            return true;
+            return new ItemProcessed(true, true);
         }
         catch (Exception e)
         {
@@ -114,7 +129,7 @@ public class GameManager : BaseComponent
             }
 
             Log.LogInfo(e.StackTrace);
-            return false;
+            return new ItemProcessed(false, false);
         }
     }
 

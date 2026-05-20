@@ -1,5 +1,6 @@
 using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
+using com.seadoggie.TFWRArchipelago.Patches;
 using com.seadoggie.TFWRArchipelago.UI;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -48,6 +49,8 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
         GameManager.Instance?.GameService.MenuOpen += OnMenuOpen;
         OnDisabled += () => GameManager.Instance?.GameService.MenuOpen -= OnMenuOpen;
+        GameManager.Instance?.GameService.NewItemReceived += OnNewItemReceived;
+        OnDisabled += () => GameManager.Instance?.GameService.NewItemReceived -= OnNewItemReceived;
 
         _statisticsGUI = new GameObject("StatGUI").AddComponent<StatisticsGUI>();
         _statisticsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
@@ -59,6 +62,12 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         _archipelagoSettingsGUI = new GameObject().AddComponent<ArchipelagoSettingsGUI>();
         _archipelagoSettingsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
         _archipelagoSettingsGUI.DisplayingWindow = false;
+    }
+
+    private void OnNewItemReceived(object sender, string e)
+    {
+        // inflate the hat popup somehow
+        HatPopupPatch.ShowWithoutHat(e);
     }
 
     private void OnMenuOpen(object sender, bool isOpen)

@@ -15,6 +15,7 @@ public class GameService : IGameService
     public event EventHandler<ModSaveGame> GameLoaded;
     public event EventHandler<EventArgs> PreLoadGame;
     public event EventHandler<bool> MenuOpen;
+    public event EventHandler<string> NewItemReceived;
 
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.GameSvc");
     public static string GetFilePath(string saveName) => Path.Combine(Saver.GetPathOfSaveDirectory(saveName), FileName);
@@ -92,11 +93,15 @@ public class GameService : IGameService
 
     public void RaiseMenuOpen(bool open) => MenuOpen?.Invoke(this, open);
 
+    public void RaiseNewItemReceived(string itemName) => NewItemReceived?.Invoke(this, itemName);
+    
     public enum Result
     {
         ModNotInitialized,
         ItemAlreadyRecevied,
         ProcessItem,
+        ItemNotFound,
+        InternalError,
     }
 }
 
@@ -113,6 +118,8 @@ public interface IGameService
     event EventHandler<ModSaveGame> GameLoaded;
 
     event EventHandler<bool> MenuOpen;
+    
+    event EventHandler<string> NewItemReceived;
 
     /// <summary>
     /// Saves the current stats of the game
@@ -122,4 +129,5 @@ public interface IGameService
     void Load();
     GameService.Result CanGivePlayerItem(string itemName, int itemsReceived);
     void RaiseMenuOpen(bool open);
+    void RaiseNewItemReceived(string itemName);
 }
