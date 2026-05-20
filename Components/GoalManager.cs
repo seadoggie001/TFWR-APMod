@@ -22,13 +22,14 @@ public class GoalManager : BaseComponent, IGoalManagerDelegates
     {
         Instance = this;
         _statsService = new StatsService();
-        _statsService.Initialize();
         
         base.OnEnable();
     }
     
     private void Start()
     {
+        _statsService.Initialize(APManager.Instance?.GetLocations());
+        
         StatEvent += OnStatEvent;
         OnDisabled += () => StatEvent -= OnStatEvent;
         
@@ -58,6 +59,7 @@ public class GoalManager : BaseComponent, IGoalManagerDelegates
     
     private void OnGameLoaded(object sender, ModSaveGame e)
     {
+        Log.LogInfo("Game was loaded");
         _statsService.Load(e.Statistics);
     }
 
