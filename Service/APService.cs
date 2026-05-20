@@ -31,7 +31,7 @@ public class APService(IAPManager apManager) : IAPService
         // Some achievements unlock hats
         GameManager.Instance?.UnlockHat(AchievementToHat(achievementName));
         // Find the relevant location for this achievement
-        APLocation location = apManager?.GetLocations()?.FirstOrDefault(m => m.achievement == achievementName);
+        APLocation location = apManager.GetLocations().FirstOrDefault(m => m.achievement == achievementName);
         if (location is null)
         {
             Log.LogWarning("Unable to locate location for achievement " + achievementName);

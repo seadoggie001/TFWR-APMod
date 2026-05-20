@@ -24,9 +24,8 @@ public class StatsService : IStatsService
     /// <summary>
     ///     Uses APLocations to determine which statistics to track
     /// </summary>
-    public void Initialize(IEnumerable<APLocation> locations = null)
+    public void Initialize(IEnumerable<APLocation> locations)
     {
-        locations ??= APManager.Instance?.GetLocations();
         Log.LogInfo("Initializing statistics...");
         // For each location with a statistic
         foreach (APLocation location in locations?.Where(m => m.statistic != null) ?? [])
@@ -176,7 +175,7 @@ public interface IStatsService
     /// <summary>
     ///     Uses APLocations to determine which statistics to track
     /// </summary>
-    void Initialize(IEnumerable<APLocation> locations = null);
+    void Initialize(IEnumerable<APLocation> locations);
 
     void Add(string name, double count);
 
