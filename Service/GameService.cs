@@ -11,7 +11,7 @@ public class GameService : IGameService
 {
     public const string FileName = "tfwrap.json";
     [CanBeNull] public ModSaveGame ModSaveGame;
-    
+
     public event EventHandler<ModSaveGame> GameLoaded;
     public event EventHandler<EventArgs> PreLoadGame;
     public event EventHandler<bool> MenuOpen;
@@ -82,11 +82,7 @@ public class GameService : IGameService
         }
 
         // If we've previously received this item
-        if (itemsReceived < ModSaveGame.ItemsReceived)
-        {
-            Log.LogInfo($"Skipping because previously received {itemName}");
-            return Result.ItemAlreadyRecevied;
-        }
+        if (itemsReceived < ModSaveGame.ItemsReceived) return Result.ItemAlreadyRecevied;
 
         Log.LogInfo("Only unlocked " + ModSaveGame.ItemsReceived);
         ModSaveGame.ItemsReceived += 1;
@@ -110,16 +106,19 @@ public interface IGameService
     /// Fired before a new game is loaded 
     /// </summary>
     event EventHandler<EventArgs> PreLoadGame;
+
     /// <summary>
     /// Fired after a game is loaded
     /// </summary>
     event EventHandler<ModSaveGame> GameLoaded;
 
     event EventHandler<bool> MenuOpen;
+
     /// <summary>
     /// Saves the current stats of the game
     /// </summary>
     void SaveProgress();
+
     void Load();
     GameService.Result CanGivePlayerItem(string itemName, int itemsReceived);
     void RaiseMenuOpen(bool open);

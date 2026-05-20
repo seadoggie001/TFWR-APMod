@@ -92,7 +92,6 @@ public class UIManager : BaseComponent, IUIManagerDelegates
 
     private void OnGameLoaded(object sender, ModSaveGame e)
     {
-        Log.LogInfo("Game loaded");
         if (e is null)
         {
             _statisticsGUI.Hide();

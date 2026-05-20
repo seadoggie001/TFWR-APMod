@@ -23,7 +23,6 @@ public class ItemQueue(Func<string, int, bool> processItemCallback) : IItemQueue
     {
         ItemInfo itemInfo = helper.PeekItem();
         string itemReceivedName = itemInfo.ItemDisplayName;
-        Log.LogInfo($"Added item to queue- ID: {itemInfo.ItemId} Name: {itemReceivedName}");
         _itemQueue.Add(itemReceivedName);
         helper.DequeueItem();
     }

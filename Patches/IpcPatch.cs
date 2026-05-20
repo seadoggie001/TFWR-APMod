@@ -33,7 +33,7 @@ public static class IpcPatch
             }
             else
             {
-                Plugin.Log.LogWarning("Ipc should be disabled");
+                Plugin.Log.LogInfo("Ipc should be disabled");
                 fieldInfo.SetValue(Ipc.Instance, running);
             }
         }

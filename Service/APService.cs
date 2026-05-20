@@ -10,7 +10,7 @@ namespace com.seadoggie.TFWRArchipelago.Service;
 
 public class APService(IAPManager apManager) : IAPService
 {
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APMgr");
+    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APSrv");
 
     private readonly HashSet<string> _unlockedCache = [];
 
