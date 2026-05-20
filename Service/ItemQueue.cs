@@ -8,7 +8,7 @@ public class ItemQueue(Func<string, int, bool> processItemCallback) : IItemQueue
 {
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.ItemQ");
     private int _itemsReceived;
-    private readonly HashSet<string> _itemQueue = [];
+    private readonly List<string> _itemQueue = [];
 
     public void Process()
     {
