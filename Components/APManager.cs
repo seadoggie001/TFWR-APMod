@@ -11,28 +11,32 @@ namespace com.seadoggie.TFWRArchipelago.Components;
 public class APManager : BaseComponent, IAPManager
 {
     [CanBeNull] public static APManager Instance { get; private set; }
-    private static readonly ManualLogSource Log = new ("TFWRAP.APManager"); 
+    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APMgr");
 
-    public readonly IAPService APService = new APService(Instance);
-    public readonly ILocationQueue LocationQueue;
-    public readonly IItemQueue ItemQueue;
+    public IAPService APService;
+    public ILocationQueue LocationQueue;
+    public IItemQueue ItemQueue;
 
-    private readonly IEnumerable<APLocation> _apLocations;
+    private IEnumerable<APLocation> _apLocations;
 
-    public APManager()
+    protected override void OnEnable()
     {
         Instance = this;
+        APService = new APService(Instance);
         LocationQueue = new LocationQueue(this);
         ItemQueue = new ItemQueue((itemName, itemsReceived) =>
             GameManager.Instance?.GiveItem(itemName, itemsReceived) ?? false);
+        Log.LogInfo("Setting up AP Locations");
         _apLocations = InitializeLocations();
+
+        base.OnEnable();
     }
 
     private void Start()
     {
         GameManager.Instance?.GameService.PreLoadGame += APService.Disconnect;
         OnDisabled += () => GameManager.Instance?.GameService.PreLoadGame -= APService.Disconnect;
-        
+
         GameManager.Instance?.GameService.GameLoaded += APService.OnGameLoaded;
         OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= APService.OnGameLoaded;
 
@@ -53,6 +57,11 @@ public class APManager : BaseComponent, IAPManager
         }
     }
 
+    private void OnDestroy()
+    {
+        Log.LogWarning("Destroying AP Manager");
+    }
+
     private void OnConnectionAttemptEvent(object sender, ConnectionInfo e) =>
         APService.TryEnableAsync(e, LocationQueue, ItemQueue);
 
@@ -68,6 +77,7 @@ public class APManager : BaseComponent, IAPManager
             string folderPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
             string locationText = File.ReadAllText(Path.Combine(folderPath, "locations.json"));
             List<APLocation> locationData = JsonConvert.DeserializeObject<List<APLocation>>(locationText);
+            Log.LogInfo($"Loaded {locationData.Count} locations");
             return locationData;
         }
         catch (Exception e)
