@@ -32,46 +32,12 @@ public class GameManager : BaseComponent
         GoalManager.Instance.GoalEvent += OnGoalEvent;
         OnDisabled += () => GoalManager.Instance.GoalEvent -= OnGoalEvent;
 
-        APManager.Instance?.LocationQueue.APLocationGiven += OnAPLocationGiven;
-        OnDisabled += () => APManager.Instance?.LocationQueue.APLocationGiven -= OnAPLocationGiven;
-
         GameService.GameLoaded += OnGameLoaded;
         OnDisabled += () => GameService.GameLoaded -= OnGameLoaded;
-        
-        GameService.Load();
     }
 
     // Disable the interprocess communication if the mod is loaded. Sorry, no tapping here.
     private static void OnGameLoaded(object sender, ModSaveGame e) => IpcPatch.SetRunning(e is not null);
-
-    private static void OnAPLocationGiven(object sender, APLocation apLocation)
-    {
-        try
-        {
-            if (apLocation.achievement == null) return;
-            // Find the farm
-            Farm farm = MainSimPatch.GetMainSim()?.farm;
-            if (farm is null)
-            {
-                Log.LogException($"Failed to find Farm. Location name: {apLocation.name}");
-                return;
-            }
-
-            int count = farm.NumUnlocked(apLocation.achievement);
-
-            farm.Unlock(apLocation.achievement, count + 1);
-        }
-        catch (Exception e)
-        {
-            Log.LogError(e.Message);
-            if (e.InnerException != null)
-            {
-                Log.LogError(e.InnerException.Message);
-            }
-
-            Log.LogInfo(e.StackTrace);
-        }
-    }
 
     private static void OnGoalEvent(object sender, GoalEvent e)
     {
@@ -120,7 +86,7 @@ public class GameManager : BaseComponent
             Farm farm = MainSimPatch.GetMainSim()?.farm;
             if (farm is null)
             {
-                Log.LogException("[GivePlayerItem] Failed to find Farm.");
+                Log.LogError("[GivePlayerItem] Failed to find Farm.");
                 return false;
             }
 
