@@ -79,7 +79,7 @@ public class StatsService : IStatsService
             return;
         }
 
-        GrantAchievements(name, count);
+        GrantAchievements(name, total);
 
         GoalManager.Instance.RaiseStatTotalEvent(name, total);
     }
