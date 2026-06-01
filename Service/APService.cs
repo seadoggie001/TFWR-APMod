@@ -15,6 +15,8 @@ public class APService(IAPManager apManager) : IAPService
     private readonly HashSet<string> _unlockedCache = [];
 
     private ArchipelagoSession Session { get; set; }
+    private APLocation _goal;
+    private Dictionary<string, object> _slotData;
 
     public event EventHandler<string> APDisconnected;
     public event EventHandler<bool> ConnectionResult;
@@ -42,14 +44,22 @@ public class APService(IAPManager apManager) : IAPService
     }
 
     // Send the location to the server
-    public void SubmitLocationById(long id) => Session?.Locations?.CompleteLocationChecks(id);
+    public void SubmitLocationById(long id)
+    {
+        Session?.Locations?.CompleteLocationChecks(id);
+
+        // If this is the goal location, tell the server about it
+        if (id == _goal?.id) Session?.SetGoalAchieved();
+    }
 
     public async Task<bool> TryEnableAsync(
         ConnectionInfo connectionSettings,
         ILocationQueue locationQueue,
         IItemQueue itemQueue)
     {
-        Log.LogInfo("Attempting to sign in to Archipelago");
+        try
+        {
+            Log.LogInfo("Attempting to sign in to Archipelago");
 
         // Only attempt to connect if not connected already
         if (Session?.Socket?.Connected ?? false)
@@ -85,6 +95,19 @@ public class APService(IAPManager apManager) : IAPService
         {
             Log.LogInfo("Successfully logged in.");
             Session.Socket.SocketClosed += reason => APDisconnected?.Invoke(this, reason);
+
+                // Load slot data
+                _slotData = await Session.DataStorage.GetSlotDataAsync();
+                
+                // Determine goal location
+                string goalName = 1 == (long) _slotData["easy_mode"]
+                    ? "Gold Farmer"
+                    : "Size Matters";
+                _goal = APManager.Instance?.GetLocations().First(m => m.name == goalName);
+
+                Log.LogInfo("Goal name was set to " + goalName);
+                if (_goal is null) Log.LogError("_goal is null!");
+
             return true;
         }
 
@@ -93,6 +116,12 @@ public class APService(IAPManager apManager) : IAPService
             $"Username: {connectionSettings.Username}, " +
             $"Password? {!string.IsNullOrWhiteSpace(connectionSettings.Password)}}}");
         return false;
+    }
+        catch (Exception ex)
+        {
+            Log.LogException("Failed to connect to AP with exception", ex);
+            return false;
+        }
     }
 
     //ToDo: If auto-connect is ever set up, this will need to check (with event arguments)
