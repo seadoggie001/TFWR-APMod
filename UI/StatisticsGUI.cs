@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Model;
@@ -11,11 +12,14 @@ namespace com.seadoggie.TFWRArchipelago.UI;
 public class StatisticsGUI : BaseGUI
 {
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.StatGUI");
+    private const float RefreshRate = 2.0f; // Every 2 seconds
+    
     private UIDocument _uiDocument;
     private readonly Dictionary<string, List<RowElements>> _statisticRows = new();
     private readonly Dictionary<string, RowElements> _goalRowsByLocation = new();
     private bool _visible;
     private Action _unregisterCallback = () => { };
+    private readonly ConcurrentQueue<Stat> _statQueue = new();
 
     private class RowElements
     {
@@ -37,12 +41,18 @@ public class StatisticsGUI : BaseGUI
         CreateLayout();
     }
 
+    private void Start()
+    {
+        // Repeatedly invoke RefreshUI. After RefreshRate seconds, repeat every RefreshRate seconds
+        InvokeRepeating(nameof(RefreshUI), RefreshRate, RefreshRate);
+    }
+
     public void Show()
     {
         RootElement.style.display = DisplayStyle.Flex;
         _visible = true;
     }
-
+    
     public void Hide(MouseUpEvent e = null)
     {
         RootElement.style.display = DisplayStyle.None;
@@ -87,11 +97,7 @@ public class StatisticsGUI : BaseGUI
 
     public void StatUpdate(string item, double value)
     {
-        if (!_statisticRows.TryGetValue(item, out List<RowElements> row)) return;
-        foreach (RowElements rowElements in row)
-        {
-            UpdateValues(rowElements, value);
-        }
+        _statQueue.Enqueue(new Stat(item, value));
     }
 
     public void LoadStats()
@@ -356,9 +362,54 @@ public class StatisticsGUI : BaseGUI
 
     private static void UpdateValues(RowElements rowElements, double value)
     {
-        rowElements.ProgressBar.value = (float)value;
-        rowElements.ProgressBar.title = $"{value:N0} / {rowElements.ProgressBar.highValue:N0}";
+        try
+        {
+            rowElements.ProgressBar.value = (float)value;
+            rowElements.ProgressBar.title = $"{value:N0} / {rowElements.ProgressBar.highValue:N0}";
 
-        rowElements.Toggle.value = value > rowElements.ProgressBar.highValue;
+            rowElements.Toggle.value = value > rowElements.ProgressBar.highValue;
+        }
+        catch (InvalidOperationException ex)
+        {
+            // This message gets thrown because I'm updating the GUI too quickly sometimes, I'm pretty sure
+            if (ex.Message !=
+                "VisualElements cannot be marked for dirty repaint under an active visual tree during generateVisualContent callback execution nor during visual tree rendering")
+            {
+                Log.LogException("Failed to update values", ex);
+            }
+        }
+    }
+
+    private void RefreshUI()
+    {
+        if(!_visible || _statQueue.IsEmpty) return;
+        
+        // Hold a unique list of stats to refresh
+        Dictionary<string, double> refreshStats = new();
+        
+        // While there are more stats
+        while (_statQueue.TryDequeue(out Stat stat))
+        {
+            // Add or combine the stat into the dictionary
+            if (refreshStats.ContainsKey(stat.Name))
+            {
+                // These are totals of the statistic, use the larger value
+                refreshStats[stat.Name] = Math.Max(refreshStats[stat.Name], stat.Value);
+            }
+            else
+            {
+                refreshStats.Add(stat.Name, stat.Value);
+            }
+        }
+
+        // For each stat to refresh
+        foreach (KeyValuePair<string, double> stat in refreshStats)
+        {
+            if (!_statisticRows.TryGetValue(stat.Key, out List<RowElements> row)) return;
+            foreach (RowElements rowElements in row)
+            {
+                UpdateValues(rowElements, stat.Value);
+            }
+        }
     }
 }
