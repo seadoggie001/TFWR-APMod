@@ -83,7 +83,7 @@ public class GameService : IGameService
         }
 
         // If we've previously received this item
-        if (itemsReceived < ModSaveGame.ItemsReceived) return Result.ItemAlreadyRecevied;
+        if (itemsReceived < ModSaveGame.ItemsReceived) return Result.ItemAlreadyReceived;
 
         Log.LogInfo("Only unlocked " + ModSaveGame.ItemsReceived);
         ModSaveGame.ItemsReceived += 1;
@@ -98,7 +98,7 @@ public class GameService : IGameService
     public enum Result
     {
         ModNotInitialized,
-        ItemAlreadyRecevied,
+        ItemAlreadyReceived,
         ProcessItem,
         ItemNotFound,
         InternalError,

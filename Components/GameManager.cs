@@ -58,7 +58,7 @@ public class GameManager : BaseComponent
         {
             case Service.GameService.Result.ModNotInitialized:
                 return false;
-            case Service.GameService.Result.ItemAlreadyRecevied:
+            case Service.GameService.Result.ItemAlreadyReceived:
                 return true;
             case Service.GameService.Result.ProcessItem:
                 break;
