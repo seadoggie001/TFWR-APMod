@@ -4,6 +4,7 @@ using com.seadoggie.TFWRArchipelago.Service;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
+// ToDo: Rename this to StatManager. Goal Manager sounds like it listens for AP-Goals.
 public class GoalManager : BaseComponent, IGoalManagerDelegates
 {
     public static GoalManager Instance;
@@ -81,6 +82,9 @@ public class GoalManager : BaseComponent, IGoalManagerDelegates
 
 public interface IGoalManagerDelegates
 {
+    /// <summary>
+    /// Raised when a goal has been completed
+    /// </summary>
     event EventHandler<GoalEvent> GoalEvent;
     /// <summary>
     /// Raised to add a value to a stat

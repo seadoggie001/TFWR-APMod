@@ -150,7 +150,7 @@ public class APService(IAPManager apManager) : IAPService
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException("Session.ConnectAsync",e);
+            Plugin.Log.LogException("Session.ConnectAsync", e);
             Log.LogError("Exception Type: " + e.GetType());
             Log.LogError(e.Message);
             Log.LogError(e.StackTrace);
