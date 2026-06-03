@@ -149,8 +149,8 @@ public class StatisticsGUI : BaseGUI
         buttonRow.AddToClassList("row");
         buttonRow.AddToClassList("btn-row");
 
-        // ToDo: Move to .USS file (.btn-row)
-        buttonRow.style.flexGrow = 0;
+        // ToDo: Move to .USS file (.btn-row)... should be done? (June 1st, 2026)
+        // buttonRow.style.flexGrow = 0;
 
         Button statBtn = new()
         {
@@ -216,7 +216,7 @@ public class StatisticsGUI : BaseGUI
         }
 
         foreach (APLocation apLocation in APManager.Instance?.GetLocations()
-                     ?.Where(m => m.statistic is null && m.timed is null) ?? [])
+                     ?.Where(m => m.statistic is null && m.timed is null && m.region != "GrassSanity") ?? [])
         {
             container.Add(CreateActionRow(apLocation));
         }

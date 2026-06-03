@@ -94,6 +94,21 @@ public class GameService : IGameService
     public void RaiseMenuOpen(bool open) => MenuOpen?.Invoke(this, open);
 
     public void RaiseNewItemReceived(string itemName) => NewItemReceived?.Invoke(this, itemName);
+
+    public void RaiseGrassSanity(Vector2Int position)
+    {
+        // idk, check if it needs to be submitted?
+        if(ModSaveGame?.Grass.Contains(position) ?? true) return;
+        string locName = $"Grass ({position.x}, {position.y})";
+        APLocation location = APManager.Instance?.GetLocations().FirstOrDefault(m => m.name == locName);
+        if (location is null)
+        {
+            Log.LogError($"Could not find location {locName}");
+            return;
+        }
+        APManager.Instance?.APService.SubmitLocationById(location.id);
+        ModSaveGame.Grass.Add(position);
+    }
     
     public enum Result
     {
@@ -130,4 +145,5 @@ public interface IGameService
     GameService.Result CanGivePlayerItem(string itemName, int itemsReceived);
     void RaiseMenuOpen(bool open);
     void RaiseNewItemReceived(string itemName);
+    void RaiseGrassSanity(Vector2Int position);
 }
