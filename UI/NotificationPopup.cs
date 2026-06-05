@@ -47,7 +47,7 @@ public class NotificationPopup : BaseGUI
 
         _rootElement.styleSheets.Add(styleSheet);
 
-        _container = new();
+        _container = new VisualElement();
         _container.AddToClassList("notification-container");
         _rootElement.Add(_container);
 
