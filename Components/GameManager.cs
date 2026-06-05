@@ -66,7 +66,7 @@ public class GameManager : BaseComponent
                 throw new ArgumentOutOfRangeException();
         }
 
-        if (itemName != "RickRoll")
+        if (itemName != APTrapItems.RickRoll)
         {
             ItemProcessed item = GivePlayerItem(itemName);
                 if (item.given)
