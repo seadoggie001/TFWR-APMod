@@ -8,7 +8,7 @@ using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
 
-public class Notification : BaseGUI
+public class NotificationPopup : BaseGUI
 {
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.UI-Notif");
     private UIDocument _uiDocument;

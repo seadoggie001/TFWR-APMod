@@ -17,7 +17,7 @@ public class UIManager : BaseComponent, IUIManagerDelegates
     private StatisticsGUI _statisticsGUI;
     private ArchipelagoSettingsGUI _archipelagoSettingsGUI;
     private FloatingActionButton _floatingActionButton;
-    private Notification _notification;
+    private NotificationPopup _notificationPopup;
 
     protected override void OnEnable()
     {
@@ -64,14 +64,14 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         _archipelagoSettingsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
         _archipelagoSettingsGUI.DisplayingWindow = false;
         
-        _notification = new GameObject("Notification").AddComponent<Notification>();
-        _notification.transform.SetParent(Plugin.Instance.MainGameObject.transform);
+        _notificationPopup = new GameObject("Notification").AddComponent<NotificationPopup>();
+        _notificationPopup.transform.SetParent(Plugin.Instance.MainGameObject.transform);
     }
 
     private void OnNewItemReceived(object sender, string e)
     {
         // inflate the hat popup somehow
-        _notification.ShowPopup("You received an item!", e);
+        _notificationPopup.ShowPopup("You received an item!", e);
     }
 
     private void OnMenuOpen(object sender, bool isOpen)
