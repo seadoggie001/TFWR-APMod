@@ -69,7 +69,9 @@ public class GameManager : BaseComponent
         if (itemName != "RickRoll")
         {
             ItemProcessed item = GivePlayerItem(itemName);
-            if (item.given) GameService.RaiseNewItemReceived(itemName);
+                if (item.given)
+                    GameService.RaiseNewItemReceived(new Notification
+                        { Title = "You received an item!", Message = itemName });
             return item.processed;
         }
         else

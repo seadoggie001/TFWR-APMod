@@ -15,7 +15,7 @@ public class GameService : IGameService
     public event EventHandler<ModSaveGame> GameLoaded;
     public event EventHandler<EventArgs> PreLoadGame;
     public event EventHandler<bool> MenuOpen;
-    public event EventHandler<string> NewItemReceived;
+    public event EventHandler<Notification> NewItemReceived;
 
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.GameSvc");
     public static string GetFilePath(string saveName) => Path.Combine(Saver.GetPathOfSaveDirectory(saveName), FileName);
@@ -93,7 +93,7 @@ public class GameService : IGameService
 
     public void RaiseMenuOpen(bool open) => MenuOpen?.Invoke(this, open);
 
-    public void RaiseNewItemReceived(string itemName) => NewItemReceived?.Invoke(this, itemName);
+    public void RaiseNewItemReceived(Notification notification) => NewItemReceived?.Invoke(this, notification);
 
     public void RaiseGrassSanity(Vector2Int position)
     {
@@ -106,6 +106,7 @@ public class GameService : IGameService
             Log.LogError($"Could not find location {locName}");
             return;
         }
+
         APManager.Instance?.APService.SubmitLocationById(location.id);
         ModSaveGame.Grass.Add(position);
     }
@@ -134,7 +135,7 @@ public interface IGameService
 
     event EventHandler<bool> MenuOpen;
     
-    event EventHandler<string> NewItemReceived;
+    event EventHandler<Notification> NewItemReceived;
 
     /// <summary>
     /// Saves the current stats of the game
@@ -144,6 +145,6 @@ public interface IGameService
     void Load();
     GameService.Result CanGivePlayerItem(string itemName, int itemsReceived);
     void RaiseMenuOpen(bool open);
-    void RaiseNewItemReceived(string itemName);
+    void RaiseNewItemReceived(Notification notification);
     void RaiseGrassSanity(Vector2Int position);
 }

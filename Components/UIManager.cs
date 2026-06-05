@@ -17,7 +17,7 @@ public class UIManager : BaseComponent, IUIManagerDelegates
     private StatisticsGUI _statisticsGUI;
     private ArchipelagoSettingsGUI _archipelagoSettingsGUI;
     private FloatingActionButton _floatingActionButton;
-    private Notification _notification;
+    private NotificationPopup _notificationPopup;
 
     protected override void OnEnable()
     {
@@ -50,8 +50,8 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
         GameManager.Instance?.GameService.MenuOpen += OnMenuOpen;
         OnDisabled += () => GameManager.Instance?.GameService.MenuOpen -= OnMenuOpen;
-        GameManager.Instance?.GameService.NewItemReceived += OnNewItemReceived;
-        OnDisabled += () => GameManager.Instance?.GameService.NewItemReceived -= OnNewItemReceived;
+        GameManager.Instance?.GameService.NewItemReceived += NotifyItemReceived;
+        OnDisabled += () => GameManager.Instance?.GameService.NewItemReceived -= NotifyItemReceived;
 
         _statisticsGUI = new GameObject("StatGUI").AddComponent<StatisticsGUI>();
         _statisticsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
@@ -64,15 +64,12 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         _archipelagoSettingsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
         _archipelagoSettingsGUI.DisplayingWindow = false;
         
-        _notification = new GameObject("Notification").AddComponent<Notification>();
-        _notification.transform.SetParent(Plugin.Instance.MainGameObject.transform);
+        _notificationPopup = new GameObject("Notification").AddComponent<NotificationPopup>();
+        _notificationPopup.transform.SetParent(Plugin.Instance.MainGameObject.transform);
     }
 
-    private void OnNewItemReceived(object sender, string e)
-    {
-        // inflate the hat popup somehow
-        _notification.ShowPopup("You received an item!", e);
-    }
+    private void NotifyItemReceived(object sender, Notification notification) =>
+        _notificationPopup.Show(notification.Title, notification.Message);
 
     private void OnMenuOpen(object sender, bool isOpen)
     {

@@ -8,7 +8,7 @@ using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
 
-public class Notification : BaseGUI
+public class NotificationPopup : BaseGUI
 {
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.UI-Notif");
     private UIDocument _uiDocument;
@@ -47,7 +47,7 @@ public class Notification : BaseGUI
 
         _rootElement.styleSheets.Add(styleSheet);
 
-        _container = new();
+        _container = new VisualElement();
         _container.AddToClassList("notification-container");
         _rootElement.Add(_container);
 
@@ -90,7 +90,7 @@ public class Notification : BaseGUI
         _isDisplayed = false;
     }
     
-    public void ShowPopup(string title, string text)
+    public void Show(string title, string text)
     {
         _messageQueue.Enqueue(title + "|" + text);
     }
