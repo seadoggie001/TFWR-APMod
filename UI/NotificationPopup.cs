@@ -90,7 +90,7 @@ public class NotificationPopup : BaseGUI
         _isDisplayed = false;
     }
     
-    public void ShowPopup(string title, string text)
+    public void Show(string title, string text)
     {
         _messageQueue.Enqueue(title + "|" + text);
     }

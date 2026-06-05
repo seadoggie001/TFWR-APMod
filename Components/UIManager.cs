@@ -50,8 +50,8 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
         GameManager.Instance?.GameService.MenuOpen += OnMenuOpen;
         OnDisabled += () => GameManager.Instance?.GameService.MenuOpen -= OnMenuOpen;
-        GameManager.Instance?.GameService.NewItemReceived += OnNewItemReceived;
-        OnDisabled += () => GameManager.Instance?.GameService.NewItemReceived -= OnNewItemReceived;
+        GameManager.Instance?.GameService.NewItemReceived += NotifyItemReceived;
+        OnDisabled += () => GameManager.Instance?.GameService.NewItemReceived -= NotifyItemReceived;
 
         _statisticsGUI = new GameObject("StatGUI").AddComponent<StatisticsGUI>();
         _statisticsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
@@ -68,11 +68,8 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         _notificationPopup.transform.SetParent(Plugin.Instance.MainGameObject.transform);
     }
 
-    private void OnNewItemReceived(object sender, string e)
-    {
-        // inflate the hat popup somehow
-        _notificationPopup.ShowPopup("You received an item!", e);
-    }
+    private void NotifyItemReceived(object sender, Notification notification) =>
+        _notificationPopup.Show(notification.Title, notification.Message);
 
     private void OnMenuOpen(object sender, bool isOpen)
     {
