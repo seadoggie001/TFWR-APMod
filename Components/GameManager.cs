@@ -61,25 +61,31 @@ public class GameManager : BaseComponent
             case Service.GameService.Result.ItemAlreadyReceived:
                 return true;
             case Service.GameService.Result.ProcessItem:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        if (itemName != APTrapItems.RickRoll)
-        {
-            ItemProcessed item = GivePlayerItem(itemName);
+                ItemProcessed item = GivePlayerItem(itemName);
                 if (item.given)
                     GameService.RaiseNewItemReceived(new Notification
                         { Title = "You received an item!", Message = itemName });
-            return item.processed;
+                return item.processed;
+            case Service.GameService.Result.ItsATrap:
+                ProcessTrapItem(itemName);
+                GameService.RaiseNewItemReceived(new Notification { Title = "It's a trap!", Message = itemName });
+                return true;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
-        else
-        {
-            RickRoll();
-            return true;
-        }
+    }
 
+    public void ProcessTrapItem(string itemName)
+    {
+        switch (itemName)
+        {
+            case APTrapItems.RickRoll:
+                RickRoll();
+                break;
+            default:
+                Log.LogError($"Unexpected trap name: {itemName}");
+                break;
+        }
     }
 
     private class ItemProcessed(bool processed, bool given)
@@ -87,7 +93,7 @@ public class GameManager : BaseComponent
         public bool processed { get; set; } = processed;
         public bool given { get; set; } = given;
     }
-    
+
     private static ItemProcessed GivePlayerItem(string itemName)
     {
         try

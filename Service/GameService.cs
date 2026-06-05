@@ -88,7 +88,9 @@ public class GameService : IGameService
         Log.LogInfo("Only unlocked " + ModSaveGame.ItemsReceived);
         ModSaveGame.ItemsReceived += 1;
 
-        return Result.ProcessItem;
+        return APTrapItems.AllTrapItems.Contains(itemName)
+            ? Result.ItsATrap
+            : Result.ProcessItem;
     }
 
     public void RaiseMenuOpen(bool open) => MenuOpen?.Invoke(this, open);
@@ -110,14 +112,13 @@ public class GameService : IGameService
         APManager.Instance?.APService.SubmitLocationById(location.id);
         ModSaveGame.Grass.Add(position);
     }
-    
+
     public enum Result
     {
         ModNotInitialized,
         ItemAlreadyReceived,
         ProcessItem,
-        ItemNotFound,
-        InternalError,
+        ItsATrap,
     }
 }
 
@@ -134,7 +135,7 @@ public interface IGameService
     event EventHandler<ModSaveGame> GameLoaded;
 
     event EventHandler<bool> MenuOpen;
-    
+
     event EventHandler<Notification> NewItemReceived;
 
     /// <summary>
