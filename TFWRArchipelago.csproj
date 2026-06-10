@@ -69,4 +69,19 @@
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
       <Exec Command="/home/seadoggie/source/repos/TFWRArchipelago/publish.sh" />
     </Target>
+
+    <Target Name="EmptyPublishFolder" BeforeTargets="PrepareForPublish">
+        <Message Text="Emptying target folder: $(PublishDir)" Importance="high" />
+        <RemoveDir Directories="$(PublishDir)" />
+        <MakeDir Directories="$(PublishDir)" />
+    </Target>
+    
+    <Target Name="ZipPublishOutput" AfterTargets="Publish">
+        <Message Text="Zipping publish output..." Importance="high" />
+        
+        <ZipDirectory
+                SourceDirectory="$(PublishDir)"
+                DestinationFile="$(MSBuildProjectDirectory)\bin\$(Configuration)\TFWRArchipelago.zip"
+                Overwrite="true" />
+    </Target>
 </Project>
