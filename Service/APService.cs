@@ -100,7 +100,7 @@ public class APService(IAPManager apManager) : IAPService
                 _slotData = await Session.DataStorage.GetSlotDataAsync();
                 
                 // Determine goal location
-                string goalName = 1 == (long) _slotData["easy_mode"]
+                string goalName = 0 == (long) _slotData["goal"]
                     ? "Gold Farmer"
                     : "Size Matters";
                 _goal = APManager.Instance?.GetLocations().First(m => m.name == goalName);
