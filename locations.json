@@ -1211,7 +1211,7 @@
     "requirements": [
       {
         "name": "Expand",
-        "count": 3
+        "count": 4
       }
     ],
     "statistic": {
@@ -1266,6 +1266,12 @@
     "name": "Gold Farmer",
     "description": "Farm 1K Gold",
     "region": "Maze",
+    "requirements": [
+      {
+        "name": "Senses",
+        "count": 1
+      }
+    ],
     "statistic": {
       "key": "gold",
       "value": "1K"
@@ -1276,6 +1282,12 @@
     "name": "Raking in the Gold",
     "description": "Farm 10K Gold",
     "region": "Maze",
+    "requirements": [
+      {
+        "name": "Senses",
+        "count": 1
+      }
+    ],
     "statistic": {
       "key": "gold",
       "value": "10K"
@@ -1286,6 +1298,12 @@
     "name": "All that Glitters",
     "description": "Farm 100K Gold",
     "region": "Maze",
+    "requirements": [
+      {
+        "name": "Senses",
+        "count": 1
+      }
+    ],
     "statistic": {
       "key": "gold",
       "value": "100K"
@@ -1296,6 +1314,12 @@
     "name": "Gold Mine",
     "description": "Farm 1M Gold",
     "region": "Maze",
+    "requirements": [
+      {
+        "name": "Senses",
+        "count": 1
+      }
+    ],
     "statistic": {
       "key": "gold",
       "value": "1M"
@@ -1306,6 +1330,12 @@
     "name": "Going for Gold",
     "description": "Farm 100M gold",
     "region": "Maze",
+    "requirements": [
+      {
+        "name": "Senses",
+        "count": 1
+      }
+    ],
     "statistic": {
       "key": "gold",
       "value": "100M"
