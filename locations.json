@@ -117,11 +117,11 @@
     "id": 10012,
     "name": "Big Farm",
     "description": "Reach the maximum farm size",
-    "region": "EndGame",
+    "region": "Start",
     "requirements": [
       {
-        "name": "Expand",
-        "count": 9
+        "name": "Really Big Farm",
+        "count": 1
       }
     ],
     "achievement": "BIG_FARM"
@@ -262,6 +262,16 @@
   },
   {
     "id": 11001,
+    "name": "10 Flips",
+    "description": "Flip 10 times",
+    "region": "Flip",
+    "statistic": {
+      "key": "flips",
+      "value": "10"
+    }
+  },
+  {
+    "id": 11002,
     "name": "Flipping Awesome",
     "description": "Flip 100 times",
     "region": "Flip",
@@ -271,7 +281,7 @@
     }
   },
   {
-    "id": 11002,
+    "id": 11003,
     "name": "Getting Dizzy",
     "description": "Flip 1K times",
     "region": "Flip",
@@ -295,7 +305,7 @@
     }
   },
   {
-    "id": 11003,
+    "id": 11004,
     "name": "All the flips",
     "description": "Flip 10K times",
     "region": "Flip",
@@ -319,7 +329,7 @@
     }
   },
   {
-    "id": 11004,
+    "id": 11005,
     "name": "Just keep flipping, just keep flipping",
     "description": "Flip 100K times",
     "region": "Flip",
@@ -428,6 +438,16 @@
   },
   {
     "id": 13000,
+    "name": "10 Hay",
+    "description": "Farm 10 hay",
+    "region": "Hay",
+    "statistic": {
+      "key": "hay",
+      "value": "10"
+    }
+  },
+  {
+    "id": 13001,
     "name": "Hay Fever",
     "description": "Farm 100 hay",
     "region": "Hay",
@@ -437,7 +457,7 @@
     }
   },
   {
-    "id": 13001,
+    "id": 13002,
     "name": "Hey, Farmer!",
     "description": "Farm 1K Hay",
     "region": "Hay",
@@ -457,14 +477,18 @@
     }
   },
   {
-    "id": 13002,
+    "id": 13003,
     "name": "Cause I have farmed 10K Hay",
     "description": "Farm 10K hay",
     "region": "Hay",
     "requirements": [
       {
-        "name": "Grass",
-        "count": 3
+        "name": "Expand",
+        "count": 1
+      },
+      {
+        "name": "Functions",
+        "count": 1
       },
       {
         "name": "Megafarm",
@@ -475,8 +499,8 @@
         "count": 1
       },
       {
-        "name": "Functions",
-        "count": 1
+        "name": "Grass",
+        "count": 3
       }
     ],
     "statistic": {
@@ -485,14 +509,18 @@
     }
   },
   {
-    "id": 13003,
+    "id": 13004,
     "name": "Hay Master",
     "description": "Farm 100K hay",
     "region": "Hay",
     "requirements": [
       {
-        "name": "Grass",
-        "count": 4
+        "name": "Expand",
+        "count": 2
+      },
+      {
+        "name": "Functions",
+        "count": 1
       },
       {
         "name": "Megafarm",
@@ -503,8 +531,8 @@
         "count": 1
       },
       {
-        "name": "Functions",
-        "count": 1
+        "name": "Grass",
+        "count": 4
       }
     ],
     "statistic": {
@@ -513,14 +541,18 @@
     }
   },
   {
-    "id": 13004,
+    "id": 13005,
     "name": "1M Hay",
     "description": "Farm 1M hay",
     "region": "Hay",
     "requirements": [
       {
-        "name": "Grass",
-        "count": 6
+        "name": "Expand",
+        "count": 3
+      },
+      {
+        "name": "Functions",
+        "count": 1
       },
       {
         "name": "Megafarm",
@@ -531,8 +563,8 @@
         "count": 1
       },
       {
-        "name": "Functions",
-        "count": 1
+        "name": "Grass",
+        "count": 6
       }
     ],
     "statistic": {
@@ -541,14 +573,18 @@
     }
   },
   {
-    "id": 13005,
+    "id": 13006,
     "name": "10M Hay",
     "description": "Farm 10M hay",
     "region": "Hay",
     "requirements": [
       {
-        "name": "Grass",
-        "count": 7
+        "name": "Expand",
+        "count": 4
+      },
+      {
+        "name": "Functions",
+        "count": 1
       },
       {
         "name": "Megafarm",
@@ -559,8 +595,8 @@
         "count": 1
       },
       {
-        "name": "Functions",
-        "count": 1
+        "name": "Grass",
+        "count": 7
       }
     ],
     "statistic": {
@@ -569,11 +605,15 @@
     }
   },
   {
-    "id": 13006,
+    "id": 13007,
     "name": "100M Hay",
     "description": "Farm 100M hay",
     "region": "Hay",
     "requirements": [
+      {
+        "name": "Expand",
+        "count": 4
+      },
       {
         "name": "Grass",
         "count": 8
@@ -597,7 +637,7 @@
     }
   },
   {
-    "id": 13007,
+    "id": 13008,
     "name": "Big Hay Farmer",
     "description": "Farm 1B hay",
     "region": "Hay",
@@ -607,15 +647,7 @@
         "count": 10
       },
       {
-        "name": "Megafarm",
-        "count": 5
-      },
-      {
-        "name": "Loop",
-        "count": 1
-      },
-      {
-        "name": "Functions",
+        "name": "Maxed out farm",
         "count": 1
       }
     ],
@@ -626,6 +658,16 @@
   },
   {
     "id": 15000,
+    "name": "10 carrots",
+    "description": "Farm 100 carrots",
+    "region": "Carrot",
+    "statistic": {
+      "key": "carrot",
+      "value": "10"
+    }
+  },
+  {
+    "id": 15001,
     "name": "Must be a bunny",
     "description": "Farm 100 carrots",
     "region": "Carrot",
@@ -635,7 +677,7 @@
     }
   },
   {
-    "id": 15001,
+    "id": 15002,
     "name": "Carrot Farmer",
     "description": "Farm 1K carrots",
     "region": "Carrot",
@@ -655,7 +697,7 @@
     }
   },
   {
-    "id": 15002,
+    "id": 15003,
     "name": "10K carrots",
     "description": "Farm 10K carrots",
     "region": "Carrot",
@@ -675,7 +717,7 @@
     }
   },
   {
-    "id": 15003,
+    "id": 15004,
     "name": "100K Carrots",
     "description": "Farm 100K carrots",
     "region": "Carrot",
@@ -703,7 +745,7 @@
     }
   },
   {
-    "id": 15004,
+    "id": 15005,
     "name": "All the carrots",
     "description": "Farm 1M carrots",
     "region": "Carrot",
@@ -731,7 +773,7 @@
     }
   },
   {
-    "id": 15005,
+    "id": 15006,
     "name": "10M Carrots",
     "description": "Farm 10M carrots",
     "region": "Carrot",
@@ -759,7 +801,7 @@
     }
   },
   {
-    "id": 15006,
+    "id": 15007,
     "name": "100M Carrots",
     "description": "Farm 100M carrots",
     "region": "Carrot",
@@ -787,7 +829,7 @@
     }
   },
   {
-    "id": 15007,
+    "id": 15008,
     "name": "Orange you glad you're done with carrots?",
     "description": "Farm 1B carrots",
     "region": "Carrot",
@@ -816,6 +858,16 @@
   },
   {
     "id": 16000,
+    "name": "10 Wood",
+    "description": "Farm 10 wood",
+    "region": "Wood",
+    "statistic": {
+      "key": "wood",
+      "value": "10"
+    }
+  },
+  {
+    "id": 16001,
     "name": "100 Wood",
     "description": "Farm 100 wood",
     "region": "Wood",
@@ -825,11 +877,15 @@
     }
   },
   {
-    "id": 16001,
+    "id": 16002,
     "name": "Deforestation",
     "description": "Farm 1K Wood",
     "region": "Wood",
     "requirements": [
+      {
+        "name": "Trees",
+        "count": 1
+      },
       {
         "name": "Expand",
         "count": 1
@@ -841,7 +897,7 @@
     }
   },
   {
-    "id": 16002,
+    "id": 16003,
     "name": "10K Wood",
     "description": "Farm 10K Wood",
     "region": "Wood",
@@ -869,7 +925,7 @@
     }
   },
   {
-    "id": 16003,
+    "id": 16004,
     "name": "100K Wood",
     "description": "Farm 100K Wood",
     "region": "Wood",
@@ -897,7 +953,7 @@
     }
   },
   {
-    "id": 16004,
+    "id": 16005,
     "name": "1M Wood",
     "description": "Farm 1M Wood",
     "region": "Wood",
@@ -925,7 +981,7 @@
     }
   },
   {
-    "id": 16005,
+    "id": 16006,
     "name": "10M Wood",
     "description": "Farm 10M Wood",
     "region": "Wood",
@@ -953,7 +1009,7 @@
     }
   },
   {
-    "id": 16006,
+    "id": 16007,
     "name": "100M Wood",
     "description": "Farm 100M Wood",
     "region": "Wood",
@@ -981,7 +1037,7 @@
     }
   },
   {
-    "id": 16007,
+    "id": 16008,
     "name": "Big Wood Farmer",
     "description": "Farm 1B wood",
     "region": "Wood",
@@ -1009,7 +1065,38 @@
     }
   },
   {
+    "id": 16009,
+    "name": "Woodn't you know it, you're on the clock",
+    "description": "Farm 1B wood in 1 minute",
+    "region": "Wood",
+    "requirements": [
+      {
+        "name": "Maxed out farm",
+        "count": 1
+      },
+      {
+        "name": "Trees",
+        "count": 10
+      }
+    ],
+    "timed": {
+      "key": "wood",
+      "value": "1B",
+      "time": "1m"
+    }
+  },
+  {
     "id": 17000,
+    "name": "10 Pumpkins",
+    "description": "Farm 10 pumpkins",
+    "region": "Pumpkins",
+    "statistic": {
+      "key": "pumpkin",
+      "value": "10"
+    }
+  },
+  {
+    "id": 17001,
     "name": "Jack Collector",
     "description": "Farm 100 pumpkins",
     "region": "Pumpkins",
@@ -1019,11 +1106,15 @@
     }
   },
   {
-    "id": 17001,
+    "id": 17002,
     "name": "1K Pumpkins",
     "description": "Farm 1K Pumpkins",
     "region": "Pumpkins",
     "requirements": [
+      {
+        "name": "Drone Speed",
+        "count": 1
+      },
       {
         "name": "Expand",
         "count": 3
@@ -1039,11 +1130,15 @@
     }
   },
   {
-    "id": 17002,
+    "id": 17003,
     "name": "10K Pumpkins",
     "description": "Farm 10K Pumpkins",
     "region": "Pumpkins",
     "requirements": [
+      {
+        "name": "Drone Speed",
+        "count": 1
+      },
       {
         "name": "Expand",
         "count": 3
@@ -1059,11 +1154,15 @@
     }
   },
   {
-    "id": 17003,
+    "id": 17004,
     "name": "100K Pumpkins",
     "description": "Farm 100K Pumpkins",
     "region": "Pumpkins",
     "requirements": [
+      {
+        "name": "Drone Speed",
+        "count": 1
+      },
       {
         "name": "Expand",
         "count": 3
@@ -1079,11 +1178,15 @@
     }
   },
   {
-    "id": 17004,
+    "id": 17005,
     "name": "1M Pumpkins",
     "description": "Farm 1M Pumpkins",
     "region": "Pumpkins",
     "requirements": [
+      {
+        "name": "Drone Speed",
+        "count": 1
+      },
       {
         "name": "Expand",
         "count": 3
@@ -1099,14 +1202,18 @@
     }
   },
   {
-    "id": 17005,
-    "name": "Big Pumpkin Farmer",
-    "description": "Farm 100M pumpkins",
+    "id": 17006,
+    "name": "10M Pumpkins",
+    "description": "Farm 10M Pumpkins",
     "region": "Pumpkins",
     "requirements": [
       {
+        "name": "Drone Speed",
+        "count": 1
+      },
+      {
         "name": "Expand",
-        "count": 4
+        "count": 3
       },
       {
         "name": "Pumpkins",
@@ -1115,11 +1222,70 @@
     ],
     "statistic": {
       "key": "pumpkin",
+      "value": "10M"
+    }
+  },
+  {
+    "id": 17007,
+    "name": "Big Pumpkin Farmer",
+    "description": "Farm 100M pumpkins",
+    "region": "Pumpkins",
+    "requirements": [
+      {
+        "name": "Drone Speed",
+        "count": 1
+      },
+      {
+        "name": "Expand",
+        "count": 4
+      },
+      {
+        "name": "Pumpkins",
+        "count": 7
+      }
+    ],
+    "statistic": {
+      "key": "pumpkin",
       "value": "100M"
     }
   },
   {
+    "id": 17008,
+    "name": "Pumpkin Master",
+    "description": "Farm 20M pumpkins in 1 minute",
+    "region": "Pumpkins",
+    "requirements": [
+      {
+        "name": "Maxed out farm",
+        "count": 1
+      },
+      {
+        "name": "Expand",
+        "count": 4
+      },
+      {
+        "name": "Pumpkins",
+        "count": 10
+      }
+    ],
+    "timed": {
+      "key": "pumpkin",
+      "value": "20M",
+      "time": "1m"
+    }
+  },
+  {
     "id": 18000,
+    "name": "10 Power",
+    "description": "Farm 10 power",
+    "region": "Sunflower",
+    "statistic": {
+      "key": "power",
+      "value": "10"
+    }
+  },
+  {
+    "id": 18001,
     "name": "Flower Power",
     "description": "Farm 100 power",
     "region": "Sunflower",
@@ -1129,7 +1295,7 @@
     }
   },
   {
-    "id": 18001,
+    "id": 18002,
     "name": "Power Farmer",
     "description": "Farm 1K Power",
     "region": "Sunflower",
@@ -1146,14 +1312,22 @@
     }
   },
   {
-    "id": 18002,
+    "id": 18003,
     "name": "Over 9000!",
     "description": "Farm 9001 power",
     "region": "Sunflower",
     "requirements": [
       {
+        "name": "Functions",
+        "count": 1
+      },
+      {
+        "name": "Megafarm",
+        "count": 1
+      },
+      {
         "name": "Expand",
-        "count": 3
+        "count": 4
       }
     ],
     "statistic": {
@@ -1162,14 +1336,22 @@
     }
   },
   {
-    "id": 18003,
+    "id": 18004,
     "name": "Unlimited Power Farmer",
     "description": "Farm 100K Power",
     "region": "Sunflower",
     "requirements": [
       {
+        "name": "Functions",
+        "count": 1
+      },
+      {
+        "name": "Megafarm",
+        "count": 2
+      },
+      {
         "name": "Expand",
-        "count": 3
+        "count": 5
       }
     ],
     "statistic": {
@@ -1178,7 +1360,34 @@
     }
   },
   {
+    "id": 18005,
+    "name": "Sunflower Master",
+    "description": "Farm 12K power in 1 minute",
+    "region": "Sunflower",
+    "requirements": [
+      {
+        "name": "Maxed out farm",
+        "count": 1
+      }
+    ],
+    "timed": {
+      "key": "power",
+      "value": "12K",
+      "time": "1m"
+    }
+  },
+  {
     "id": 19000,
+    "name": "10 Cacti",
+    "description": "Farm 10 cacti",
+    "region": "Cactus",
+    "statistic": {
+      "key": "cactus",
+      "value": "10"
+    }
+  },
+  {
+    "id": 19001,
     "name": "A Little Pokey",
     "description": "Farm 100 cacti",
     "region": "Cactus",
@@ -1188,7 +1397,7 @@
     }
   },
   {
-    "id": 19001,
+    "id": 19002,
     "name": "Can't touch this (ow!)",
     "description": "Farm 1K Cacti",
     "region": "Cactus",
@@ -1204,7 +1413,7 @@
     }
   },
   {
-    "id": 19002,
+    "id": 19003,
     "name": "10K Cacti",
     "description": "Farm 10K Cacti",
     "region": "Cactus",
@@ -1220,7 +1429,7 @@
     }
   },
   {
-    "id": 19003,
+    "id": 19004,
     "name": "Kinda Prickly",
     "description": "Farm 100K cacti",
     "region": "Cactus",
@@ -1236,10 +1445,10 @@
     }
   },
   {
-    "id": 19004,
+    "id": 19005,
     "name": "Big Cactus Farmer",
     "description": "Farm 1M cacti",
-    "region": "EndGame",
+    "region": "Cactus",
     "requirements": [
       {
         "name": "Expand",
@@ -1252,7 +1461,34 @@
     }
   },
   {
+    "id": 19006,
+    "name": "Cactus Master",
+    "description": "Farm 20M cacti in 1 minute",
+    "region": "Cactus",
+    "requirements": [
+      {
+        "name": "Maxed out farm",
+        "count": 1
+      }
+    ],
+    "timed": {
+      "key": "cactus",
+      "value": "20M",
+      "time": "1m"
+    }
+  },
+  {
     "id": 20000,
+    "name": "10 Gold",
+    "description": "Farm 10 Gold",
+    "region": "Maze",
+    "statistic": {
+      "key": "gold",
+      "value": "10"
+    }
+  },
+  {
+    "id": 20001,
     "name": "Golden Thumb",
     "description": "Farm 100 Gold",
     "region": "Maze",
@@ -1262,11 +1498,15 @@
     }
   },
   {
-    "id": 20001,
+    "id": 20002,
     "name": "Gold Farmer",
     "description": "Farm 1K Gold",
     "region": "Maze",
     "requirements": [
+      {
+        "name": "Operators",
+        "count": 1
+      },
       {
         "name": "Senses",
         "count": 1
@@ -1278,11 +1518,15 @@
     }
   },
   {
-    "id": 20002,
+    "id": 20003,
     "name": "Raking in the Gold",
     "description": "Farm 10K Gold",
     "region": "Maze",
     "requirements": [
+      {
+        "name": "Operators",
+        "count": 1
+      },
       {
         "name": "Senses",
         "count": 1
@@ -1294,11 +1538,19 @@
     }
   },
   {
-    "id": 20003,
+    "id": 20004,
     "name": "All that Glitters",
     "description": "Farm 100K Gold",
     "region": "Maze",
     "requirements": [
+      {
+        "name": "Mazes",
+        "count": 2
+      },
+      {
+        "name": "Operators",
+        "count": 1
+      },
       {
         "name": "Senses",
         "count": 1
@@ -1310,11 +1562,19 @@
     }
   },
   {
-    "id": 20004,
+    "id": 20005,
     "name": "Gold Mine",
     "description": "Farm 1M Gold",
     "region": "Maze",
     "requirements": [
+      {
+        "name": "Mazes",
+        "count": 3
+      },
+      {
+        "name": "Operators",
+        "count": 1
+      },
       {
         "name": "Senses",
         "count": 1
@@ -1326,11 +1586,43 @@
     }
   },
   {
-    "id": 20005,
+    "id": 20006,
+    "name": "10M Gold",
+    "description": "Farm 10M Gold",
+    "region": "Maze",
+    "requirements": [
+      {
+        "name": "Mazes",
+        "count": 4
+      },
+      {
+        "name": "Operators",
+        "count": 1
+      },
+      {
+        "name": "Senses",
+        "count": 1
+      }
+    ],
+    "statistic": {
+      "key": "gold",
+      "value": "10M"
+    }
+  },
+  {
+    "id": 20007,
     "name": "Going for Gold",
     "description": "Farm 100M gold",
     "region": "Maze",
     "requirements": [
+      {
+        "name": "Mazes",
+        "count": 5
+      },
+      {
+        "name": "Operators",
+        "count": 1
+      },
       {
         "name": "Senses",
         "count": 1
@@ -1342,7 +1634,38 @@
     }
   },
   {
+    "id": 20008,
+    "name": "Maze Master",
+    "description": "Farm 2M gold in 1 minute",
+    "region": "Maze",
+    "requirements": [
+      {
+        "name": "Maxed out farm",
+        "count": 1
+      },
+      {
+        "name": "Mazes",
+        "count": 5
+      }
+    ],
+    "timed": {
+      "key": "gold",
+      "value": "2M",
+      "time": "1m"
+    }
+  },
+  {
     "id": 21000,
+    "name": "10 Bones",
+    "description": "Farm 10 Bones",
+    "region": "Dinos",
+    "statistic": {
+      "key": "bone",
+      "value": "10"
+    }
+  },
+  {
+    "id": 21001,
     "name": "Bone Farmer",
     "description": "Farm 100 Bones",
     "region": "Dinos",
@@ -1352,7 +1675,7 @@
     }
   },
   {
-    "id": 21001,
+    "id": 21002,
     "name": "1K Bones",
     "description": "Farm 1K Bones",
     "region": "Dinos",
@@ -1362,7 +1685,7 @@
     }
   },
   {
-    "id": 21002,
+    "id": 21003,
     "name": "10K Bones",
     "description": "Farm 10K Bones",
     "region": "Dinos",
@@ -1378,7 +1701,7 @@
     }
   },
   {
-    "id": 21003,
+    "id": 21004,
     "name": "100K Bones",
     "description": "Farm 100K Bones",
     "region": "Dinos",
@@ -1398,7 +1721,7 @@
     }
   },
   {
-    "id": 21004,
+    "id": 21005,
     "name": "1M Bones",
     "description": "Farm 1M Bones",
     "region": "Dinos",
@@ -1418,7 +1741,27 @@
     }
   },
   {
-    "id": 21005,
+    "id": 21006,
+    "name": "10M Bones",
+    "description": "Farm 1M Bones",
+    "region": "Dinos",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 7
+      },
+      {
+        "name": "Dinosaurs",
+        "count": 4
+      }
+    ],
+    "statistic": {
+      "key": "bone",
+      "value": "10M"
+    }
+  },
+  {
+    "id": 21007,
     "name": "Big Bone Farmer",
     "description": "Farm 100M Bones",
     "region": "Dinos",
@@ -1438,6 +1781,27 @@
     }
   },
   {
+    "id": 21008,
+    "name": "Dino Master",
+    "description": "Farm 100M bones",
+    "region": "Dinos",
+    "requirements": [
+      {
+        "name": "Maxed out farm",
+        "count": 1
+      },
+      {
+        "name": "Dinosaurs",
+        "count": 5
+      }
+    ],
+    "timed": {
+      "key": "bone",
+      "value": "1M",
+      "time": "1m"
+    }
+  },
+  {
     "id": 22000,
     "name": "A bit weird",
     "description": "Farm 1 weird substance",
@@ -1449,6 +1813,16 @@
   },
   {
     "id": 22001,
+    "name": "10 Weird Substance",
+    "description": "Farm 10 weird substance",
+    "region": "WeirdSubstance",
+    "statistic": {
+      "key": "weird_substance",
+      "value": "10"
+    }
+  },
+  {
+    "id": 22002,
     "name": "That's kinda weird",
     "description": "Farm 100 weird substance",
     "region": "WeirdSubstance",
@@ -1458,7 +1832,7 @@
     }
   },
   {
-    "id": 22002,
+    "id": 22003,
     "name": "That's really weird",
     "description": "Farm 1K weird substance",
     "region": "WeirdSubstance",
@@ -1482,7 +1856,7 @@
     }
   },
   {
-    "id": 22003,
+    "id": 22004,
     "name": "10K Weird Substance",
     "description": "Farm 10K weird substance",
     "region": "WeirdSubstance",
@@ -1510,7 +1884,7 @@
     }
   },
   {
-    "id": 22004,
+    "id": 22005,
     "name": "100K Weird Substance",
     "description": "Farm 100K weird substance",
     "region": "WeirdSubstance",
@@ -1535,108 +1909,6 @@
     "statistic": {
       "key": "weird_substance",
       "value": "100K"
-    }
-  },
-  {
-    "id": 99000,
-    "name": "Sunflower Master",
-    "description": "Farm 12K power in 1 minute",
-    "region": "EndGame",
-    "requirements": [
-      {
-        "name": "Sunflowers",
-        "count": 1
-      }
-    ],
-    "timed": {
-      "key": "power",
-      "value": "12K",
-      "time": "1m"
-    }
-  },
-  {
-    "id": 99001,
-    "name": "Cactus Master",
-    "description": "Farm 20M cacti in 1 minute",
-    "region": "EndGame",
-    "requirements": [
-      {
-        "name": "Cactus",
-        "count": 1
-      }
-    ],
-    "timed": {
-      "key": "cactus",
-      "value": "20M",
-      "time": "1m"
-    }
-  },
-  {
-    "id": 99002,
-    "name": "Dino Master",
-    "description": "Farm 100M bones",
-    "region": "EndGame",
-    "requirements": [
-      {
-        "name": "Dinosaurs",
-        "count": 1
-      }
-    ],
-    "timed": {
-      "key": "bone",
-      "value": "1M",
-      "time": "1m"
-    }
-  },
-  {
-    "id": 99003,
-    "name": "Maze Master",
-    "description": "Farm 2M gold in 1 minute",
-    "region": "EndGame",
-    "requirements": [
-      {
-        "name": "Mazes",
-        "count": 1
-      }
-    ],
-    "timed": {
-      "key": "gold",
-      "value": "2M",
-      "time": "1m"
-    }
-  },
-  {
-    "id": 99004,
-    "name": "Pumpkin Master",
-    "description": "Farm 20M pumpkins in 1 minute",
-    "region": "EndGame",
-    "requirements": [
-      {
-        "name": "Pumpkins",
-        "count": 1
-      }
-    ],
-    "timed": {
-      "key": "pumpkin",
-      "value": "20M",
-      "time": "1m"
-    }
-  },
-  {
-    "id": 99005,
-    "name": "Woodn't you know it, you're on the clock",
-    "description": "Farm 1B wood in 1 minute",
-    "region": "EndGame",
-    "requirements": [
-      {
-        "name": "Trees",
-        "count": 1
-      }
-    ],
-    "timed": {
-      "key": "wood",
-      "value": "1B",
-      "time": "1m"
     }
   },
   {
