@@ -15,7 +15,7 @@ public class APManager : BaseComponent, IAPManager
 
     public IAPService APService;
     public ILocationQueue LocationQueue;
-    public IItemQueue ItemQueue;
+    private IItemQueue _itemQueue;
 
     private IEnumerable<APLocation> _apLocations;
 
@@ -24,7 +24,7 @@ public class APManager : BaseComponent, IAPManager
         Instance = this;
         APService = new APService(Instance);
         LocationQueue = new LocationQueue(this);
-        ItemQueue = new ItemQueue((itemName, itemsReceived) =>
+        _itemQueue = new ItemQueue((itemName, itemsReceived) =>
             GameManager.Instance?.GiveItem(itemName, itemsReceived) ?? false);
         Log.LogInfo("Setting up AP Locations");
         _apLocations = InitializeLocations();
@@ -48,7 +48,7 @@ public class APManager : BaseComponent, IAPManager
     {
         try
         {
-            ItemQueue.Process();
+            _itemQueue.Process();
             LocationQueue.Process();
         }
         catch (Exception e)
@@ -63,7 +63,7 @@ public class APManager : BaseComponent, IAPManager
     }
 
     private void OnConnectionAttemptEvent(object sender, ConnectionInfo e) =>
-        APService.TryEnableAsync(e, LocationQueue, ItemQueue);
+        APService.TryEnableAsync(e, LocationQueue, _itemQueue);
 
     public IEnumerable<APLocation> GetLocations() => _apLocations;
 

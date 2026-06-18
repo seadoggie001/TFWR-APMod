@@ -9,8 +9,8 @@ namespace com.seadoggie.TFWRArchipelago.Service;
 
 public class GameService : IGameService
 {
-    public const string FileName = "tfwrap.json";
-    [CanBeNull] public ModSaveGame ModSaveGame;
+    private const string FileName = "tfwrap.json";
+    [CanBeNull] private ModSaveGame _modSaveGame;
 
     public event EventHandler<ModSaveGame> GameLoaded;
     public event EventHandler<EventArgs> PreLoadGame;
@@ -24,8 +24,8 @@ public class GameService : IGameService
     {
         try
         {
-            ModSaveGame?.Statistics = GoalManager.Instance.UserStatsSave();
-            string json = JsonUtility.ToJson(ModSaveGame);
+            _modSaveGame?.Statistics = GoalManager.Instance.UserStatsSave();
+            string json = JsonUtility.ToJson(_modSaveGame);
             string filePath = GetFilePath(GameManager.DefaultSaveName());
             File.WriteAllText(filePath, json);
         }
@@ -70,23 +70,23 @@ public class GameService : IGameService
         Plugin.Log.LogInfo("Save game was loaded");
 
         Plugin.Instance.Enabled = true;
-        ModSaveGame = modSaveGame;
-        GameLoaded?.Invoke(this, ModSaveGame);
+        _modSaveGame = modSaveGame;
+        GameLoaded?.Invoke(this, _modSaveGame);
     }
 
     public Result CanGivePlayerItem(string itemName, int itemsReceived)
     {
-        if (ModSaveGame is null)
+        if (_modSaveGame is null)
         {
             Log.LogError($"Failed to give {itemName} because the ModSaveGame isn't loaded yet");
             return Result.ModNotInitialized;
         }
 
         // If we've previously received this item
-        if (itemsReceived < ModSaveGame.ItemsReceived) return Result.ItemAlreadyReceived;
+        if (itemsReceived < _modSaveGame.ItemsReceived) return Result.ItemAlreadyReceived;
 
-        Log.LogInfo("Only unlocked " + ModSaveGame.ItemsReceived);
-        ModSaveGame.ItemsReceived += 1;
+        Log.LogInfo("Only unlocked " + _modSaveGame.ItemsReceived);
+        _modSaveGame.ItemsReceived += 1;
 
         return APTrapItems.AllTrapItems.Contains(itemName)
             ? Result.ItsATrap
@@ -99,8 +99,8 @@ public class GameService : IGameService
 
     public void RaiseGrassSanity(Vector2Int position)
     {
-        // idk, check if it needs to be submitted?
-        if(ModSaveGame?.Grass.Contains(position) ?? true) return;
+        // Check if it needs to be submitted
+        if(_modSaveGame?.Grass.Contains(position) ?? true) return;
         string locName = $"Grass ({position.x}, {position.y})";
         APLocation location = APManager.Instance?.GetLocations().FirstOrDefault(m => m.name == locName);
         if (location is null)
@@ -108,9 +108,9 @@ public class GameService : IGameService
             Log.LogError($"Could not find location {locName}");
             return;
         }
-
+        
         APManager.Instance?.APService.SubmitLocationById(location.id);
-        ModSaveGame.Grass.Add(position);
+        _modSaveGame.Grass.Add(position);
     }
 
     public enum Result

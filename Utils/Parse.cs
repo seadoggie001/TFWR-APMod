@@ -3,7 +3,7 @@ namespace com.seadoggie.TFWRArchipelago.Utils;
 public static class Parse
 {
     /// <summary>
-    /// Converts a formatted number (1K, 3B, etc) into a double
+    /// Converts a formatted number (1K, 3B, etc.) into a double
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>

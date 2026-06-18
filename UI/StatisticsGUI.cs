@@ -307,9 +307,9 @@ public class StatisticsGUI : BaseGUI
             ProgressBar = progressBar,
             Toggle = toggle,
         };
-        if (_statisticRows.ContainsKey(key))
+        if (_statisticRows.TryGetValue(key, out List<RowElements> statisticRow))
         {
-            _statisticRows[key].Add(rowElements);
+            statisticRow.Add(rowElements);
         }
         else
         {

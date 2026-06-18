@@ -26,7 +26,7 @@ public class AchievementsPatch
     public static void IncrementStat(string statName, int increment)
     {
         if (!Plugin.Instance.Enabled) return;
-        GoalManager.Instance.RaiseStatEvent(statName, (double)increment);
+        GoalManager.Instance.RaiseStatEvent(statName, increment);
     }
 
     /// <summary>

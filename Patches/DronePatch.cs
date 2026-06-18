@@ -1,6 +1,7 @@
 using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Model;
 using HarmonyLib;
+// ReSharper disable InconsistentNaming
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 

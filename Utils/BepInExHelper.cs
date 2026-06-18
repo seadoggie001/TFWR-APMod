@@ -1,6 +1,6 @@
 namespace com.seadoggie.TFWRArchipelago.Utils;
 
-public class BepInExHelper
+public static class BepInExHelper
 {
     public const bool HarmonySkipFunction = false;
 }

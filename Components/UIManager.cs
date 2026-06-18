@@ -1,6 +1,5 @@
 using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
-using com.seadoggie.TFWRArchipelago.Patches;
 using com.seadoggie.TFWRArchipelago.UI;
 using JetBrains.Annotations;
 using UnityEngine;

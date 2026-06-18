@@ -10,7 +10,7 @@ namespace com.seadoggie.TFWRArchipelago.Service;
 /// </summary>
 public class StatsService : IStatsService
 {
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.UserStats");
+    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.StatsService");
 
     private readonly Dictionary<string, double> _stats = new();
 
