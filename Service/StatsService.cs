@@ -44,7 +44,7 @@ public class StatsService : IStatsService
             if (_milestones.TryGetValue(location.statistic.key, out List<Milestone> milestones))
             {
                 // If there's not already a milestone with this target value, add it
-                if (!milestones.Any(m => Math.Abs(m.Target - value) < 50)) milestones.Add(milestone);
+                if (!milestones.Any(m => Math.Abs(m.Target - value) < 5)) milestones.Add(milestone);
             }
             else
             {
@@ -53,6 +53,8 @@ public class StatsService : IStatsService
             }
 
             _stats[location.statistic.key] = 0;
+            // Uncomment to see all requested stats
+            // Log.LogInfo($"Stat: {location.statistic.key} Value: {value}");
         }
 
         Log.LogInfo("Tracking stats for: " + string.Join(", ", _milestones.Keys));
