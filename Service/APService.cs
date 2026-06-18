@@ -17,6 +17,7 @@ public class APService(IAPManager apManager) : IAPService
     private ArchipelagoSession Session { get; set; }
     private APLocation _goal;
     private Dictionary<string, object> _slotData;
+    private APOptions _options;
 
     public event EventHandler<string> APDisconnected;
     public event EventHandler<bool> ConnectionResult;
@@ -61,62 +62,94 @@ public class APService(IAPManager apManager) : IAPService
         {
             Log.LogInfo("Attempting to sign in to Archipelago");
 
-        // Only attempt to connect if not connected already
-        if (Session?.Socket?.Connected ?? false)
-        {
-            Log.LogWarning("Already signed in");
-            return true;
-        }
+            // Only attempt to connect if not connected already
+            if (Session?.Socket?.Connected ?? false)
+            {
+                Log.LogWarning("Already signed in");
+                return true;
+            }
 
-        Log.LogInfo($"Creating a session. URL: {connectionSettings.Url}:{connectionSettings.Port}");
-        // Create the session
-        Session = ArchipelagoSessionFactory.CreateSession(connectionSettings.Url, connectionSettings.Port);
+            Log.LogInfo($"Creating a session. URL: {connectionSettings.Url}:{connectionSettings.Port}");
+            // Create the session
+            Session = ArchipelagoSessionFactory.CreateSession(connectionSettings.Url, connectionSettings.Port);
 
-        Log.LogInfo("Setting up item queue");
-        Session.Items.ItemReceived += itemQueue.OnItemReceived;
+            Log.LogInfo("Setting up item queue");
+            Session.Items.ItemReceived += itemQueue.OnItemReceived;
 
-        Log.LogInfo("Connecting");
-        RoomInfoPacket roomInfoPacket = await ConnectAsync();
-        if (roomInfoPacket == null)
-        {
-            Log.LogError(
-                $"Failed to connect to room. Connection Details: {{URL: {connectionSettings.Url}:{connectionSettings.Port}}}");
-            ConnectionResult?.Invoke(this, false);
-            return false;
-        }
+            Log.LogInfo("Connecting");
+            RoomInfoPacket roomInfoPacket = await ConnectAsync();
+            if (roomInfoPacket == null)
+            {
+                Log.LogError(
+                    $"Failed to connect to room. Connection Details: {{URL: {connectionSettings.Url}:{connectionSettings.Port}}}");
+                ConnectionResult?.Invoke(this, false);
+                return false;
+            }
 
-        Log.LogInfo("Setting up location queue");
-        Session.Locations.CheckedLocationsUpdated += locationQueue.OnLocationsReceived;
+            Log.LogInfo("Setting up location queue");
+            Session.Locations.CheckedLocationsUpdated += locationQueue.OnLocationsReceived;
 
-        Log.LogInfo("Logging in");
-        LoginResult loginResult = await LoginAsync(connectionSettings);
-        ConnectionResult?.Invoke(this, loginResult.Successful);
-        if (loginResult.Successful)
-        {
-            Log.LogInfo("Successfully logged in.");
-            Session.Socket.SocketClosed += reason => APDisconnected?.Invoke(this, reason);
+            Log.LogInfo("Logging in");
+            LoginResult loginResult = await LoginAsync(connectionSettings);
+            ConnectionResult?.Invoke(this, loginResult.Successful);
+            if (loginResult.Successful)
+            {
+                Log.LogInfo("Successfully logged in.");
+                Session.Socket.SocketClosed += reason => APDisconnected?.Invoke(this, reason);
 
                 // Load slot data
                 _slotData = await Session.DataStorage.GetSlotDataAsync();
                 
-                // Determine goal location
-                string goalName = 0 == (long) _slotData["goal"]
-                    ? "Gold Farmer"
-                    : "Size Matters";
-                _goal = APManager.Instance?.GetLocations().First(m => m.name == goalName);
+                _options = new APOptions
+                {
+                    GoalName = 0 == (long)_slotData["goal"]
+                        ? "Gold Farmer"
+                        : "Size Matters",
+                    RandomizedCosts = (long)_slotData["crop_cost"] == 1,
+                    CropCosts = new Dictionary<string, List<string>>()
+                };
 
-                Log.LogInfo("Goal name was set to " + goalName);
+                if (_options.RandomizedCosts)
+                {
+                    IEnumerable<string> cropOptions =
+                    [
+                        "crops.Hay",
+                        "crops.Bush",
+                        "crops.Tree",
+                        "crops.Carrot",
+                        "crops.Cactus",
+                        "crops.Dinosaur",
+                        "crops.Sunflower",
+                        "crops.Pumpkin",
+                    ];
+                    foreach (string cropOption in cropOptions)
+                    {
+                        if (!_slotData.TryGetValue(cropOption, out object cost)) continue;
+                        string cropName = cropOption.Replace("crops.", "").ToLower();
+                            
+                        // Dinosaurs don't need a cost, but apples do. I know it's weird, but trust me.
+                        cropName = cropName.Replace("dinosaur", "apple");
+
+                        Newtonsoft.Json.Linq.JArray array = (Newtonsoft.Json.Linq.JArray) cost;
+                        _options.CropCosts[cropName] = array.Values<string>().ToList();
+                    }
+                }
+                
+                // Determine goal location
+                _goal = APManager.Instance?.GetLocations().First(m => m.name == _options.GoalName);
+
+                Log.LogInfo("Goal name was set to " + _options.GoalName);
                 if (_goal is null) Log.LogError("_goal is null!");
 
-            return true;
-        }
+                return true;
+            }
 
-        Log.LogError(
-            $"Failed to connect. Connection Details: {{URL: {connectionSettings.Url}:{connectionSettings.Port}, " +
-            $"Username: {connectionSettings.Username}, " +
-            $"Password? {!string.IsNullOrWhiteSpace(connectionSettings.Password)}}}");
-        return false;
-    }
+            Log.LogError(
+                $"Failed to connect. Connection Details: {{URL: {connectionSettings.Url}:{connectionSettings.Port}, " +
+                $"Username: {connectionSettings.Username}, " +
+                $"Password? {!string.IsNullOrWhiteSpace(connectionSettings.Password)}}}");
+            return false;
+        }
         catch (Exception ex)
         {
             Log.LogException("Failed to connect to AP with exception", ex);
@@ -200,6 +233,8 @@ public class APService(IAPManager apManager) : IAPService
 
         return loginResult;
     }
+    
+    public APOptions GetOptions() => _options;
 }
 
 public interface IAPService
@@ -214,4 +249,5 @@ public interface IAPService
         IItemQueue itemQueue);
 
     void Disconnect(object sender, EventArgs e);
+    APOptions GetOptions();
 }

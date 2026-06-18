@@ -45,6 +45,6 @@ public class Plugin : BaseUnityPlugin
             return;
         }
         
-        Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running v{MyPluginInfo.PLUGIN_VERSION}");
+        Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running version {MyPluginInfo.PLUGIN_VERSION}");
     }
 }

@@ -104,4 +104,20 @@ public class ResourceManagerPatch
             // __result.description = "Text describing a hint for this item";
         }
     }
+    
+    [HarmonyPostfix]
+    [HarmonyPatch(nameof(ResourceManager.GetFarmObject))]
+    public static void GetFarmObject(string name, ref FarmObjectSO __result)
+    {
+        if (!Plugin.Instance.Enabled || __result is null || !__result) return;
+        if (APManager.Instance is null) return;
+        if (!(APManager.Instance?.APService?.GetOptions()?.CropCosts?.TryGetValue(name, out List<string> items) ?? false)) return;
+        ItemBlock cost = ItemBlock.CreateEmpty();
+        foreach (string item in items)
+        {
+            cost.AddItem(StringIds.GetItemId(item), 1);
+        }
+                
+        __result.cost = cost;
+    }
 }
