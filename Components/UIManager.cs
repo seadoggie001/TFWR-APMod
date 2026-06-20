@@ -124,7 +124,10 @@ public class UIManager : BaseComponent, IUIManagerDelegates
 
     private void OnStatTotalEvent(object sender, Stat e) => _statisticsGUI.StatUpdate(e.Name, e.Value);
 
-    private void OnAPLocationGiven(object sender, APLocation location) => _statisticsGUI.MarkCompleted(location.name);
+    private void OnAPLocationGiven(object sender, APLocation location)
+    {
+        if(location.region != "GrassSanity") _statisticsGUI.MarkCompleted(location.name);
+    } 
 
     // ToDo: tell the user (somehow) why the connection was cancelled? Launch the GUI?
     private void OnAPDisconnected(object sender, string reason)
