@@ -1,5 +1,4 @@
 using BepInEx.Logging;
-using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Patches;
 using JetBrains.Annotations;
@@ -14,6 +13,9 @@ public class ArchipelagoSettingsGUI : BaseGUI
 {
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APConnGUI");
 
+    public event EventHandler<ConnectionInfo> ConnectionAttemptEvent;
+    public event EventHandler<EventArgs> DisconnectRequestEvent;
+    
     // Spacing constants
     private const int ControlHeight = 25, ControlWidth = 200;
     private const int LabelWidth = 100;
@@ -78,6 +80,8 @@ public class ArchipelagoSettingsGUI : BaseGUI
             }
         }
     }
+
+    public bool debugMode;
 
     private void CalculateWindowRect()
     {
@@ -150,7 +154,7 @@ public class ArchipelagoSettingsGUI : BaseGUI
                 if (GUI.Button(new Rect(HorizontalSpacing, contRect.y, 80, ControlHeight), "Disconnect"))
                 {
                     // Request a disconnect from the server
-                    APManager.Instance?.APService.Disconnect(this, EventArgs.Empty);
+                    DisconnectRequestEvent?.Invoke(this, EventArgs.Empty);
                 }
             }
             else if (GUI.Button(new Rect(HorizontalSpacing, contRect.y, 80, ControlHeight), "Submit") &&
@@ -182,7 +186,7 @@ public class ArchipelagoSettingsGUI : BaseGUI
                 GUI.Label(labelRect, text);
             }
 
-            if (GameManager.Instance?.TfwrConfig.Debug ?? false)
+            if (debugMode)
             {
                 labelRect.y += VerticalSpacing + ControlHeight;
                 contRect.y += VerticalSpacing + ControlHeight;
@@ -203,7 +207,7 @@ public class ArchipelagoSettingsGUI : BaseGUI
         _state = Status.Connecting;
 
         // Request the login attempt
-        UIManager.Instance?.RaiseConnectionAttemptEvent(new ConnectionInfo(_archUrl, int.Parse(_archPort),
+        ConnectionAttemptEvent?.Invoke(this, new ConnectionInfo(_archUrl, int.Parse(_archPort),
             _archUsername, _archPassword));
     }
 

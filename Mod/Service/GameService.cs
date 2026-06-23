@@ -1,5 +1,4 @@
 using BepInEx.Logging;
-using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
@@ -16,17 +15,23 @@ public class GameService : IGameService
     public event EventHandler<EventArgs> PreLoadGame;
     public event EventHandler<bool> MenuOpen;
     public event EventHandler<Notification> NewItemReceived;
+    public event EventHandler<string> GrassSanity;
 
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.GameSvc");
     public static string GetFilePath(string saveName) => Path.Combine(Saver.GetPathOfSaveDirectory(saveName), FileName);
 
-    public void SaveProgress()
+    /// <summary>
+    /// Saves the current stats of the game
+    /// </summary>
+    /// <param name="statistics"></param>
+    /// <param name="fileName"></param>
+    public void SaveProgress(List<Pair<string, double>> statistics, string fileName)
     {
         try
         {
-            _modSaveGame?.Statistics = GoalManager.Instance.UserStatsSave();
+            _modSaveGame?.Statistics = statistics;
             string json = JsonUtility.ToJson(_modSaveGame);
-            string filePath = GetFilePath(GameManager.DefaultSaveName());
+            string filePath = GetFilePath(fileName);
             File.WriteAllText(filePath, json);
         }
         catch (Exception e)
@@ -35,14 +40,14 @@ public class GameService : IGameService
         }
     }
 
-    public void Load()
+    public void Load(string fileName)
     {
         PreLoadGame?.Invoke(this, EventArgs.Empty);
         ModSaveGame modSaveGame = new();
         // Try to load even if the plugin isn't enabled
         try
         {
-            string filePath = GetFilePath(GameManager.DefaultSaveName());
+            string filePath = GetFilePath(fileName);
             if (!File.Exists(filePath))
             {
                 Plugin.Instance.Enabled = false;
@@ -58,12 +63,6 @@ public class GameService : IGameService
         catch (Exception e)
         {
             Log.LogException("Failed to load data", e);
-            return;
-        }
-
-        if (GameManager.Instance is null)
-        {
-            Plugin.Log.LogError("Save game was not loaded!");
             return;
         }
 
@@ -101,15 +100,11 @@ public class GameService : IGameService
     {
         // Check if it needs to be submitted
         if(_modSaveGame?.Grass.Contains(position) ?? true) return;
-        string locName = $"Grass ({position.x}, {position.y})";
-        APLocation location = APManager.Instance?.GetLocations().FirstOrDefault(m => m.name == locName);
-        if (location is null)
-        {
-            Log.LogError($"Could not find location {locName}");
-            return;
-        }
+        _modSaveGame.Grass.Add(position);
         
-        APManager.Instance?.APService.SubmitLocationById(location.id);
+        string locName = $"Grass ({position.x}, {position.y})";
+        GrassSanity?.Invoke(this, locName);
+        
         _modSaveGame.Grass.Add(position);
     }
 

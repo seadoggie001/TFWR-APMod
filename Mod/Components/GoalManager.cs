@@ -5,7 +5,7 @@ using com.seadoggie.TFWRArchipelago.Service;
 namespace com.seadoggie.TFWRArchipelago.Components;
 
 // ToDo: Rename this to StatManager. Goal Manager sounds like it listens for AP-Goals.
-public class GoalManager : BaseComponent, IGoalManagerDelegates
+public class GoalManager : BaseComponent
 {
     public static GoalManager Instance;
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.GoalMgr");
@@ -78,20 +78,4 @@ public class GoalManager : BaseComponent, IGoalManagerDelegates
     {
         return _statsService.MilestoneCopy();
     }
-}
-
-public interface IGoalManagerDelegates
-{
-    /// <summary>
-    /// Raised when a goal has been completed
-    /// </summary>
-    event EventHandler<GoalEvent> GoalEvent;
-    /// <summary>
-    /// Raised to add a value to a stat
-    /// </summary>
-    event EventHandler<Stat> StatEvent;
-    /// <summary>
-    /// Raised with updated stat totals 
-    /// </summary>
-    event EventHandler<Stat> StatTotalEvent;
 }

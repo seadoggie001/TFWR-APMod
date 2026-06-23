@@ -1,12 +1,11 @@
 using System.Collections.ObjectModel;
 using BepInEx.Logging;
-using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
-public class LocationQueue(IAPManager apManager) : ILocationQueue
+public class LocationQueue(IEnumerable<APLocation> allLocations) : ILocationQueue
 {
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.LocQ");
     private readonly HashSet<long> _locationQueue = [];
@@ -33,7 +32,7 @@ public class LocationQueue(IAPManager apManager) : ILocationQueue
     {
         try
         {
-            APLocation apLocation = apManager.GetLocations().FirstOrDefault(m => m.id == location);
+            APLocation apLocation = allLocations.FirstOrDefault(m => m.id == location);
 
             if (apLocation is null)
             {

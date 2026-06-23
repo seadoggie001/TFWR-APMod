@@ -3,6 +3,7 @@ using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.UI;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
@@ -13,10 +14,10 @@ public class UIManager : BaseComponent, IUIManagerDelegates
 
     public event EventHandler<ConnectionInfo> ConnectionAttemptEvent;
 
-    private StatisticsGUI _statisticsGUI;
-    private ArchipelagoSettingsGUI _archipelagoSettingsGUI;
-    private FloatingActionButton _floatingActionButton;
-    private NotificationPopup _notificationPopup;
+    public StatisticsGUI statisticsGUI;
+    public ArchipelagoSettingsGUI settingsGUI;
+    public FloatingActionButton floatingActionButton;
+    public NotificationPopup notificationPopup;
 
     protected override void OnEnable()
     {
@@ -52,30 +53,31 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         GameManager.Instance?.GameService.NewItemReceived += NotifyItemReceived;
         OnDisabled += () => GameManager.Instance?.GameService.NewItemReceived -= NotifyItemReceived;
 
-        _statisticsGUI = new GameObject("StatGUI").AddComponent<StatisticsGUI>();
-        _statisticsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
-        _statisticsGUI.Hide();
+        statisticsGUI = new GameObject("StatGUI").AddComponent<StatisticsGUI>();
+        statisticsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
+        statisticsGUI.Hide();
 
-        _floatingActionButton = new GameObject("FabGUI").AddComponent<FloatingActionButton>();
-        _floatingActionButton.transform.SetParent(Plugin.Instance.MainGameObject.transform);
+        floatingActionButton = new GameObject("FabGUI").AddComponent<FloatingActionButton>();
+        floatingActionButton.transform.SetParent(Plugin.Instance.MainGameObject.transform);
 
-        _archipelagoSettingsGUI = new GameObject().AddComponent<ArchipelagoSettingsGUI>();
-        _archipelagoSettingsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
-        _archipelagoSettingsGUI.DisplayingWindow = false;
+        settingsGUI = new GameObject("SettingsGUI").AddComponent<ArchipelagoSettingsGUI>();
+        settingsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
+        settingsGUI.DisplayingWindow = false;
+        settingsGUI.debugMode = GameManager.Instance?.TfwrConfig.Debug ?? false;
         
-        _notificationPopup = new GameObject("Notification").AddComponent<NotificationPopup>();
-        _notificationPopup.transform.SetParent(Plugin.Instance.MainGameObject.transform);
+        notificationPopup = new GameObject("Notification").AddComponent<NotificationPopup>();
+        notificationPopup.transform.SetParent(Plugin.Instance.MainGameObject.transform);
     }
 
     private void NotifyItemReceived(object sender, Notification notification) =>
-        _notificationPopup.Show(notification.Title, notification.Message);
+        notificationPopup.Show(notification.Title, notification.Message);
 
     private void OnMenuOpen(object sender, bool isOpen)
     {
         if (isOpen)
-            _statisticsGUI.Hide();
+            statisticsGUI.Hide();
         else
-            _statisticsGUI.Show();
+            statisticsGUI.Show();
     }
 
     public bool MouseOverAnyWindow()
@@ -89,26 +91,26 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         //     return true;
         // }
 
-        return _archipelagoSettingsGUI && _archipelagoSettingsGUI.DisplayingWindow
-                                       && _archipelagoSettingsGUI.IsMouseOverWindow();
+        return settingsGUI && settingsGUI.DisplayingWindow
+                                       && settingsGUI.IsMouseOverWindow();
     }
 
     public void OpenConnectionSettings()
     {
         Log.LogInfo($"OpenConnectionSettings");
-        _archipelagoSettingsGUI.Show(GameManager.Instance?.TfwrConfig.ConnectionInfo);
+        settingsGUI.Show(GameManager.Instance?.TfwrConfig.ConnectionInfo);
     }
 
     private void OnGameLoaded(object sender, ModSaveGame e)
     {
         if (e is null)
         {
-            _statisticsGUI.Hide();
+            statisticsGUI.Hide();
         }
         else
         {
-            _statisticsGUI.LoadStats();
-            _statisticsGUI.Show();
+            statisticsGUI.LoadStats();
+            statisticsGUI.Show();
         }
     }
 
@@ -118,33 +120,33 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         ConnectionAttemptEvent?.Invoke(this, attempt);
     }
 
-    public bool StatGuiOpen() => !_statisticsGUI;
+    public bool StatGuiOpen() => !statisticsGUI;
 
-    public Rect StatGuiBounds() => _statisticsGUI.RootElement.worldBound;
+    public Rect StatGuiBounds() => statisticsGUI.RootElement.worldBound;
 
-    private void OnStatTotalEvent(object sender, Stat e) => _statisticsGUI.StatUpdate(e.Name, e.Value);
+    private void OnStatTotalEvent(object sender, Stat e) => statisticsGUI.StatUpdate(e.Name, e.Value);
 
     private void OnAPLocationGiven(object sender, APLocation location)
     {
-        if(location.region != "GrassSanity") _statisticsGUI.MarkCompleted(location.name);
+        if(location.region != "GrassSanity") statisticsGUI.MarkCompleted(location.name);
     } 
 
     // ToDo: tell the user (somehow) why the connection was cancelled? Launch the GUI?
     private void OnAPDisconnected(object sender, string reason)
     {
-        _floatingActionButton.ConnectionStatus(false);
-        _archipelagoSettingsGUI.Disconnected(reason);
+        floatingActionButton.ConnectionStatus(false);
+        settingsGUI.Disconnected(reason);
     }
 
     private void OnConnectionResult(object sender, bool success)
     {
-        _archipelagoSettingsGUI.ConnectionAttempt(success);
-        _floatingActionButton.ConnectionStatus(success);
+        settingsGUI.ConnectionAttempt(success);
+        floatingActionButton.ConnectionStatus(success);
         if (!success) return;
-        _statisticsGUI.Show();
+        statisticsGUI.Show();
     }
 
-    private void OnGoalEvent(object sender, GoalEvent e) => _statisticsGUI.MarkCompleted(e.Name);
+    private void OnGoalEvent(object sender, GoalEvent e) => statisticsGUI.MarkCompleted(e.Name);
 }
 
 public interface IUIManagerDelegates

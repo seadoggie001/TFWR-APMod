@@ -34,7 +34,12 @@ public class GameManager : BaseComponent
 
         GameService.GameLoaded += OnGameLoaded;
         OnDisabled += () => GameService.GameLoaded -= OnGameLoaded;
+        
+        APManager.Instance?.APService.AchievementUnlocked += OnAchievementUnlocked;
+        OnDisabled += () => APManager.Instance?.APService.AchievementUnlocked -= OnAchievementUnlocked;
     }
+
+    private void OnAchievementUnlocked(object sender, string achievement) => UnlockHat(achievement);
 
     // Disable the interprocess communication if the mod is loaded. Sorry, no tapping here.
     private static void OnGameLoaded(object sender, ModSaveGame e) => IpcPatch.SetRunning(e is not null);
@@ -146,14 +151,25 @@ public class GameManager : BaseComponent
     public void RickRoll() => Application.OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
 
     public void UnlockHat(string hatName)
+    
+    public void UnlockHat(string achievement)
     {
+        string hatName = achievement switch
+        {
+            Achievement.CauseARuntimeError => Model.Hat.TrafficCone.Resource,
+            Achievement.StackOverflow => Model.Hat.TrafficConeStack.Resource,
+            Achievement.HigherOrderProgramming => Model.Hat.Wizard.Resource,
+            _ => null
+        };
         if (hatName == null) return;
+        
         HatSO hat = ResourceManager.GetHat(hatName);
         if (hat is null) Log.LogError($"Failed to find hat: {hatName}");
+        
         MainSim.Inst.UnlockHat(hat);
     }
 
-    public void Load() => GameService.Load();
+    public void Load() => GameService.Load(DefaultSaveName());
 
-    public void SaveProgress() => GameService.SaveProgress();
+    public void SaveProgress() => GameService.SaveProgress(GoalManager.Instance?.UserStatsSave(), DefaultSaveName());
 }

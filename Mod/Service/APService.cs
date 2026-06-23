@@ -2,13 +2,12 @@ using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
 using BepInEx.Logging;
-using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
-public class APService(IAPManager apManager) : IAPService
+public class APService(IEnumerable<APLocation> allLocations) : IAPService
 {
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APSrv");
 
@@ -19,22 +18,39 @@ public class APService(IAPManager apManager) : IAPService
     private Dictionary<string, object> _slotData;
     private APOptions _options;
 
+    /// <summary>
+    /// Fired whenever there is an error and the AP connection is lost
+    /// </summary>
     public event EventHandler<string> APDisconnected;
+
+    /// <summary>
+    /// Fired when a login connection attempt is completed
+    /// </summary>
     public event EventHandler<bool> ConnectionResult;
 
     // Reset the unlock cache
     public void OnGameLoaded(object sender, ModSaveGame modSaveGame) => _unlockedCache.Clear();
 
+    
+    /// <summary>
+    /// Fired when an achievement is unlocked
+    /// </summary>
+    public event EventHandler<string> AchievementUnlocked;
+
+    /// <summary>
+    /// Submits a location based on an achievementName
+    /// </summary>
+    /// <param name="achievementName"></param>
     public void UnlockAchievement(string achievementName)
     {
         // Skip already unlocked achievements
         if (!_unlockedCache.Add(achievementName)) return;
         // Don't allow for Steam Achievements
         Achievements.enabled = false;
-        // Some achievements unlock hats
-        GameManager.Instance?.UnlockHat(AchievementToHat(achievementName));
+        // Let everything know that an achievement was unlocked
+        AchievementUnlocked?.Invoke(this, achievementName);
         // Find the relevant location for this achievement
-        APLocation location = apManager.GetLocations().FirstOrDefault(m => m.achievement == achievementName);
+        APLocation location = allLocations.FirstOrDefault(m => m.achievement == achievementName);
         if (location is null)
         {
             Log.LogWarning("Unable to locate location for achievement " + achievementName);
@@ -136,7 +152,7 @@ public class APService(IAPManager apManager) : IAPService
                 }
                 
                 // Determine goal location
-                _goal = APManager.Instance?.GetLocations().First(m => m.name == _options.GoalName);
+                _goal = allLocations.First(m => m.name == _options.GoalName);
 
                 Log.LogInfo("Goal name was set to " + _options.GoalName);
                 if (_goal is null) Log.LogError("_goal is null!");
@@ -164,15 +180,6 @@ public class APService(IAPManager apManager) : IAPService
         Session?.Socket?.DisconnectAsync();
         APDisconnected?.Invoke(this, null);
     }
-
-    private static string AchievementToHat(string achievement) =>
-        achievement switch
-        {
-            Achievement.CauseARuntimeError => Model.Hat.TrafficCone.Resource,
-            Achievement.StackOverflow => Model.Hat.TrafficConeStack.Resource,
-            Achievement.HigherOrderProgramming => Model.Hat.Wizard.Resource,
-            _ => null
-        };
 
     private async Task<RoomInfoPacket> ConnectAsync()
     {
@@ -233,15 +240,29 @@ public class APService(IAPManager apManager) : IAPService
 
         return loginResult;
     }
-    
+
     public APOptions GetOptions() => _options;
+    
+    public void SubmitGrass(string grassName)
+    {
+        if(!_options.GrassSanity) return;
+        APLocation location = allLocations.FirstOrDefault(m => m.name == grassName);
+        if (location == null) return;
+        SubmitLocationById(location.id);
+    }
 }
 
 public interface IAPService
 {
+    /// <inheritdoc cref="APService.APDisconnected" />
     event EventHandler<string> APDisconnected;
+
+    /// <inheritdoc cref="APService.ConnectionResult" />
     event EventHandler<bool> ConnectionResult;
     void OnGameLoaded(object sender, ModSaveGame modSaveGame);
+
+    /// <inheritdoc cref="APService.AchievementUnlocked" />
+    event EventHandler<string> AchievementUnlocked;
     void UnlockAchievement(string achievementName);
     void SubmitLocationById(long id);
 
@@ -250,4 +271,5 @@ public interface IAPService
 
     void Disconnect(object sender, EventArgs e);
     APOptions GetOptions();
+    void SubmitGrass(string grassName);
 }

@@ -23,8 +23,7 @@ public static class DronePatch
     public static void Harvest(Drone __instance)
     {
         FarmObject obj = __instance.EntityUnderDrone();
-        if (obj == null) return;
-        if(obj.objectSO.dropItem != "hay") return;
+        if (obj?.objectSO?.dropItem != "hay") return;
         GameManager.Instance?.GameService.RaiseGrassSanity(__instance.pos);
     }
 }

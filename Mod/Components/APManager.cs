@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
-public class APManager : BaseComponent, IAPManager
+public class APManager : BaseComponent
 {
     [CanBeNull] public static APManager Instance { get; private set; }
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APMgr");
@@ -22,12 +22,12 @@ public class APManager : BaseComponent, IAPManager
     protected override void OnEnable()
     {
         Instance = this;
-        APService = new APService(Instance);
-        LocationQueue = new LocationQueue(this);
+        _apLocations = InitializeLocations();
+        List<APLocation> locations = _apLocations.ToList();
+        APService = new APService(locations);
+        LocationQueue = new LocationQueue(locations);
         _itemQueue = new ItemQueue((itemName, itemsReceived) =>
             GameManager.Instance?.GiveItem(itemName, itemsReceived) ?? false);
-        Log.LogInfo("Setting up AP Locations");
-        _apLocations = InitializeLocations();
 
         base.OnEnable();
     }
@@ -37,11 +37,17 @@ public class APManager : BaseComponent, IAPManager
         GameManager.Instance?.GameService.PreLoadGame += APService.Disconnect;
         OnDisabled += () => GameManager.Instance?.GameService.PreLoadGame -= APService.Disconnect;
 
-        GameManager.Instance?.GameService.GameLoaded += APService.OnGameLoaded;
-        OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= APService.OnGameLoaded;
+        GameManager.Instance?.GameService.GameLoaded += APService.ResetAchievementCache;
+        OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= APService.ResetAchievementCache;
 
-        UIManager.Instance?.ConnectionAttemptEvent += OnConnectionAttemptEvent;
-        OnDisabled += () => UIManager.Instance?.ConnectionAttemptEvent -= OnConnectionAttemptEvent;
+        GameManager.Instance?.GameService.GrassSanity += OnGrassSanity;
+        OnDisabled += () => GameManager.Instance?.GameService.GrassSanity -= OnGrassSanity;
+
+        UIManager.Instance?.settingsGUI.ConnectionAttemptEvent += OnConnectionAttemptEvent;
+        OnDisabled += () => UIManager.Instance?.settingsGUI.ConnectionAttemptEvent -= OnConnectionAttemptEvent;
+        
+        UIManager.Instance?.settingsGUI.DisconnectRequestEvent += APService.Disconnect;
+        OnDisabled += () => UIManager.Instance?.settingsGUI.DisconnectRequestEvent -= APService.Disconnect;
     }
 
     private void Update()
@@ -57,10 +63,7 @@ public class APManager : BaseComponent, IAPManager
         }
     }
 
-    private void OnDestroy()
-    {
-        Log.LogWarning("Destroying AP Manager");
-    }
+    private void OnGrassSanity(object sender, string grassCoords) => APService.SubmitGrass(grassCoords);
 
     private void OnConnectionAttemptEvent(object sender, ConnectionInfo e) =>
         APService.TryEnableAsync(e, LocationQueue, _itemQueue);
@@ -86,9 +89,4 @@ public class APManager : BaseComponent, IAPManager
             return [];
         }
     }
-}
-
-public interface IAPManager
-{
-    IEnumerable<APLocation> GetLocations();
 }

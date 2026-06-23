@@ -5,4 +5,5 @@ public class APOptions
     public string GoalName { get; set; }
     public bool RandomizedCosts { get; set; }
     public Dictionary<string, List<string>> CropCosts { get; set; }
+    public bool GrassSanity { get; set; }
 }
