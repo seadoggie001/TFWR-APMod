@@ -110,6 +110,7 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
             {
                 Log.LogInfo("Successfully logged in.");
                 Session.Socket.SocketClosed += reason => APDisconnected?.Invoke(this, reason);
+                Session.Socket.ErrorReceived += (exception, message) => APDisconnected?.Invoke(this, message);
 
                 // Load slot data
                 _slotData = await Session.DataStorage.GetSlotDataAsync();
@@ -140,7 +141,7 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
                     {
                         if (!_slotData.TryGetValue(cropOption, out object cost)) continue;
                         string cropName = cropOption.Replace("crops.", "").ToLower();
-                            
+
                         // Dinosaurs don't need a cost, but apples do. I know it's weird, but trust me.
                         cropName = cropName.Replace("dinosaur", "apple");
 
@@ -148,7 +149,7 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
                         _options.CropCosts[cropName] = array.Values<string>().ToList();
                     }
                 }
-                
+
                 // Determine goal location
                 _goal = allLocations.First(m => m.name == _options.GoalName);
 
