@@ -11,7 +11,7 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
 {
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APSrv");
 
-    private readonly HashSet<string> _unlockedCache = [];
+    private readonly HashSet<string> _achievementCache = [];
 
     private ArchipelagoSession Session { get; set; }
     private APLocation _goal;
@@ -27,15 +27,13 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
     /// Fired when a login connection attempt is completed
     /// </summary>
     public event EventHandler<bool> ConnectionResult;
-
-    // Reset the unlock cache
-    public void OnGameLoaded(object sender, ModSaveGame modSaveGame) => _unlockedCache.Clear();
-
     
     /// <summary>
     /// Fired when an achievement is unlocked
     /// </summary>
     public event EventHandler<string> AchievementUnlocked;
+    
+    public void ResetAchievementCache(object sender, ModSaveGame modSaveGame) => _achievementCache.Clear();
 
     /// <summary>
     /// Submits a location based on an achievementName
@@ -44,7 +42,7 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
     public void UnlockAchievement(string achievementName)
     {
         // Skip already unlocked achievements
-        if (!_unlockedCache.Add(achievementName)) return;
+        if (!_achievementCache.Add(achievementName)) return;
         // Don't allow for Steam Achievements
         Achievements.enabled = false;
         // Let everything know that an achievement was unlocked
@@ -115,7 +113,7 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
 
                 // Load slot data
                 _slotData = await Session.DataStorage.GetSlotDataAsync();
-                
+
                 _options = new APOptions
                 {
                     GoalName = 0 == (long)_slotData["goal"]
@@ -259,10 +257,11 @@ public interface IAPService
 
     /// <inheritdoc cref="APService.ConnectionResult" />
     event EventHandler<bool> ConnectionResult;
-    void OnGameLoaded(object sender, ModSaveGame modSaveGame);
 
     /// <inheritdoc cref="APService.AchievementUnlocked" />
     event EventHandler<string> AchievementUnlocked;
+    
+    void ResetAchievementCache(object sender, ModSaveGame modSaveGame);
     void UnlockAchievement(string achievementName);
     void SubmitLocationById(long id);
 
