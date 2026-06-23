@@ -14,7 +14,6 @@ public class GameService : IGameService
     public event EventHandler<ModSaveGame> GameLoaded;
     public event EventHandler<EventArgs> PreLoadGame;
     public event EventHandler<bool> MenuOpen;
-    public event EventHandler<Notification> NewItemReceived;
     public event EventHandler<string> GrassSanity;
 
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.GameSvc");
@@ -94,8 +93,6 @@ public class GameService : IGameService
 
     public void RaiseMenuOpen(bool open) => MenuOpen?.Invoke(this, open);
 
-    public void RaiseNewItemReceived(Notification notification) => NewItemReceived?.Invoke(this, notification);
-
     public void RaiseGrassSanity(Vector2Int position)
     {
         // Check if it needs to be submitted
@@ -130,17 +127,16 @@ public interface IGameService
     event EventHandler<ModSaveGame> GameLoaded;
 
     event EventHandler<bool> MenuOpen;
+    
+    event EventHandler<string> GrassSanity;
 
-    event EventHandler<Notification> NewItemReceived;
-
-    /// <summary>
-    /// Saves the current stats of the game
-    /// </summary>
-    void SaveProgress();
-
-    void Load();
+    /// <inheritdoc cref="GameService.SaveProgress(List{Pair{string, double}}, string)" />
+    void SaveProgress(List<Pair<string, double>> statistics, string fileName);
+    
+    /// <inheritdoc cref="GameService.Load(string)" />
+    void Load(string fileName);
+    
     GameService.Result CanGivePlayerItem(string itemName, int itemsReceived);
     void RaiseMenuOpen(bool open);
-    void RaiseNewItemReceived(Notification notification);
     void RaiseGrassSanity(Vector2Int position);
 }

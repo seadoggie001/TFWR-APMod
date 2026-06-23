@@ -50,8 +50,8 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
         GameManager.Instance?.GameService.MenuOpen += OnMenuOpen;
         OnDisabled += () => GameManager.Instance?.GameService.MenuOpen -= OnMenuOpen;
-        GameManager.Instance?.GameService.NewItemReceived += NotifyItemReceived;
-        OnDisabled += () => GameManager.Instance?.GameService.NewItemReceived -= NotifyItemReceived;
+        GameManager.Instance?.NewItemReceived += NotifyItemReceived;
+        OnDisabled += () => GameManager.Instance?.NewItemReceived -= NotifyItemReceived;
 
         statisticsGUI = new GameObject("StatGUI").AddComponent<StatisticsGUI>();
         statisticsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);

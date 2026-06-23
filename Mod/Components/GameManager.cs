@@ -18,6 +18,8 @@ public class GameManager : BaseComponent
 
     public readonly IGameService GameService = new GameService();
 
+    public event EventHandler<Notification> NewItemReceived;
+
     protected override void OnEnable()
     {
         Instance = this;
@@ -68,12 +70,11 @@ public class GameManager : BaseComponent
             case Service.GameService.Result.ProcessItem:
                 ItemProcessed item = GivePlayerItem(itemName);
                 if (item.given)
-                    GameService.RaiseNewItemReceived(new Notification
-                        { Title = "You received an item!", Message = itemName });
+                    RaiseNewItemReceived(new Notification { Title = "You received an item!", Message = itemName });
                 return item.processed;
             case Service.GameService.Result.ItsATrap:
                 ProcessTrapItem(itemName);
-                GameService.RaiseNewItemReceived(new Notification { Title = "It's a trap!", Message = itemName });
+                RaiseNewItemReceived(new Notification { Title = "It's a trap!", Message = itemName });
                 return true;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -149,8 +150,8 @@ public class GameManager : BaseComponent
     public static string DefaultSaveName() => OptionHolder.GetString("activeSave", "Save0");
 
     public void RickRoll() => Application.OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-
-    public void UnlockHat(string hatName)
+    
+    public void RaiseNewItemReceived(Notification notification) => NewItemReceived?.Invoke(this, notification);
     
     public void UnlockHat(string achievement)
     {
