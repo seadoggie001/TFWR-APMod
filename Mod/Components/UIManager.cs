@@ -97,8 +97,10 @@ public class UIManager : BaseComponent
 
     public void OpenConnectionSettings()
     {
-        Log.LogInfo($"OpenConnectionSettings");
-        settingsGUI.Show(GameManager.Instance?.TfwrConfig.ConnectionInfo);
+        Task.Run(() =>
+        {
+            settingsGUI.Show(GameManager.Instance?.TfwrConfig.ConnectionInfo);
+        });
     }
 
     private void OnGameLoaded(object sender, ModSaveGame e)

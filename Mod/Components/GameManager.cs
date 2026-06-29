@@ -169,7 +169,19 @@ public class GameManager : BaseComponent
         MainSim.Inst.UnlockHat(hat);
     }
 
-    public void Load() => GameService.Load(DefaultSaveName());
+    public void Load()
+    {
+        Task.Run(() =>
+        {
+            GameService.Load(DefaultSaveName());
+        });
+    }
 
-    public void SaveProgress() => GameService.SaveProgress(GoalManager.Instance?.UserStatsSave(), DefaultSaveName());
+    public void SaveProgress()
+    {
+        Task.Run(() =>
+        {
+            GameService.SaveProgress(GoalManager.Instance?.UserStatsSave(), DefaultSaveName());
+        });
+    }
 }

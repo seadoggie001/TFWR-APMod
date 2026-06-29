@@ -36,11 +36,14 @@ public class GoalManager : BaseComponent
     /// Raised to add a value to a stat
     /// </summary>
     public event EventHandler<Stat> StatEvent;
-    public void RaiseStatEvent(string statName, double value) => StatEvent?.Invoke(null, new Stat(statName, value));
 
-    public void RaiseStatTotalEvent(string statName, double value) =>
-        StatTotalEvent?.Invoke(null, new Stat(statName, value));
+    public void RaiseStatEvent(string statName, double value)
+    {
+        Task.Run(() =>
         {
+            StatEvent?.Invoke(null, new Stat(statName, value));
+        });
+    }
 
     public List<Pair<string, double>> UserStatsSave() => StatsService.Save();
 

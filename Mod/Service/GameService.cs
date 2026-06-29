@@ -91,18 +91,26 @@ public class GameService : IGameService
             : Result.ProcessItem;
     }
 
-    public void RaiseMenuOpen(bool open) => MenuOpen?.Invoke(this, open);
+    public void RaiseMenuOpen(bool open)
+    {
+        Task.Run(() =>
+        {
+            MenuOpen?.Invoke(this, open);
+        });
+    }
 
     public void RaiseGrassSanity(Vector2Int position)
     {
-        // Check if it needs to be submitted
-        if(_modSaveGame?.Grass.Contains(position) ?? true) return;
-        _modSaveGame.Grass.Add(position);
-        
-        string locName = $"Grass ({position.x}, {position.y})";
-        GrassSanity?.Invoke(this, locName);
-        
-        _modSaveGame.Grass.Add(position);
+        Task.Run(() =>
+        {
+            // Check if it needs to be submitted
+            if(_modSaveGame?.Grass?.Contains(position) ?? true) return;
+            _modSaveGame.Grass.Add(position);
+            
+            string locName = $"Grass ({position.x}, {position.y})";
+            Log.LogInfo("Grass insanity was triggered");
+            GrassSanity?.Invoke(this, locName);
+        });
     }
 
     public enum Result

@@ -41,21 +41,24 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
     /// <param name="achievementName"></param>
     public void UnlockAchievement(string achievementName)
     {
-        // Skip already unlocked achievements
-        if (!_achievementCache.Add(achievementName)) return;
-        // Don't allow for Steam Achievements
-        Achievements.enabled = false;
-        // Let everything know that an achievement was unlocked
-        AchievementUnlocked?.Invoke(this, achievementName);
-        // Find the relevant location for this achievement
-        APLocation location = allLocations.FirstOrDefault(m => m.achievement == achievementName);
-        if (location is null)
+        Task.Run(() =>
         {
-            Log.LogWarning("Unable to locate location for achievement " + achievementName);
-            return;
-        }
+            // Skip already unlocked achievements
+            if (!_achievementCache.Add(achievementName)) return;
+            // Don't allow for Steam Achievements
+            Achievements.enabled = false;
+            // Let everything know that an achievement was unlocked
+            AchievementUnlocked?.Invoke(this, achievementName);
+            // Find the relevant location for this achievement
+            APLocation location = allLocations.FirstOrDefault(m => m.achievement == achievementName);
+            if (location is null)
+            {
+                Log.LogWarning("Unable to locate location for achievement " + achievementName);
+                return;
+            }
 
-        SubmitLocationById(location.id);
+            SubmitLocationById(location.id);
+        });
     }
 
     // Send the location to the server
