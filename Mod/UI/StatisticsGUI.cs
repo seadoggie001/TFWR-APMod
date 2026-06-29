@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using BepInEx.Logging;
-using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
 using UnityEngine;
@@ -13,7 +12,7 @@ public class StatisticsGUI : BaseGUI
 {
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.StatGUI");
     private const float RefreshRate = 2.0f; // Every 2 seconds
-    
+
     private UIDocument _uiDocument;
     private readonly Dictionary<string, List<RowElements>> _statisticRows = new();
     private readonly Dictionary<string, RowElements> _goalRowsByLocation = new();
@@ -36,9 +35,7 @@ public class StatisticsGUI : BaseGUI
 
         // Create the GUI and setup styles
         Initialize();
-
-        // Build the layout
-        CreateLayout();
+        Hide();
     }
 
     private void Start()
@@ -52,7 +49,7 @@ public class StatisticsGUI : BaseGUI
         RootElement.style.display = DisplayStyle.Flex;
         _visible = true;
     }
-    
+
     public void Hide(MouseUpEvent e = null)
     {
         RootElement.style.display = DisplayStyle.None;
@@ -69,7 +66,8 @@ public class StatisticsGUI : BaseGUI
             return;
         }
 
-        foreach (RowElements rowElements in row.Where(rowElements => Math.Abs(rowElements.ProgressBar.highValue - (float)value) < 1))
+        foreach (RowElements rowElements in row.Where(rowElements =>
+                     Math.Abs(rowElements.ProgressBar.highValue - (float)value) < 1))
         {
             rowElements.Toggle.value = true;
             rowElements.Row.AddToClassList("complete");
@@ -100,8 +98,13 @@ public class StatisticsGUI : BaseGUI
         _statQueue.Enqueue(new Stat(item, value));
     }
 
-    public void LoadStats()
+    public void LoadStats(IEnumerable<KeyValuePair<string, List<Milestone>>> groupedMilestones,
+        Dictionary<string, double> stats,
+        IEnumerable<APLocation> allLocations)
     {
+        if(groupedMilestones is null) Log.LogWarning("GroupedMilestones is null");
+        if(stats is null) Log.LogWarning("Stats is null");
+        if(allLocations is null) Log.LogWarning("AllLocations is null");
         // Unregister all callbacks
         _unregisterCallback?.Invoke();
         // Reset unregister callback
@@ -112,9 +115,9 @@ public class StatisticsGUI : BaseGUI
         _statisticRows.Clear();
         _goalRowsByLocation.Clear();
         // Create the layout again
-        CreateLayout();
+        CreateLayout(groupedMilestones, stats, allLocations);
     }
-    
+
     private void Initialize()
     {
         GameObject root = new("TFWRAPStatisticsGUI");
@@ -138,7 +141,9 @@ public class StatisticsGUI : BaseGUI
         RootElement = _uiDocument.rootVisualElement;
     }
 
-    private void CreateLayout()
+    private void CreateLayout(IEnumerable<KeyValuePair<string, List<Milestone>>> groupedMilestones,
+        Dictionary<string, double> stats,
+        IEnumerable<APLocation> allLocations)
     {
         VisualElement root = _uiDocument.rootVisualElement;
         root.style.top = 75;
@@ -182,7 +187,7 @@ public class StatisticsGUI : BaseGUI
         close.AddToClassList("btn-close");
         close.RegisterCallback<MouseUpEvent>(Hide);
         _unregisterCallback += () => close.UnregisterCallback<MouseUpEvent>(Hide);
-        
+
         buttonRow.Add(statBtn);
         buttonRow.Add(achievementBtn);
         buttonRow.Add(completedBtn);
@@ -205,18 +210,20 @@ public class StatisticsGUI : BaseGUI
         container.AddToClassList("statistic-container");
 
         bool first = true;
-        foreach (KeyValuePair<string, List<Milestone>> statistic in GoalManager.Instance.MilestoneCopy())
+        
+        foreach (KeyValuePair<string, List<Milestone>> statistic in groupedMilestones)
         {
             List<Milestone> milestones = statistic.Value.OrderBy(milestone => milestone.Target).ToList();
+            if (!stats.TryGetValue(statistic.Key, out double value)) value = 0;
             foreach (Milestone milestone in milestones)
             {
-                container.Add(CreateMilestoneRow(statistic.Key, milestone, first));
+                container.Add(CreateMilestoneRow(statistic.Key, milestone, first, value));
                 first = false;
             }
         }
 
-        foreach (APLocation apLocation in APManager.Instance?.GetLocations()
-                     ?.Where(m => m.statistic is null && m.timed is null && m.region != "GrassSanity") ?? [])
+        foreach (APLocation apLocation in allLocations.Where(m =>
+                     m.statistic is null && m.timed is null && m.region != "GrassSanity"))
         {
             container.Add(CreateActionRow(apLocation));
         }
@@ -253,7 +260,7 @@ public class StatisticsGUI : BaseGUI
         }
     }
 
-    private VisualElement CreateMilestoneRow(string key, Milestone milestone, bool first)
+    private VisualElement CreateMilestoneRow(string key, Milestone milestone, bool first, double value)
     {
         GroupBox row = new();
         row.AddToClassList("statistic");
@@ -288,7 +295,6 @@ public class StatisticsGUI : BaseGUI
         // Progress row
         VisualElement progressRow = new();
         progressRow.AddToClassList("row");
-        if (!GoalManager.Instance.TryGetValue(key, out double value)) value = 0;
         ProgressBar progressBar = new()
         {
             lowValue = 0,
@@ -382,11 +388,11 @@ public class StatisticsGUI : BaseGUI
 
     private void RefreshUI()
     {
-        if(!_visible || _statQueue.IsEmpty) return;
-        
+        if (!_visible || _statQueue.IsEmpty) return;
+
         // Hold a unique list of stats to refresh
         Dictionary<string, double> refreshStats = new();
-        
+
         // While there are more stats
         while (_statQueue.TryDequeue(out Stat stat))
         {

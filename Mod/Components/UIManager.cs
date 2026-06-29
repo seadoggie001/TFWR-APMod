@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
-public class UIManager : BaseComponent, IUIManagerDelegates
+public class UIManager : BaseComponent
 {
     [CanBeNull] public static UIManager Instance;
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.UIMgr");
@@ -34,10 +34,10 @@ public class UIManager : BaseComponent, IUIManagerDelegates
 
     private void Start()
     {
-        GoalManager.Instance.GoalEvent += OnGoalEvent;
-        OnDisabled += () => GoalManager.Instance.GoalEvent -= OnGoalEvent;
-        GoalManager.Instance.StatTotalEvent += OnStatTotalEvent;
-        OnDisabled += () => GoalManager.Instance.StatTotalEvent -= OnStatTotalEvent;
+        GoalManager.Instance?.StatsService.GoalEvent += OnGoalEvent;
+        OnDisabled += () => GoalManager.Instance?.StatsService.GoalEvent -= OnGoalEvent;
+        GoalManager.Instance?.StatsService.StatTotalEvent += OnStatTotalEvent;
+        OnDisabled += () => GoalManager.Instance?.StatsService.StatTotalEvent -= OnStatTotalEvent;
 
         APManager.Instance?.APService.APDisconnected += OnAPDisconnected;
         OnDisabled += () => APManager.Instance?.APService.APDisconnected -= OnAPDisconnected;
@@ -109,15 +109,13 @@ public class UIManager : BaseComponent, IUIManagerDelegates
         }
         else
         {
-            statisticsGUI.LoadStats();
+            statisticsGUI.LoadStats(
+                GoalManager.Instance?.StatsService.MilestoneCopy(),
+                GoalManager.Instance?.StatsService.StatCopy(),
+                APManager.Instance?.GetLocations()
+            );
             statisticsGUI.Show();
         }
-    }
-
-    public void RaiseConnectionAttemptEvent(ConnectionInfo attempt)
-    {
-        Log.LogInfo($"RaiseConnectionAttemptEvent");
-        ConnectionAttemptEvent?.Invoke(this, attempt);
     }
 
     public bool StatGuiOpen() => !statisticsGUI;
@@ -147,9 +145,4 @@ public class UIManager : BaseComponent, IUIManagerDelegates
     }
 
     private void OnGoalEvent(object sender, GoalEvent e) => statisticsGUI.MarkCompleted(e.Name);
-}
-
-public interface IUIManagerDelegates
-{
-    public event EventHandler<ConnectionInfo> ConnectionAttemptEvent;
 }

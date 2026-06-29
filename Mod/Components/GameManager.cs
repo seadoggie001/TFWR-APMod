@@ -16,7 +16,7 @@ public class GameManager : BaseComponent
 
     public readonly TfwrConfig TfwrConfig = new();
 
-    public readonly IGameService GameService = new GameService();
+    public IGameService GameService;
 
     public event EventHandler<Notification> NewItemReceived;
 
@@ -24,15 +24,14 @@ public class GameManager : BaseComponent
     {
         Instance = this;
         TfwrConfig.SetupConfig(Plugin.Instance.Config);
-        Log.LogInfo("Game Manager Initialized");
-
+        GameService = new GameService();
         base.OnEnable();
     }
 
     private void Start()
     {
-        GoalManager.Instance.GoalEvent += OnGoalEvent;
-        OnDisabled += () => GoalManager.Instance.GoalEvent -= OnGoalEvent;
+        GoalManager.Instance?.StatsService.GoalEvent += OnGoalEvent;
+        OnDisabled += () => GoalManager.Instance?.StatsService.GoalEvent -= OnGoalEvent;
 
         GameService.GameLoaded += OnGameLoaded;
         OnDisabled += () => GameService.GameLoaded -= OnGameLoaded;

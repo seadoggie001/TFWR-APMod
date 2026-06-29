@@ -1,5 +1,4 @@
 using BepInEx.Logging;
-using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
 
@@ -20,6 +19,16 @@ public class StatsService : IStatsService
     private readonly Dictionary<string, List<Milestone>> _milestones = new();
 
     private readonly object _lockObject = new();
+
+    /// <summary>
+    /// Raised when a statistic is completed
+    /// </summary>
+    public event EventHandler<GoalEvent> GoalEvent;
+
+    /// <summary>
+    /// Raised with updated stat totals 
+    /// </summary>
+    public event EventHandler<Stat> StatTotalEvent;
 
     /// <summary>
     ///     Uses APLocations to determine which statistics to track
@@ -82,7 +91,7 @@ public class StatsService : IStatsService
 
         GrantAchievements(name, total);
 
-        GoalManager.Instance.RaiseStatTotalEvent(name, total);
+        StatTotalEvent?.Invoke(null, new Stat(name, total));
     }
 
     /// <summary>
@@ -109,16 +118,27 @@ public class StatsService : IStatsService
         {
             _stats.Clear();
             foreach (Pair<string, double> newStat in newStats)
+            {
                 if (_stats.ContainsKey(newStat.key))
                     _stats.Add(newStat.key, newStat.value);
                 else
                     _stats[newStat.key] = newStat.value;
+                StatTotalEvent?.Invoke(null, new Stat(newStat.key, newStat.value));
+            }
         }
     }
 
     public Dictionary<string, List<Milestone>> MilestoneCopy()
     {
         return new Dictionary<string, List<Milestone>>(_milestones.ToDictionary(m => m.Key, m => m.Value));
+    }
+
+    public Dictionary<string, double> StatCopy()
+    {
+        lock (_lockObject)
+        {
+            return new Dictionary<string, double>(_stats.ToDictionary(m => m.Key, m => m.Value));
+        }
     }
 
     /// <summary>
@@ -156,7 +176,7 @@ public class StatsService : IStatsService
             Log.LogInfo(
                 $"Found achievement! Stat: {stat} Location: {milestone.Location} Achievement: {milestone.Achievement}");
             // Grant the achievement or location
-            GoalManager.Instance.RaiseGoalEvent(!string.IsNullOrWhiteSpace(milestone.Achievement)
+            GoalEvent?.Invoke(this, !string.IsNullOrWhiteSpace(milestone.Achievement)
                 ? new GoalEvent(milestone.APLocation.id, milestone.Achievement, GoalType.Achievement)
                 : new GoalEvent(milestone.APLocation.id, milestone.Location, GoalType.Statistic));
             milestone.Triggered = true;
@@ -174,6 +194,12 @@ public class StatsService : IStatsService
 
 public interface IStatsService
 {
+    /// <inheritdoc cref="StatsService.GoalEvent" />
+    event EventHandler<GoalEvent> GoalEvent;
+    
+    /// <inheritdoc cref="StatsService.StatTotalEvent" />
+    event EventHandler<Stat> StatTotalEvent;
+    
     /// <summary>
     ///     Uses APLocations to determine which statistics to track
     /// </summary>
@@ -194,5 +220,6 @@ public interface IStatsService
     void Load(List<Pair<string, double>> newStats);
 
     Dictionary<string, List<Milestone>> MilestoneCopy();
+    Dictionary<string, double> StatCopy();
     bool TryGetValue(string stat, out double value);
 }

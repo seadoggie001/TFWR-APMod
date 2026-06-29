@@ -176,7 +176,8 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
     // if this is the initial connection
     public void Disconnect(object sender, EventArgs e)
     {
-        Session?.Socket?.DisconnectAsync();
+        if (Session?.Socket == null) return;
+        Session.Socket.DisconnectAsync();
         APDisconnected?.Invoke(this, null);
     }
 
