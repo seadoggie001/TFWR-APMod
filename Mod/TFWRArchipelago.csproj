@@ -20,6 +20,7 @@
         <ManagedPath>$(GamePath)/TheFarmerWasReplaced_Data/Managed</ManagedPath>
         <BepInExPath>$(GamePath)/BepInEx</BepInExPath>
         <PluginsPath>$(BepInExPath)/plugins</PluginsPath>
+        <MyPluginPath>$(PluginsPath)/$(AssemblyName)</MyPluginPath>
         <IsPackable>false</IsPackable>
         <Authors>seadoggie</Authors>
     </PropertyGroup>
@@ -45,40 +46,49 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Assets\archipelago">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Assets\archipelago.manifest">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Assets\StandaloneWindows64">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Assets\StandaloneWindows64.manifest">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
+        <EmbeddedResource Include="Assets\archipelago">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets\archipelago.manifest">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets\StandaloneWindows64">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets\StandaloneWindows64.manifest">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="data.yaml" />
-      <None Update="locations.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Remove="data.yaml" />
+        <None Update="locations.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="/home/seadoggie/source/repos/TFWRArchipelago/publish.sh" />
+        <Message Text="Updating Steam files -> 
+            From: $(ProjectDir)$(OutputPath)
+            To:   $(MyPluginPath)" Importance="high"  />
+        <RemoveDir Directories="$(MyPluginPath)" />
+        <MakeDir Directories="$(MyPluginPath)" />
+        <ItemGroup>
+            <FilesToCopy Include="$(ProjectDir)$(OutputPath)**/*"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(MyPluginPath)/%(RecursiveDir)" />
     </Target>
+
 
     <Target Name="EmptyPublishFolder" BeforeTargets="PrepareForPublish">
         <Message Text="Emptying target folder: $(PublishDir)" Importance="high" />
         <RemoveDir Directories="$(PublishDir)" />
         <MakeDir Directories="$(PublishDir)" />
     </Target>
-    
+
     <Target Name="ZipPublishOutput" AfterTargets="Publish">
         <Message Text="Zipping publish output..." Importance="high" />
-        
+
         <ZipDirectory
                 SourceDirectory="$(PublishDir)"
                 DestinationFile="$(MSBuildProjectDirectory)\bin\$(Configuration)\TFWRArchipelago.zip"
