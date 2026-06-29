@@ -48,6 +48,13 @@ public class APManager : BaseComponent
         
         UIManager.Instance?.settingsGUI.DisconnectRequestEvent += APService.Disconnect;
         OnDisabled += () => UIManager.Instance?.settingsGUI.DisconnectRequestEvent -= APService.Disconnect;
+        
+        APService.APDisconnected += OnAPDisconnected;
+    }
+
+    private void OnAPDisconnected(object sender, string e)
+    {
+        _itemQueue.Reset();
     }
 
     private void Update()

@@ -26,10 +26,17 @@ public class ItemQueue(Func<string, int, bool> processItemCallback) : IItemQueue
         _itemQueue.Add(itemReceivedName);
         helper.DequeueItem();
     }
+
+    public void Reset()
+    {
+        _itemsReceived = 0;
+        _itemQueue.Clear();
+    }
 }
 
 public interface IItemQueue
 {
     void Process();
     void OnItemReceived(IReceivedItemsHelper helper);
+    void Reset();
 }
