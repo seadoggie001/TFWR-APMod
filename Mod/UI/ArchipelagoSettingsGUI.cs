@@ -1,3 +1,4 @@
+using Archipelago.MultiClient.Net;
 using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Patches;
@@ -15,7 +16,7 @@ public class ArchipelagoSettingsGUI : BaseGUI
 
     public event EventHandler<ConnectionInfo> ConnectionAttemptEvent;
     public event EventHandler<EventArgs> DisconnectRequestEvent;
-    
+
     // Spacing constants
     private const int ControlHeight = 25, ControlWidth = 200;
     private const int LabelWidth = 100;
@@ -171,7 +172,7 @@ public class ArchipelagoSettingsGUI : BaseGUI
                 string text = _state switch
                 {
                     Status.Connected => "Connected",
-                    Status.ConnectionFailed => "Failed to connect. Please review the connection settings.",
+                    Status.ConnectionFailed => _disconnectedReason,
                     Status.Connecting => "Connecting to Archipelago... please wait...",
                     Status.None => "This is literally impossible",
                     Status.Disconnected => _disconnectedReason ?? "Disconnected",
@@ -211,11 +212,20 @@ public class ArchipelagoSettingsGUI : BaseGUI
             _archUsername, _archPassword));
     }
 
-    public void ConnectionAttempt(bool success) => _state = success ? Status.Connected : Status.ConnectionFailed;
+    public void ConnectionAttempt(LoginResult result)
+    {
+        _state = result.Successful ? Status.Connected : Status.ConnectionFailed;
+        if (result is LoginFailure failure)
+        {
+            _disconnectedReason = failure.Errors.FirstOrDefault() ??
+                                  "Failed to connect. Please review the connection settings.";
+        }
+    }
 
     public void Disconnected([CanBeNull] string reason = null)
     {
         _state = Status.Disconnected;
         _disconnectedReason = reason;
+        DisplayingWindow = true;
     }
 }

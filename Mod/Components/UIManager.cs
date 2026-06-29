@@ -1,9 +1,9 @@
+using Archipelago.MultiClient.Net;
 using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.UI;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
@@ -11,8 +11,6 @@ public class UIManager : BaseComponent
 {
     [CanBeNull] public static UIManager Instance;
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.UIMgr");
-
-    public event EventHandler<ConnectionInfo> ConnectionAttemptEvent;
 
     public StatisticsGUI statisticsGUI;
     public ArchipelagoSettingsGUI settingsGUI;
@@ -138,11 +136,11 @@ public class UIManager : BaseComponent
         settingsGUI.Disconnected(reason);
     }
 
-    private void OnConnectionResult(object sender, bool success)
+    private void OnConnectionResult(object sender, LoginResult result)
     {
-        settingsGUI.ConnectionAttempt(success);
-        floatingActionButton.ConnectionStatus(success);
-        if (!success) return;
+        settingsGUI.ConnectionAttempt(result);
+        floatingActionButton.ConnectionStatus(result.Successful);
+        if (!result.Successful) return;
         statisticsGUI.Show();
     }
 

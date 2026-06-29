@@ -26,13 +26,13 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
     /// <summary>
     /// Fired when a login connection attempt is completed
     /// </summary>
-    public event EventHandler<bool> ConnectionResult;
-    
+    public event EventHandler<LoginResult> ConnectionResult;
+
     /// <summary>
     /// Fired when an achievement is unlocked
     /// </summary>
     public event EventHandler<string> AchievementUnlocked;
-    
+
     public void ResetAchievementCache(object sender, ModSaveGame modSaveGame) => _achievementCache.Clear();
 
     /// <summary>
@@ -99,7 +99,8 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
             {
                 Log.LogError(
                     $"Failed to connect to room. Connection Details: {{URL: {connectionSettings.Url}:{connectionSettings.Port}}}");
-                ConnectionResult?.Invoke(this, false);
+                ConnectionResult?.Invoke(this,
+                    new LoginFailure("Failed to connect. Please review the connection settings."));
                 return false;
             }
 
@@ -108,12 +109,12 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
 
             Log.LogInfo("Logging in");
             LoginResult loginResult = await LoginAsync(connectionSettings);
-            ConnectionResult?.Invoke(this, loginResult.Successful);
+            ConnectionResult?.Invoke(this, loginResult);
             if (loginResult.Successful)
             {
                 Log.LogInfo("Successfully logged in.");
                 Session.Socket.SocketClosed += reason => APDisconnected?.Invoke(this, reason);
-                Session.Socket.ErrorReceived += (exception, message) => APDisconnected?.Invoke(this, message);
+                Session.Socket.ErrorReceived += (Exception _, string message) => APDisconnected?.Invoke(this, message);
 
                 // Load slot data
                 _slotData = await Session.DataStorage.GetSlotDataAsync();
@@ -126,7 +127,7 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
                     RandomizedCosts = (long)_slotData["crop_cost"] == 1,
                     CropCosts = new Dictionary<string, List<string>>()
                 };
-
+                
                 if (_options.RandomizedCosts)
                 {
                     IEnumerable<string> cropOptions =
@@ -148,7 +149,7 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
                         // Dinosaurs don't need a cost, but apples do. I know it's weird, but trust me.
                         cropName = cropName.Replace("dinosaur", "apple");
 
-                        Newtonsoft.Json.Linq.JArray array = (Newtonsoft.Json.Linq.JArray) cost;
+                        Newtonsoft.Json.Linq.JArray array = (Newtonsoft.Json.Linq.JArray)cost;
                         _options.CropCosts[cropName] = array.Values<string>().ToList();
                     }
                 }
@@ -245,10 +246,10 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
     }
 
     public APOptions GetOptions() => _options;
-    
+
     public void SubmitGrass(string grassName)
     {
-        if(!_options.GrassSanity) return;
+        if (!_options.GrassSanity) return;
         APLocation location = allLocations.FirstOrDefault(m => m.name == grassName);
         if (location == null) return;
         SubmitLocationById(location.id);
@@ -261,11 +262,11 @@ public interface IAPService
     event EventHandler<string> APDisconnected;
 
     /// <inheritdoc cref="APService.ConnectionResult" />
-    event EventHandler<bool> ConnectionResult;
+    event EventHandler<LoginResult> ConnectionResult;
 
     /// <inheritdoc cref="APService.AchievementUnlocked" />
     event EventHandler<string> AchievementUnlocked;
-    
+
     void ResetAchievementCache(object sender, ModSaveGame modSaveGame);
     void UnlockAchievement(string achievementName);
     void SubmitLocationById(long id);
