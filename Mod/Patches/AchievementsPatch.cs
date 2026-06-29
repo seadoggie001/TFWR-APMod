@@ -1,4 +1,5 @@
 using com.seadoggie.TFWRArchipelago.Components;
+using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 
 // ReSharper disable InconsistentNaming
@@ -12,8 +13,15 @@ public class AchievementsPatch
     [HarmonyPrefix]
     public static void UnlockAchievement(string achievement)
     {
-        if (!Plugin.Instance.Enabled) return;
-        APManager.Instance?.APService.UnlockAchievement(achievement);
+        try
+        {
+            if (!Plugin.Instance.Enabled) return;
+            APManager.Instance?.APService.UnlockAchievement(achievement);
+        }
+        catch (Exception e)
+        {
+            Plugin.Log.LogException($"{nameof(UnlockAchievement)}", e);
+        }
     }
 
     /// <summary>
@@ -25,8 +33,15 @@ public class AchievementsPatch
     [HarmonyPrefix]
     public static void IncrementStat(string statName, int increment)
     {
-        if (!Plugin.Instance.Enabled) return;
-        GoalManager.Instance.RaiseStatEvent(statName, increment);
+        try
+        {
+            if (!Plugin.Instance.Enabled) return;
+            GoalManager.Instance?.RaiseStatEvent(statName, increment);
+        }
+        catch (Exception e)
+        {
+            Plugin.Log.LogException($"{nameof(IncrementStat)}", e);
+        }
     }
 
     /// <summary>
@@ -40,8 +55,15 @@ public class AchievementsPatch
     [HarmonyPrefix]
     public static void CollectItem(int itemId, double number, ItemBlock ___total_stats)
     {
-        ___total_stats.AddItem(itemId, number);
-        if (!Plugin.Instance.Enabled) return;
-        GoalManager.Instance.RaiseStatEvent(StringIds.GetItemName(itemId), number);
+        try
+        {
+            ___total_stats.AddItem(itemId, number);
+            if (!Plugin.Instance.Enabled) return;
+            GoalManager.Instance?.RaiseStatEvent(StringIds.GetItemName(itemId), number);
+        }
+        catch (Exception e)
+        {
+            Plugin.Log.LogException($"{nameof(CollectItem)}", e);
+        }
     }
 }

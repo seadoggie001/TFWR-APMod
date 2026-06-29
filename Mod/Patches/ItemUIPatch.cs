@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 using UnityEngine.UI;
 using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
@@ -13,6 +14,13 @@ public class ItemUIPatch
     [HarmonyPatch(nameof(ItemUI.Setup), typeof(int), typeof(double))]
     public static void Setup(ref Image ___image, int itemId, double c)
     {
-        if (itemId == StringIdsPatch.ArchipelagoItem) ___image.sprite = Resources.Archipelago;
+        try
+        {
+            if (itemId == StringIdsPatch.ArchipelagoItem) ___image.sprite = Resources.Archipelago;
+        }
+        catch (Exception e)
+        {
+            Plugin.Log.LogException($"{nameof(Setup)}", e);
+        }
     }
 }

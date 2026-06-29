@@ -19,15 +19,23 @@ public class WorkspacePatch
     [HarmonyPatch(nameof(Workspace.Scroll), typeof(float))]
     public static bool Scroll(float scroll)
     {
-        // Ignore all of this if StatisticsGUI isn't around
-        if (UIManager.Instance?.StatGuiOpen() ?? false) return !BepInExHelper.HarmonySkipFunction;
-        // If the current mouse position overlaps the StatisticsGUI
-        if (UIManager.Instance!.StatGuiBounds().Overlaps(new Rect(Input.mousePosition, new Vector2(1,1))))
+        try
         {
-            // Skip the normal function. Our GUI handles the scroll
-            return BepInExHelper.HarmonySkipFunction;
+            // Ignore all of this if StatisticsGUI isn't around
+            if (UIManager.Instance?.StatGuiOpen() ?? false) return !BepInExHelper.HarmonySkipFunction;
+            // If the current mouse position overlaps the StatisticsGUI
+            if (UIManager.Instance!.StatGuiBounds().Overlaps(new Rect(Input.mousePosition, new Vector2(1,1))))
+            {
+                // Skip the normal function. Our GUI handles the scroll
+                return BepInExHelper.HarmonySkipFunction;
+            }
+            // Continue as normal
+            return !BepInExHelper.HarmonySkipFunction;
         }
-        // Continue as normal
-        return !BepInExHelper.HarmonySkipFunction;
+        catch (Exception e)
+        {
+            Plugin.Log.LogException($"{nameof(Scroll)}", e);
+            return !BepInExHelper.HarmonySkipFunction;
+        }
     }
 }

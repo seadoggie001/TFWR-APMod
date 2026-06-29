@@ -17,32 +17,39 @@ public class OptionMenuPatch
     [HarmonyPatch("OnOptionChanged", typeof(string))]
     public static void OnOptionChanged(string optionName)
     {
-        if (!(GameManager.Instance?.TfwrConfig?.Debug ?? false) ||
-            !ResourceManagerPatch.CustomOptions.Contains(optionName))
-            return;
-
-        Plugin.Log.LogInfo("CustomOption Changed. Name: " + optionName);
-        // Don't cause an infinite loop because we're setting the value in the "listener"
-        // Note: a locking object fails here... perhaps it's related to BepinEx or Harmony?
-        if (_settingValue) return;
-        _settingValue = true;
-        switch (optionName)
+        try
         {
-            case ResourceManagerPatch.ArchipelagoOptionToggle:
-                try
-                {
-                    UIManager.Instance?.OpenConnectionSettings();
-                }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogException("Failed to create the connection settings modifier GUI", e);
-                }
+            if (!(GameManager.Instance?.TfwrConfig?.Debug ?? false) ||
+                !ResourceManagerPatch.CustomOptions.Contains(optionName))
+                return;
 
-                OptionHolder.SetOption(ResourceManagerPatch.ArchipelagoOptionToggle,
-                    ResourceManagerPatch.ArchipelagoOptionToggleValue);
-                break;
+            Plugin.Log.LogInfo("CustomOption Changed. Name: " + optionName);
+            // Don't cause an infinite loop because we're setting the value in the "listener"
+            // Note: a locking object fails here... perhaps it's related to BepinEx or Harmony?
+            if (_settingValue) return;
+            _settingValue = true;
+            switch (optionName)
+            {
+                case ResourceManagerPatch.ArchipelagoOptionToggle:
+                    try
+                    {
+                        UIManager.Instance?.OpenConnectionSettings();
+                    }
+                    catch (Exception e)
+                    {
+                        Plugin.Log.LogException("Failed to create the connection settings modifier GUI", e);
+                    }
+
+                    OptionHolder.SetOption(ResourceManagerPatch.ArchipelagoOptionToggle,
+                        ResourceManagerPatch.ArchipelagoOptionToggleValue);
+                    break;
+            }
+
+            _settingValue = false;
         }
-
-        _settingValue = false;
+        catch (Exception e)
+        {
+            Plugin.Log.LogException($"{nameof(OnOptionChanged)}", e);
+        }
     }
 }

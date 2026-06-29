@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using com.seadoggie.TFWRArchipelago.Components;
+using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 using UnityEngine;
 
@@ -19,26 +20,33 @@ public class ResourceManagerPatch
     [HarmonyPatch(nameof(ResourceManager.LoadAll))]
     public static void LoadAll(ref ItemSO[] ___items)
     {
-        // Skip this if we've already loaded our item
-        if(___items.Any(m => m.itemName == StringIdsPatch.ArchipelagoItemName)) return;
-        
-        // Install the Archipelago item
-        ItemSO item = ScriptableObject.CreateInstance<ItemSO>();
-        item.itemId = StringIdsPatch.ArchipelagoItem;
-        item.itemName = StringIdsPatch.ArchipelagoItemName;
-        // The rest of this is all nonsense?
-        item.description = "Archipelago Stuff";
-        item.docs = "I got some docs!?";
-        item.enabled = true;
-        item.name = "Some other Archipelago name?";
-        item.trackStats = true;
-        // Now tell the game about it
-        ___items = ___items.AddItem(item).ToArray();
-
-        // Track stats for all items
-        foreach (ItemSO itemSo in ___items)
+        try
         {
-            itemSo.trackStats = true;
+            // Skip this if we've already loaded our item
+            if(___items.Any(m => m.itemName == StringIdsPatch.ArchipelagoItemName)) return;
+            
+            // Install the Archipelago item
+            ItemSO item = ScriptableObject.CreateInstance<ItemSO>();
+            item.itemId = StringIdsPatch.ArchipelagoItem;
+            item.itemName = StringIdsPatch.ArchipelagoItemName;
+            // The rest of this is all nonsense?
+            item.description = "Archipelago Stuff";
+            item.docs = "I got some docs!?";
+            item.enabled = true;
+            item.name = "Some other Archipelago name?";
+            item.trackStats = true;
+            // Now tell the game about it
+            ___items = ___items.AddItem(item).ToArray();
+
+            // Track stats for all items
+            foreach (ItemSO itemSo in ___items)
+            {
+                itemSo.trackStats = true;
+            }
+        }
+        catch (Exception e)
+        {
+            Plugin.Log.LogException($"{nameof(LoadAll)}", e);
         }
     }
 
@@ -50,16 +58,23 @@ public class ResourceManagerPatch
     [HarmonyPatch(nameof(ResourceManager.GetAllOptions))]
     public static void GetAllOptions(ref IEnumerable<OptionSO> __result)
     {
-        if(!(GameManager.Instance?.TfwrConfig?.Debug ?? false))
-            return;
-        List<OptionSO> options = __result.ToList();
-        _openArchipelagoOption ??= AddOption(ArchipelagoOptionToggle, "Open Archipelago settings", "general", 0f,
-            [ArchipelagoOptionToggleValue, "Closed"], ArchipelagoOptionToggleValue);
-        options.Add(_openArchipelagoOption);
-        options.Add(AddOption("DEBUG", "Cause debugging is hard", "general", 0f, ["Send location", "done"],
-            "Send location"));
-        CustomOptions = [ArchipelagoOptionToggle, "DEBUG"];
-        __result = options;
+        try
+        {
+            if(!(GameManager.Instance?.TfwrConfig?.Debug ?? false))
+                return;
+            List<OptionSO> options = __result.ToList();
+            _openArchipelagoOption ??= AddOption(ArchipelagoOptionToggle, "Open Archipelago settings", "general", 0f,
+                [ArchipelagoOptionToggleValue, "Closed"], ArchipelagoOptionToggleValue);
+            options.Add(_openArchipelagoOption);
+            options.Add(AddOption("DEBUG", "Cause debugging is hard", "general", 0f, ["Send location", "done"],
+                "Send location"));
+            CustomOptions = [ArchipelagoOptionToggle, "DEBUG"];
+            __result = options;
+        }
+        catch (Exception e)
+        {
+            Plugin.Log.LogException($"{nameof(GetAllOptions)}", e);
+        }
     }
 
     /// <summary>
@@ -75,33 +90,48 @@ public class ResourceManagerPatch
     private static CycleOptionSO AddOption(string name, string tooltip, string category, float importance,
         List<string> options, string defaultValue)
     {
-        CycleOptionSO option = ScriptableObject.CreateInstance<CycleOptionSO>();
-        option.name = name;
-        option.optionName = name;
-        option.tooltip = tooltip;
-        option.category = category;
-        option.importance = importance;
-        option.options = options;
-        option.defaultValue = defaultValue;
-        // ReSharper disable once Unity.UnknownResource -- This will load from TFWR's resources
-        OptionSO[] existingOptions = Resources.LoadAll<OptionSO>("Options/");
-        OptionSO cycleOption = existingOptions.FirstOrDefault(m => m is CycleOptionSO);
-        if (cycleOption != null && cycleOption.optionUI != null) option.optionUI = cycleOption.optionUI;
-        if (OptionHolder.GetOption(name) == null) OptionHolder.SetOption(name, defaultValue);
-        return option;
+        try
+        {
+            CycleOptionSO option = ScriptableObject.CreateInstance<CycleOptionSO>();
+            option.name = name;
+            option.optionName = name;
+            option.tooltip = tooltip;
+            option.category = category;
+            option.importance = importance;
+            option.options = options;
+            option.defaultValue = defaultValue;
+            // ReSharper disable once Unity.UnknownResource -- This will load from TFWR's resources
+            OptionSO[] existingOptions = Resources.LoadAll<OptionSO>("Options/");
+            OptionSO cycleOption = existingOptions.FirstOrDefault(m => m is CycleOptionSO);
+            if (cycleOption != null && cycleOption.optionUI != null) option.optionUI = cycleOption.optionUI;
+            if (OptionHolder.GetOption(name) == null) OptionHolder.SetOption(name, defaultValue);
+            return option;
+        }
+        catch (Exception e)
+        {
+            Plugin.Log.LogException($"{nameof(AddOption)}", e);
+            return null;
+        }
     }
 
     [HarmonyPostfix]
     [HarmonyPatch(nameof(ResourceManager.GetUnlock))]
     public static void GetUnlock(string name, ref UnlockSO __result)
     {
-        if (Plugin.Instance.Enabled && __result is not null && __result)
+        try
         {
-            // Everything costs an Archipelago item
-            __result.unlockCost = new ItemBlock(StringIdsPatch.ArchipelagoItem, 1);
-            
-            // ToDo: Someday, check if there's a hint for this item. If there is a hint, display it here...
-            // __result.description = "Text describing a hint for this item";
+            if (Plugin.Instance.Enabled && __result is not null && __result)
+            {
+                // Everything costs an Archipelago item
+                __result.unlockCost = new ItemBlock(StringIdsPatch.ArchipelagoItem, 1);
+                
+                // ToDo: Someday, check if there's a hint for this item. If there is a hint, display it here...
+                // __result.description = "Text describing a hint for this item";
+            }
+        }
+        catch (Exception e)
+        {
+            Plugin.Log.LogException($"{nameof(GetUnlock)}", e);
         }
     }
     
@@ -109,15 +139,22 @@ public class ResourceManagerPatch
     [HarmonyPatch(nameof(ResourceManager.GetFarmObject))]
     public static void GetFarmObject(string name, ref FarmObjectSO __result)
     {
-        if (!Plugin.Instance.Enabled || __result is null || !__result) return;
-        if (APManager.Instance is null) return;
-        if (!(APManager.Instance?.APService?.GetOptions()?.CropCosts?.TryGetValue(name, out List<string> items) ?? false)) return;
-        ItemBlock cost = ItemBlock.CreateEmpty();
-        foreach (string item in items)
+        try
         {
-            cost.AddItem(StringIds.GetItemId(item), 1);
+            if (!Plugin.Instance.Enabled || __result is null || !__result) return;
+            if (APManager.Instance is null) return;
+            if (!(APManager.Instance?.APService?.GetOptions()?.CropCosts?.TryGetValue(name, out List<string> items) ?? false)) return;
+            ItemBlock cost = ItemBlock.CreateEmpty();
+            foreach (string item in items)
+            {
+                cost.AddItem(StringIds.GetItemId(item), 1);
+            }
+                    
+            __result.cost = cost;
         }
-                
-        __result.cost = cost;
+        catch (Exception e)
+        {
+            Plugin.Log.LogException($"{nameof(GetFarmObject)}", e);
+        }
     }
 }

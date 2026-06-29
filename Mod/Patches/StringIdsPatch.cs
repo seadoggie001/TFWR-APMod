@@ -15,23 +15,23 @@ public class StringIdsPatch
     [HarmonyPatch(nameof(StringIds.SetItemIds), typeof(IEnumerable<string>))]
     public static void SetItemIds(IEnumerable<string> items, Dictionary<string, int> ___itemIds, ref string[] ___itemNames)
     {
-        // If my name is already there, quit
-        if(___itemIds.ContainsKey(ArchipelagoItemName)) return;
-        
-        // Find the next ID
-        int index = items.Count();
-        // Save the ID
         try
         {
+            // If my name is already there, quit
+            if(___itemIds.ContainsKey(ArchipelagoItemName)) return;
+            
+            // Find the next ID
+            int index = items.Count();
+            // Save the ID
             ___itemIds.Add(ArchipelagoItemName, index);
+            // Save the name
+            ___itemNames = ___itemNames.AddItem(ArchipelagoItemName).ToArray();
+            // Steal the ID
+            ArchipelagoItem = index;
         }
         catch (Exception e)
         {
             Plugin.Log.LogException("Failed to add ArchipelagoItem.", e);
         }
-        // Save the name
-        ___itemNames = ___itemNames.AddItem(ArchipelagoItemName).ToArray();
-        // Steal the ID
-        ArchipelagoItem = index;
     }
 }

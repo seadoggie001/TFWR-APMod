@@ -22,9 +22,9 @@ public static class IpcPatch
     /// <param name="running"></param>
     public static void SetRunning(bool running)
     {
-        if(!(GameManager.Instance?.TfwrConfig.DisableIpc ?? false)) return;
         try
         {
+            if(!(GameManager.Instance?.TfwrConfig.DisableIpc ?? false)) return;
             Type type = typeof(Ipc);
             FieldInfo fieldInfo = type.GetField("_isRunning", BindingFlags.NonPublic | BindingFlags.Instance);
             if (fieldInfo is null)
