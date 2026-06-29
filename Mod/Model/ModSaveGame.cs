@@ -19,5 +19,5 @@ public class ModSaveGame
     /// <summary>
     /// Grass sanity items completed
     /// </summary>
-    public HashSet<Vector2Int> Grass;
+    public HashSet<Vector2Int> Grass = [];
 }

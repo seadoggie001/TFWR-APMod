@@ -125,7 +125,8 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
                         ? "Gold Farmer"
                         : "Size Matters",
                     RandomizedCosts = (long)_slotData["crop_cost"] == 1,
-                    CropCosts = new Dictionary<string, List<string>>()
+                    CropCosts = new Dictionary<string, List<string>>(),
+                    GrassSanity = (long)_slotData["grass_sanity"] == 1,
                 };
                 
                 if (_options.RandomizedCosts)
