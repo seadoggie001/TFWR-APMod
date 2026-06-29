@@ -29,10 +29,10 @@ public class Plugin : BaseUnityPlugin
 
         // Create Managers
         MainGameObject = new GameObject("Archipelago");
+        MainGameObject.AddComponent<UIManager>();
         MainGameObject.AddComponent<APManager>();
         MainGameObject.AddComponent<GoalManager>();
         MainGameObject.AddComponent<GameManager>();
-        MainGameObject.AddComponent<UIManager>();
         
         // Apply game patches
         try
