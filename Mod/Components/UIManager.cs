@@ -25,7 +25,6 @@ public class UIManager : BaseComponent
 
     public override void OnDisable()
     {
-        Log.LogInfo($"OnDisable");
         OnDisabled();
         base.OnDisable();
     }
@@ -75,7 +74,7 @@ public class UIManager : BaseComponent
         if (isOpen)
             statisticsGUI.Hide();
         else
-            statisticsGUI.Show();
+            statisticsGUI.Show(false);
     }
 
     public bool MouseOverAnyWindow()
@@ -101,20 +100,20 @@ public class UIManager : BaseComponent
         });
     }
 
-    private void OnGameLoaded(object sender, ModSaveGame e)
+    private void OnGameLoaded(object sender, ModSaveGame modSaveGame)
     {
-        if (e is null)
+        if (modSaveGame is null)
         {
-            statisticsGUI.Hide();
+            statisticsGUI.Disable();
         }
         else
         {
+            statisticsGUI.Enable();
             statisticsGUI.LoadStats(
                 GoalManager.Instance?.StatsService.MilestoneCopy(),
                 GoalManager.Instance?.StatsService.StatCopy(),
                 APManager.Instance?.GetLocations()
             );
-            statisticsGUI.Show();
         }
     }
 
@@ -141,7 +140,7 @@ public class UIManager : BaseComponent
         settingsGUI.ConnectionAttempt(result);
         floatingActionButton.ConnectionStatus(result.Successful);
         if (!result.Successful) return;
-        statisticsGUI.Show();
+        statisticsGUI.Show(false);
     }
 
     private void OnGoalEvent(object sender, GoalEvent e) => statisticsGUI.MarkCompleted(e.Name);

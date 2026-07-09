@@ -16,9 +16,32 @@ public class StatisticsGUI : BaseGUI
     private UIDocument _uiDocument;
     private readonly Dictionary<string, List<RowElements>> _statisticRows = new();
     private readonly Dictionary<string, RowElements> _goalRowsByLocation = new();
-    private bool _visible;
+    private Visibility _visible;
+
+    private enum Visibility
+    {
+        /// <summary>GUI is Open</summary>
+        Visible,
+        /// <summary>GUI is temporarily software-closed</summary>
+        Hidden,
+        /// <summary>GUI is closed</summary>
+        Closed,
+        /// <summary>GUI is closed due to it not being an AP Game</summary>
+        Disabled,
+    }
     private Action _unregisterCallback = () => { };
-    private readonly ConcurrentQueue<Stat> _statQueue = new();
+    
+    /// <summary>Queue of statistic changes to be processed</summary>
+    private ConcurrentQueue<Stat> _statQueue = new();
+
+    private bool _reload = false;
+    private UpdateInformation _updateInformation = null;
+    private class UpdateInformation
+    {
+        public IEnumerable<KeyValuePair<string, List<Milestone>>> GroupedMilestones { get; set; }
+        public Dictionary<string, double> Stats { get; set; }
+        public IEnumerable<APLocation> AllLocations { get; set; }
+    }
 
     private class RowElements
     {
@@ -35,7 +58,6 @@ public class StatisticsGUI : BaseGUI
 
         // Create the GUI and setup styles
         Initialize();
-        Hide();
     }
 
     private void Start()
@@ -44,19 +66,38 @@ public class StatisticsGUI : BaseGUI
         InvokeRepeating(nameof(RefreshUI), RefreshRate, RefreshRate);
     }
 
-    public void Show()
+    public void Show(bool user)
     {
+        // Only the user can un-close the statistics
+        if (!user && _visible >= Visibility.Closed) return;
+        
         RootElement.style.display = DisplayStyle.Flex;
-        _visible = true;
+        _visible = Visibility.Visible;
     }
 
-    public void Hide(MouseUpEvent e = null)
+    public void Hide()
     {
         RootElement.style.display = DisplayStyle.None;
-        _visible = false;
+        if (_visible < Visibility.Closed) _visible = Visibility.Hidden;
     }
 
-    public bool IsVisible() => _visible;
+    public void Disable()
+    {
+        _visible = Visibility.Disabled;
+    }
+
+    public void Enable()
+    {
+        if (_visible == Visibility.Disabled) _visible = Visibility.Hidden;
+    }
+    
+    private void Closed(MouseUpEvent _)
+    {
+        RootElement.style.display = DisplayStyle.None;
+        _visible = Visibility.Closed;
+    }
+
+    public bool IsVisible() => _visible == Visibility.Visible;
 
     public void MarkCompleted(string key, double value)
     {
@@ -98,24 +139,55 @@ public class StatisticsGUI : BaseGUI
         _statQueue.Enqueue(new Stat(item, value));
     }
 
+    /// <summary>
+    /// This is called to alert the GUI that a new set of statistics needs to be processed
+    /// </summary>
+    /// <param name="groupedMilestones"></param>
+    /// <param name="stats"></param>
+    /// <param name="allLocations"></param>
     public void LoadStats(IEnumerable<KeyValuePair<string, List<Milestone>>> groupedMilestones,
         Dictionary<string, double> stats,
         IEnumerable<APLocation> allLocations)
     {
-        if(groupedMilestones is null) Log.LogWarning("GroupedMilestones is null");
-        if(stats is null) Log.LogWarning("Stats is null");
-        if(allLocations is null) Log.LogWarning("AllLocations is null");
+        if (groupedMilestones is null) Log.LogWarning("GroupedMilestones is null");
+        if (stats is null) Log.LogWarning("Stats is null");
+        if (allLocations is null) Log.LogWarning("AllLocations is null");
+        
+        // Save the information needed for a reload
+        _reload = true;
+        _updateInformation = new UpdateInformation
+        {
+            GroupedMilestones = groupedMilestones,
+            Stats = stats,
+            AllLocations = allLocations,
+        };
+        // Clear the statistic queue
+        _statQueue = new ConcurrentQueue<Stat>();
+    }
+
+    private void RebuildUI()
+    {
         // Unregister all callbacks
         _unregisterCallback?.Invoke();
         // Reset unregister callback
         _unregisterCallback = () => { };
-        // Remove all stats
-        _uiDocument.rootVisualElement.Clear();
+        if (_uiDocument?.rootVisualElement is null)
+        {
+            Initialize();
+        }
+        else
+        {
+            // Remove all stats
+            _uiDocument.rootVisualElement.Clear();
+        }
         // clear internal data
         _statisticRows.Clear();
         _goalRowsByLocation.Clear();
         // Create the layout again
-        CreateLayout(groupedMilestones, stats, allLocations);
+        CreateLayout(_updateInformation.GroupedMilestones, _updateInformation.Stats, _updateInformation.AllLocations);
+        
+        _reload = false;
+        _updateInformation = null;
     }
 
     private void Initialize()
@@ -148,6 +220,7 @@ public class StatisticsGUI : BaseGUI
         VisualElement root = _uiDocument.rootVisualElement;
         root.style.top = 75;
         root.style.maxWidth = 300;
+        root.style.display = _visible == Visibility.Visible ? DisplayStyle.Flex : DisplayStyle.None;
 
         // Button row
         VisualElement buttonRow = new();
@@ -185,8 +258,8 @@ public class StatisticsGUI : BaseGUI
         };
         close.AddToClassList("btn");
         close.AddToClassList("btn-close");
-        close.RegisterCallback<MouseUpEvent>(Hide);
-        _unregisterCallback += () => close.UnregisterCallback<MouseUpEvent>(Hide);
+        close.RegisterCallback<MouseUpEvent>(Closed);
+        _unregisterCallback += () => close.UnregisterCallback<MouseUpEvent>(Closed);
 
         buttonRow.Add(statBtn);
         buttonRow.Add(achievementBtn);
@@ -388,7 +461,8 @@ public class StatisticsGUI : BaseGUI
 
     private void RefreshUI()
     {
-        if (!_visible || _statQueue.IsEmpty) return;
+        if (_reload) RebuildUI();
+        if (_visible != Visibility.Visible || _statQueue.IsEmpty) return;
 
         // Hold a unique list of stats to refresh
         Dictionary<string, double> refreshStats = new();
