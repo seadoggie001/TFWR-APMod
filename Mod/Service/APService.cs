@@ -99,7 +99,6 @@ public class APService : IAPService
             if (Session?.Socket?.Connected ?? false)
             {
                 Log.LogWarning("Already signed in");
-                return true;
             }
 
             Log.LogInfo($"Creating a session. URL: {connectionSettings.Url}:{connectionSettings.Port}");
@@ -136,41 +135,10 @@ public class APService : IAPService
                 // Load slot data
                 _slotData = await Session.DataStorage.GetSlotDataAsync();
 
-                _options = new APOptions
-                {
-                    GoalName = 0 == (long)_slotData["goal"]
-                        ? "Gold Farmer"
-                        : "Size Matters",
-                    RandomizedCosts = (long)_slotData["crop_cost"] == 1,
-                    CropCosts = new Dictionary<string, List<string>>(),
-                    GrassSanity = (long)_slotData["grass_sanity"] == 1,
-                };
-                
-                if (_options.RandomizedCosts)
-                {
-                    IEnumerable<string> cropOptions =
-                    [
-                        "crops.Hay",
-                        "crops.Bush",
-                        "crops.Tree",
-                        "crops.Carrot",
-                        "crops.Cactus",
-                        "crops.Dinosaur",
-                        "crops.Sunflower",
-                        "crops.Pumpkin",
-                    ];
-                    foreach (string cropOption in cropOptions)
-                    {
-                        if (!_slotData.TryGetValue(cropOption, out object cost)) continue;
-                        string cropName = cropOption.Replace("crops.", "").ToLower();
+                // Load necessary options
+                _options = new APOptions(_slotData);
 
-                        // Dinosaurs don't need a cost, but apples do. I know it's weird, but trust me.
-                        cropName = cropName.Replace("dinosaur", "apple");
-
-                        Newtonsoft.Json.Linq.JArray array = (Newtonsoft.Json.Linq.JArray)cost;
-                        _options.CropCosts[cropName] = array.Values<string>().ToList();
-                    }
-                }
+                Log.LogInfo(_options);
 
                 // Determine goal location
                 _goal = _allLocations.First(m => m.name == _options.GoalName);
