@@ -5,7 +5,7 @@
         <RootNamespace>com.seadoggie.TFWRArchipelago</RootNamespace>
         <AssemblyName>TFWRArchipelago</AssemblyName>
         <Description>Archipelago implementation</Description>
-        <Version>0.0.7</Version>
+        <Version>0.0.8</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <ImplicitUsings>true</ImplicitUsings>
         <LangVersion>latest</LangVersion>

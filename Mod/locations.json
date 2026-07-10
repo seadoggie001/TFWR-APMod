@@ -659,7 +659,7 @@
   {
     "id": 15000,
     "name": "10 carrots",
-    "description": "Farm 100 carrots",
+    "description": "Farm 10 carrots",
     "region": "Carrot",
     "statistic": {
       "key": "carrot",
