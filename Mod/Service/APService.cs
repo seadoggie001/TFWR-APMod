@@ -7,7 +7,7 @@ using com.seadoggie.TFWRArchipelago.Utils;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
-public class APService(IEnumerable<APLocation> allLocations) : IAPService
+public class APService : IAPService
 {
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APSrv");
 
@@ -17,6 +17,15 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
     private APLocation _goal;
     private Dictionary<string, object> _slotData;
     private APOptions _options;
+    private readonly IEnumerable<APLocation> _allLocations;
+
+    public APService(IEnumerable<APLocation> allLocations)
+    {
+        _allLocations = allLocations;
+        APDisconnected += OnAPDisconnected;
+    }
+
+    private void OnAPDisconnected(object sender, string _) => Session?.Socket.DisconnectAsync();
 
     /// <summary>
     /// Fired whenever there is an error and the AP connection is lost
@@ -108,6 +117,7 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
                     $"Failed to connect to room. Connection Details: {{URL: {connectionSettings.Url}:{connectionSettings.Port}}}");
                 ConnectionResult?.Invoke(this,
                     new LoginFailure("Failed to connect. Please review the connection settings."));
+                await Session.Socket.DisconnectAsync();
                 return false;
             }
 
@@ -121,7 +131,7 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
             {
                 Log.LogInfo("Successfully logged in.");
                 Session.Socket.SocketClosed += reason => APDisconnected?.Invoke(this, reason);
-                Session.Socket.ErrorReceived += (Exception _, string message) => APDisconnected?.Invoke(this, message);
+                Session.Socket.ErrorReceived += (_, message) => APDisconnected?.Invoke(this, message);
 
                 // Load slot data
                 _slotData = await Session.DataStorage.GetSlotDataAsync();
@@ -163,7 +173,7 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
                 }
 
                 // Determine goal location
-                _goal = allLocations.First(m => m.name == _options.GoalName);
+                _goal = _allLocations.First(m => m.name == _options.GoalName);
 
                 Log.LogInfo("Goal name was set to " + _options.GoalName);
                 if (_goal is null) Log.LogError("_goal is null!");
@@ -258,8 +268,13 @@ public class APService(IEnumerable<APLocation> allLocations) : IAPService
     public void SubmitGrass(string grassName)
     {
         if (!_options.GrassSanity) return;
-        APLocation location = allLocations.FirstOrDefault(m => m.name == grassName);
-        if (location == null) return;
+        APLocation location = _allLocations.FirstOrDefault(m => m.name == grassName);
+        if (location == null)
+        {
+            Log.LogError($"Grass sanity is not found in the APLocations. Expected: {grassName}");
+            return;
+        }
+
         SubmitLocationById(location.id);
     }
 }
