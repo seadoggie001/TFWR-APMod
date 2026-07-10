@@ -1,6 +1,7 @@
 using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
+using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
@@ -39,9 +40,16 @@ public class GoalManager : BaseComponent
 
     public void RaiseStatEvent(string statName, double value)
     {
-        Task.Run(() =>
+        _ = Task.Run(() =>
         {
-            StatEvent?.Invoke(null, new Stat(statName, value));
+            try
+            {
+                StatEvent?.Invoke(null, new Stat(statName, value));
+            }
+            catch (Exception ex)
+            {
+                Log.LogException(nameof(RaiseStatEvent), ex);
+            }
         });
     }
 

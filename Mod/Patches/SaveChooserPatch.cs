@@ -15,6 +15,10 @@ public class SaveChooserPatch
 {
     private const string NewApButton = "NewAPButton";
 
+    /// <summary>
+    /// This adds a custom button "New AP" to the Load menu.
+    /// </summary>
+    /// <param name="__instance"></param>
     [HarmonyPrefix]
     [HarmonyPatch(nameof(SaveChooser.Setup))]
     public static void Setup(SaveChooser __instance)

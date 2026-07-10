@@ -11,6 +11,7 @@ namespace com.seadoggie.TFWRArchipelago.UI;
 public class NotificationPopup : BaseGUI
 {
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.UI-Notif");
+    private const string TransitionClassName = "expanded";
     private UIDocument _uiDocument;
     private VisualElement _rootElement;
     private VisualElement _container;
@@ -79,13 +80,13 @@ public class NotificationPopup : BaseGUI
 
     private IEnumerator Transition()
     {
-        _container.AddToClassList("expanded");
+        _container.AddToClassList(TransitionClassName);
         yield return new WaitForSeconds(0.5f);
-        _notification.AddToClassList("expanded");
+        _notification.AddToClassList(TransitionClassName);
         yield return new WaitForSeconds(5);
-        _notification.RemoveFromClassList("expanded");
+        _notification.RemoveFromClassList(TransitionClassName);
         yield return new WaitForSeconds(0.5f);
-        _container.RemoveFromClassList("expanded");
+        _container.RemoveFromClassList(TransitionClassName);
         yield return new WaitForSeconds(1);
         _isDisplayed = false;
     }

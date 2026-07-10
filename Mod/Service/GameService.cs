@@ -33,19 +33,19 @@ public class GameService : IGameService
             string filePath = GetFilePath(fileName);
             File.WriteAllText(filePath, json);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Log.LogException("Failed to save progress", e);
+            Log.LogException(nameof(SaveProgress), ex);
         }
     }
 
     public void Load(string fileName)
     {
-        PreLoadGame?.Invoke(this, EventArgs.Empty);
-        ModSaveGame modSaveGame = new();
         // Try to load even if the plugin isn't enabled
         try
         {
+            PreLoadGame?.Invoke(this, EventArgs.Empty);
+            ModSaveGame modSaveGame = new();
             string filePath = GetFilePath(fileName);
             if (!File.Exists(filePath))
             {
@@ -58,18 +58,17 @@ public class GameService : IGameService
             {
                 modSaveGame = JsonUtility.FromJson<ModSaveGame>(json);
             }
+
+            Plugin.Log.LogInfo("Save game was loaded");
+
+            Plugin.Instance.Enabled = true;
+            _modSaveGame = modSaveGame;
+            GameLoaded?.Invoke(this, _modSaveGame);
         }
         catch (Exception e)
         {
             Log.LogException("Failed to load data", e);
-            return;
         }
-
-        Plugin.Log.LogInfo("Save game was loaded");
-
-        Plugin.Instance.Enabled = true;
-        _modSaveGame = modSaveGame;
-        GameLoaded?.Invoke(this, _modSaveGame);
     }
 
     public Result CanGivePlayerItem(string itemName, int itemsReceived)
@@ -95,7 +94,14 @@ public class GameService : IGameService
     {
         Task.Run(() =>
         {
-            MenuOpen?.Invoke(this, open);
+            try
+            {
+                MenuOpen?.Invoke(this, open);
+            }
+            catch (Exception ex)
+            {
+                Log.LogException(nameof(RaiseMenuOpen), ex);
+            }
         });
     }
 
@@ -103,13 +109,20 @@ public class GameService : IGameService
     {
         Task.Run(() =>
         {
-            // Check if it needs to be submitted
-            if(_modSaveGame?.Grass?.Contains(position) ?? true) return;
-            _modSaveGame.Grass.Add(position);
-            
-            string locName = $"Grass ({position.x}, {position.y})";
-            Log.LogInfo("Grass insanity was triggered");
-            GrassSanity?.Invoke(this, locName);
+            try
+            {
+                if (_modSaveGame is null) return;
+                // Check if it needs to be submitted
+                if (!_modSaveGame.Grass.Add(position)) return;
+
+                string locName = $"Grass ({position.x}, {position.y})";
+                Log.LogInfo($"Grass insanity was triggered. Name: {locName}");
+                GrassSanity?.Invoke(this, locName);
+            }
+            catch (Exception ex)
+            {
+                Log.LogException(nameof(RaiseGrassSanity), ex);
+            }
         });
     }
 

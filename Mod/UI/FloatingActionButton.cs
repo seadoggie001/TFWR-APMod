@@ -25,11 +25,7 @@ public class FloatingActionButton : BaseGUI
         Initialize();
     }
 
-    private void OnDisable()
-    {
-        Log.LogWarning("FAB disabled");
-        _onDisabled?.Invoke();
-    }
+    private void OnDisable() => _onDisabled?.Invoke();
 
     public void ConnectionStatus(bool isConnected)
     {

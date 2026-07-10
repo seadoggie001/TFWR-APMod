@@ -12,6 +12,11 @@ namespace com.seadoggie.TFWRArchipelago.Patches;
 [HarmonyPatch(typeof(SaveOption))]
 public class SaveOptionPatch
 {
+    /// <summary>
+    /// This creates an AP icon on modded save files
+    /// </summary>
+    /// <param name="__instance"></param>
+    /// <param name="fileName"></param>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(SaveOption.Setup), typeof(string), typeof(SaveChooser))]
     public static void Setup(SaveOption __instance, string fileName)

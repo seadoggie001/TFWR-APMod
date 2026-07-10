@@ -12,6 +12,13 @@ namespace com.seadoggie.TFWRArchipelago.Patches;
 [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony forces the use of some variable names")]
 public class UnlockBoxPatch
 {
+    /// <summary>
+    /// This function is used to make unlocks cost an AP item and display it in the background
+    /// </summary>
+    /// <param name="__instance"></param>
+    /// <param name="___image"></param>
+    /// <param name="___codeText"></param>
+    /// <param name="___currentCost"></param>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(UnlockBox.SetupRec),
         [typeof(bool), typeof(HashSet<string>), typeof(ItemBlock), typeof(Dictionary<string, int>), typeof(bool)],
