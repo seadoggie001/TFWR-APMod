@@ -22,20 +22,25 @@ public class StatisticsGUI : BaseGUI
     {
         /// <summary>GUI is Open</summary>
         Visible,
+
         /// <summary>GUI is temporarily software-closed</summary>
         Hidden,
+
         /// <summary>GUI is closed</summary>
         Closed,
+
         /// <summary>GUI is closed due to it not being an AP Game</summary>
         Disabled,
     }
+
     private Action _unregisterCallback = () => { };
-    
+
     /// <summary>Queue of statistic changes to be processed</summary>
     private ConcurrentQueue<Stat> _statQueue = new();
 
     private bool _reload = false;
     private UpdateInformation _updateInformation = null;
+
     private class UpdateInformation
     {
         public IEnumerable<KeyValuePair<string, List<Milestone>>> GroupedMilestones { get; set; }
@@ -69,35 +74,42 @@ public class StatisticsGUI : BaseGUI
     public void Show(bool user)
     {
         // Only the user can un-close the statistics
-        if (!user && _visible >= Visibility.Closed) return;
-        
-        RootElement.style.display = DisplayStyle.Flex;
-        _visible = Visibility.Visible;
+        if (user || _visible <= Visibility.Hidden)
+        {
+            RootElement.RemoveFromClassList("collapse");
+            _visible = Visibility.Visible;
+            RootElement.style.display = DisplayStyle.Flex;
+        }
     }
 
-    public void Hide()
+    public void Minimize()
     {
-        RootElement.style.display = DisplayStyle.None;
-        if (_visible < Visibility.Closed) _visible = Visibility.Hidden;
+        // Only hide if it's an AP game
+        if (!Plugin.Instance.Enabled) return;
+
+        RootElement.AddToClassList("collapse");
+        if (_visible < Visibility.Closed)
+            _visible = Visibility.Hidden;
     }
 
     public void Disable()
     {
+        RootElement.style.display = DisplayStyle.None;
         _visible = Visibility.Disabled;
     }
 
     public void Enable()
     {
-        if (_visible == Visibility.Disabled) _visible = Visibility.Hidden;
-    }
-    
-    private void Closed(MouseUpEvent _)
-    {
-        RootElement.style.display = DisplayStyle.None;
-        _visible = Visibility.Closed;
+        if (_visible != Visibility.Disabled) return;
+        _visible = Visibility.Hidden;
+        RootElement.AddToClassList("collapsed");
     }
 
-    public bool IsVisible() => _visible == Visibility.Visible;
+    private void Closed(MouseUpEvent _)
+    {
+        RootElement.AddToClassList("collapse");
+        _visible = Visibility.Closed;
+    }
 
     public void MarkCompleted(string key, double value)
     {
@@ -152,7 +164,7 @@ public class StatisticsGUI : BaseGUI
         if (groupedMilestones is null) Log.LogWarning("GroupedMilestones is null");
         if (stats is null) Log.LogWarning("Stats is null");
         if (allLocations is null) Log.LogWarning("AllLocations is null");
-        
+
         // Save the information needed for a reload
         _reload = true;
         _updateInformation = new UpdateInformation
@@ -180,12 +192,13 @@ public class StatisticsGUI : BaseGUI
             // Remove all stats
             _uiDocument.rootVisualElement.Clear();
         }
+
         // clear internal data
         _statisticRows.Clear();
         _goalRowsByLocation.Clear();
         // Create the layout again
         CreateLayout(_updateInformation.GroupedMilestones, _updateInformation.Stats, _updateInformation.AllLocations);
-        
+
         _reload = false;
         _updateInformation = null;
     }
@@ -220,15 +233,23 @@ public class StatisticsGUI : BaseGUI
         VisualElement root = _uiDocument.rootVisualElement;
         root.style.top = 75;
         root.style.maxWidth = 300;
-        root.style.display = _visible == Visibility.Visible ? DisplayStyle.Flex : DisplayStyle.None;
+        root.style.display = DisplayStyle.Flex;
+        if (_visible <= Visibility.Hidden)
+        {
+            root.AddToClassList("collapse");
+        }
 
-        // Button row
-        VisualElement buttonRow = new();
-        buttonRow.AddToClassList("row");
-        buttonRow.AddToClassList("btn-row");
+        // Title row
+        VisualElement titleRow = CreateWithClass(["title-row", "row", "p-0"]);
+        root.Add(titleRow);
 
-        // ToDo: Move to .USS file (.btn-row)... should be done? (June 1st, 2026)
-        // buttonRow.style.flexGrow = 0;
+        // Title
+        Label title = new("Checks");
+        title.AddToClassList("collapse-header");
+        titleRow.Add(title);
+
+        // Button group
+        VisualElement buttonGroup = CreateWithClass(["btn-group"]);
 
         Button statBtn = new()
         {
@@ -261,13 +282,23 @@ public class StatisticsGUI : BaseGUI
         close.RegisterCallback<MouseUpEvent>(Closed);
         _unregisterCallback += () => close.UnregisterCallback<MouseUpEvent>(Closed);
 
-        buttonRow.Add(statBtn);
-        buttonRow.Add(achievementBtn);
-        buttonRow.Add(completedBtn);
-        buttonRow.Add(close);
-        root.Add(buttonRow);
+        buttonGroup.Add(statBtn);
+        buttonGroup.Add(achievementBtn);
+        buttonGroup.Add(completedBtn);
+        buttonGroup.Add(close);
+        titleRow.Add(buttonGroup);
 
-        // Enable scrolling of the container
+        Button expandBtn = new()
+        {
+            text = ">>",
+            tooltip = "Expand",
+        };
+        expandBtn.AddToClassList("btn");
+        expandBtn.AddToClassList("btn-expand");
+        expandBtn.AddToClassList("collapse-header");
+        titleRow.Add(expandBtn);
+
+        // ScrollView
         ScrollView scrollView = new()
         {
             style =
@@ -283,7 +314,7 @@ public class StatisticsGUI : BaseGUI
         container.AddToClassList("statistic-container");
 
         bool first = true;
-        
+
         foreach (KeyValuePair<string, List<Milestone>> statistic in groupedMilestones)
         {
             List<Milestone> milestones = statistic.Value.OrderBy(milestone => milestone.Target).ToList();
@@ -312,6 +343,9 @@ public class StatisticsGUI : BaseGUI
 
         completedBtn.RegisterCallback<MouseUpEvent>(ToggleCompleted);
         _unregisterCallback += () => completedBtn.UnregisterCallback<MouseUpEvent>(ToggleCompleted);
+
+        expandBtn.RegisterCallback<MouseUpEvent>(ExpandGUI);
+        _unregisterCallback += () => expandBtn.UnregisterCallback<MouseUpEvent>(ExpandGUI);
         return;
 
         void ToggleCompleted(MouseUpEvent evt)
@@ -331,6 +365,23 @@ public class StatisticsGUI : BaseGUI
             statBtn.ToggleInClassList("toggled");
             container.ToggleInClassList("hide-progress");
         }
+
+        void ExpandGUI(MouseUpEvent evt)
+        {
+            root.RemoveFromClassList("collapse");
+            _visible = Visibility.Visible;
+        }
+    }
+
+    private VisualElement CreateWithClass(IEnumerable<string> classes)
+    {
+        VisualElement element = new();
+        foreach (string className in classes)
+        {
+            element.AddToClassList(className);
+        }
+
+        return element;
     }
 
     private VisualElement CreateMilestoneRow(string key, Milestone milestone, bool first, double value)

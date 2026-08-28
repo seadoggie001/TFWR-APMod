@@ -52,7 +52,7 @@ public class UIManager : BaseComponent
 
         statisticsGUI = new GameObject("StatGUI").AddComponent<StatisticsGUI>();
         statisticsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
-        statisticsGUI.Hide();
+        statisticsGUI.Disable();
 
         floatingActionButton = new GameObject("FabGUI").AddComponent<FloatingActionButton>();
         floatingActionButton.transform.SetParent(Plugin.Instance.MainGameObject.transform);
@@ -72,7 +72,7 @@ public class UIManager : BaseComponent
     private void OnMenuOpen(object sender, bool isOpen)
     {
         if (isOpen)
-            statisticsGUI.Hide();
+            statisticsGUI.Minimize();
         else
             statisticsGUI.Show(false);
     }
