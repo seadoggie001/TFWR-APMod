@@ -141,9 +141,9 @@ public class APService : IAPService
                 Log.LogInfo(_options);
 
                 // Determine goal location
-                _goal = _allLocations.First(m => m.name == _options.GoalName);
+                _goal = _allLocations.First(m => m.name == _options.GoalName());
 
-                Log.LogInfo("Goal name was set to " + _options.GoalName);
+                Log.LogInfo("Goal name was set to " + _options.GoalName());
                 if (_goal is null) Log.LogError("_goal is null!");
 
                 return true;
@@ -235,7 +235,7 @@ public class APService : IAPService
 
     public void SubmitGrass(string grassName)
     {
-        if (!_options.GrassSanity) return;
+        if (!_options.GrassSanityEnabled()) return;
         APLocation location = _allLocations.FirstOrDefault(m => m.name == grassName);
         if (location == null)
         {
