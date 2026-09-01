@@ -8,9 +8,9 @@ using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
 
-public class StatisticsGUI : BaseGUI
+public class ProgressGUI : BaseGUI
 {
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.StatGUI");
+    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.ProgGUI");
     private const float RefreshRate = 2.0f; // Every 2 seconds
 
     private UIDocument _uiDocument;

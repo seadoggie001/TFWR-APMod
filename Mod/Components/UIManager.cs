@@ -12,7 +12,7 @@ public class UIManager : BaseComponent
     [CanBeNull] public static UIManager Instance;
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.UIMgr");
 
-    public StatisticsGUI statisticsGUI;
+    public ProgressGUI progressGUI;
     public ArchipelagoSettingsGUI settingsGUI;
     public FloatingActionButton floatingActionButton;
     public NotificationPopup notificationPopup;
@@ -50,9 +50,9 @@ public class UIManager : BaseComponent
         GameManager.Instance?.NewItemReceived += NotifyItemReceived;
         OnDisabled += () => GameManager.Instance?.NewItemReceived -= NotifyItemReceived;
 
-        statisticsGUI = new GameObject("StatGUI").AddComponent<StatisticsGUI>();
-        statisticsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
-        statisticsGUI.Disable();
+        progressGUI = new GameObject("StatGUI").AddComponent<ProgressGUI>();
+        progressGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
+        progressGUI.Disable();
 
         floatingActionButton = new GameObject("FabGUI").AddComponent<FloatingActionButton>();
         floatingActionButton.transform.SetParent(Plugin.Instance.MainGameObject.transform);
@@ -72,9 +72,9 @@ public class UIManager : BaseComponent
     private void OnMenuOpen(object sender, bool isOpen)
     {
         if (isOpen)
-            statisticsGUI.Minimize();
+            progressGUI.Minimize();
         else
-            statisticsGUI.Show();
+            progressGUI.Show();
     }
 
     public bool MouseOverAnyWindow()
@@ -104,12 +104,12 @@ public class UIManager : BaseComponent
     {
         if (modSaveGame is null)
         {
-            statisticsGUI.Disable();
+            progressGUI.Disable();
         }
         else
         {
-            statisticsGUI.Enable();
-            statisticsGUI.LoadStats(
+            progressGUI.Enable();
+            progressGUI.LoadStats(
                 GoalManager.Instance?.StatsService.MilestoneCopy(),
                 GoalManager.Instance?.StatsService.StatCopy(),
                 APManager.Instance?.GetLocations()
@@ -117,15 +117,15 @@ public class UIManager : BaseComponent
         }
     }
 
-    public bool StatGuiOpen() => !statisticsGUI;
+    public bool StatGuiOpen() => !progressGUI;
 
-    public Rect StatGuiBounds() => statisticsGUI.RootElement.worldBound;
+    public Rect StatGuiBounds() => progressGUI.RootElement.worldBound;
 
-    private void OnStatTotalEvent(object sender, Stat e) => statisticsGUI.StatUpdate(e.Name, e.Value);
+    private void OnStatTotalEvent(object sender, Stat e) => progressGUI.StatUpdate(e.Name, e.Value);
 
     private void OnAPLocationGiven(object sender, APLocation location)
     {
-        if(location.region != "GrassSanity") statisticsGUI.MarkCompleted(location.name);
+        if(location.region != "GrassSanity") progressGUI.MarkCompleted(location.name);
     } 
 
     // ToDo: tell the user (somehow) why the connection was cancelled? Launch the GUI?
@@ -140,8 +140,8 @@ public class UIManager : BaseComponent
         settingsGUI.ConnectionAttempt(result);
         floatingActionButton.ConnectionStatus(result.Successful);
         if (!result.Successful) return;
-        statisticsGUI.Show();
+        progressGUI.Show();
     }
 
-    private void OnGoalEvent(object sender, GoalEvent e) => statisticsGUI.MarkCompleted(e.Name);
+    private void OnGoalEvent(object sender, GoalEvent e) => progressGUI.MarkCompleted(e.Name);
 }
