@@ -55,7 +55,7 @@ public class GoalManager : BaseComponent
 
     public List<Pair<string, double>> UserStatsSave() => StatsService.Save();
 
-    private void OnGameLoaded(object sender, ModSaveGame e) => StatsService.Load(e.Statistics);
+    private void OnGameLoaded(object sender, ModSaveGame e) => StatsService.Load(e?.Statistics);
 
     private void OnStatEvent(object sender, Stat e) => StatsService.Add(e.Name, e.Value);
 }

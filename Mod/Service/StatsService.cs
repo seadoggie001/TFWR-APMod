@@ -117,6 +117,7 @@ public class StatsService : IStatsService
         lock (_lockObject)
         {
             _stats.Clear();
+            if (newStats is null) return;
             foreach (Pair<string, double> newStat in newStats)
             {
                 if (_stats.ContainsKey(newStat.key))

@@ -166,7 +166,6 @@ public class StatisticsGUI : BaseGUI
         if (allLocations is null) Log.LogWarning("AllLocations is null");
 
         // Save the information needed for a reload
-        _reload = true;
         _updateInformation = new UpdateInformation
         {
             GroupedMilestones = groupedMilestones,
@@ -175,6 +174,7 @@ public class StatisticsGUI : BaseGUI
         };
         // Clear the statistic queue
         _statQueue = new ConcurrentQueue<Stat>();
+        _reload = true;
     }
 
     private void RebuildUI()

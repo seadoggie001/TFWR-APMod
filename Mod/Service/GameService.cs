@@ -50,6 +50,7 @@ public class GameService : IGameService
             if (!File.Exists(filePath))
             {
                 Plugin.Instance.Enabled = false;
+                GameLoaded?.Invoke(this, null);
                 return;
             }
 
