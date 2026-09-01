@@ -9,6 +9,7 @@ namespace com.seadoggie.TFWRArchipelago.Configuration;
 /// </summary>
 public class TfwrConfig
 {
+    private ConfigFile _configFile;
     private ConfigEntry<string> _urlBinding;
     private ConfigEntry<int> _portBinding;
     private ConfigEntry<string> _usernameBinding;
@@ -18,6 +19,8 @@ public class TfwrConfig
 
     public void SetupConfig(ConfigFile config)
     {
+        _configFile = config;
+        
         #region General Config Options
 
         _urlBinding = config.Bind("General", "Archipelago Url", "archipelago.gg",
@@ -60,4 +63,6 @@ public class TfwrConfig
 
     public bool DisableIpc => _disableIpc.Value;
     public bool Debug => _debug.Value;
+
+    public void Save() => _configFile.Save();
 }

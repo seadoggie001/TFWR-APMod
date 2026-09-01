@@ -202,8 +202,6 @@ public class ArchipelagoSettingsGUI : BaseGUI
 
     private void SaveChanges()
     {
-        Log.LogInfo("Saving changes to connection info");
-
         // Update the internal status
         _state = Status.Connecting;
 

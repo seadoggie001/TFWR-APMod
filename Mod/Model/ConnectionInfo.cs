@@ -6,4 +6,8 @@ public class ConnectionInfo(string url, int port, string username, string passwo
     public int Port { get; set; } = port;
     public string Username { get; set; } = username;
     public string Password { get; set; } = password;
+
+    public override string ToString() =>
+        $"[ConnectionInfo] Url: {Url} Port: {Port} " +
+        $"Username: {Username} Password?: {!string.IsNullOrWhiteSpace(Password)}";
 }

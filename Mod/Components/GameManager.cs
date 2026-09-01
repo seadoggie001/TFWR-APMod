@@ -1,3 +1,4 @@
+using Archipelago.MultiClient.Net;
 using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Configuration;
 using com.seadoggie.TFWRArchipelago.Model;
@@ -35,9 +36,25 @@ public class GameManager : BaseComponent
 
         GameService.GameLoaded += OnGameLoaded;
         OnDisabled += () => GameService.GameLoaded -= OnGameLoaded;
-        
+
         APManager.Instance?.APService.AchievementUnlocked += OnAchievementUnlocked;
         OnDisabled += () => APManager.Instance?.APService.AchievementUnlocked -= OnAchievementUnlocked;
+
+        APManager.Instance?.APService.ConnectionResult += OnConnectionResult;
+        OnDisabled += () => APManager.Instance?.APService.ConnectionResult -= OnConnectionResult;
+
+        UIManager.Instance?.settingsGUI.ConnectionAttemptEvent += OnConnectionAttempt;
+        OnDisabled += () => UIManager.Instance?.settingsGUI.ConnectionAttemptEvent -= OnConnectionAttempt;
+    }
+
+    /// <summary>Add the connection details to the config</summary>
+    private void OnConnectionAttempt(object _, ConnectionInfo e) => TfwrConfig.ConnectionInfo = e;
+
+    /// <summary>Save the config on success</summary>
+    private void OnConnectionResult(object _, LoginResult e)
+    {
+        if (!e.Successful) return;
+        TfwrConfig.Save();
     }
 
     private void OnAchievementUnlocked(object sender, string achievement) => UnlockHat(achievement);
@@ -149,9 +166,9 @@ public class GameManager : BaseComponent
     public static string DefaultSaveName() => OptionHolder.GetString("activeSave", "Save0");
 
     public void RickRoll() => Application.OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-    
+
     public void RaiseNewItemReceived(Notification notification) => NewItemReceived?.Invoke(this, notification);
-    
+
     public void UnlockHat(string achievement)
     {
         string hatName = achievement switch
@@ -162,26 +179,20 @@ public class GameManager : BaseComponent
             _ => null
         };
         if (hatName == null) return;
-        
+
         HatSO hat = ResourceManager.GetHat(hatName);
         if (hat is null) Log.LogError($"Failed to find hat: {hatName}");
-        
+
         MainSim.Inst.UnlockHat(hat);
     }
 
     public void Load()
     {
-        Task.Run(() =>
-        {
-            GameService.Load(DefaultSaveName());
-        });
+        Task.Run(() => { GameService.Load(DefaultSaveName()); });
     }
 
     public void SaveProgress()
     {
-        Task.Run(() =>
-        {
-            GameService.SaveProgress(GoalManager.Instance?.UserStatsSave(), DefaultSaveName());
-        });
+        Task.Run(() => { GameService.SaveProgress(GoalManager.Instance?.UserStatsSave(), DefaultSaveName()); });
     }
 }
