@@ -71,45 +71,17 @@ public class StatisticsGUI : BaseGUI
         InvokeRepeating(nameof(RefreshUI), RefreshRate, RefreshRate);
     }
 
-    public void Show(bool user)
-    {
-        // Only the user can un-close the statistics
-        if (user || _visible <= Visibility.Hidden)
-        {
-            RootElement.RemoveFromClassList("collapse");
-            _visible = Visibility.Visible;
-            RootElement.style.display = DisplayStyle.Flex;
-        }
-    }
+    public void Show() => ChangeVisibility(Visibility.Visible, false);
 
-    public void Minimize()
-    {
-        // Only hide if it's an AP game
-        if (!Plugin.Instance.Enabled) return;
+    public void Minimize() => ChangeVisibility(Visibility.Hidden, false);
 
-        RootElement.AddToClassList("collapse");
-        if (_visible < Visibility.Closed)
-            _visible = Visibility.Hidden;
-    }
+    public void Disable() => ChangeVisibility(Visibility.Disabled, false, true);
 
-    public void Disable()
-    {
-        RootElement.style.display = DisplayStyle.None;
-        _visible = Visibility.Disabled;
-    }
+    public void Enable() => ChangeVisibility(Visibility.Hidden, false, true);
 
-    public void Enable()
-    {
-        if (_visible != Visibility.Disabled) return;
-        _visible = Visibility.Hidden;
-        RootElement.AddToClassList("collapsed");
-    }
-
-    private void Closed(MouseUpEvent _)
-    {
-        RootElement.AddToClassList("collapse");
-        _visible = Visibility.Closed;
-    }
+    private void Closed(MouseUpEvent _) => ChangeVisibility(Visibility.Closed, true);
+    
+    private void ExpandGUI(MouseUpEvent _) => ChangeVisibility(Visibility.Visible, true);
 
     public void MarkCompleted(string key, double value)
     {
@@ -175,6 +147,46 @@ public class StatisticsGUI : BaseGUI
         // Clear the statistic queue
         _statQueue = new ConcurrentQueue<Stat>();
         _reload = true;
+    }
+
+    private void ChangeVisibility(Visibility visibility, bool user, bool force = false)
+    {
+        if (force || user)
+        {
+            _visible = visibility;
+        }
+        else
+        {
+            if (!Plugin.Instance.Enabled) return;
+
+            if (visibility is Visibility.Hidden or Visibility.Visible)
+            {
+                if (_visible < Visibility.Closed) _visible = visibility;
+            }
+            else
+            {
+                Plugin.Log.LogInfo("Ooops, GUI visibility went weird");
+            }
+        }
+
+        switch (_visible)
+        {
+            case Visibility.Visible:
+                RootElement.style.display = DisplayStyle.Flex;
+                RootElement.RemoveFromClassList("collapse");
+                break;
+            case Visibility.Hidden:
+            case Visibility.Closed:
+                RootElement.style.display = DisplayStyle.Flex;
+                RootElement.AddToClassList("collapse");
+                break;
+            case Visibility.Disabled:
+                RootElement.style.display = DisplayStyle.None;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(_visible),
+                    "Unexpected visibility found in ChangeVisibility");
+        }
     }
 
     private void RebuildUI()
@@ -279,8 +291,6 @@ public class StatisticsGUI : BaseGUI
         };
         close.AddToClassList("btn");
         close.AddToClassList("btn-close");
-        close.RegisterCallback<MouseUpEvent>(Closed);
-        _unregisterCallback += () => close.UnregisterCallback<MouseUpEvent>(Closed);
 
         buttonGroup.Add(statBtn);
         buttonGroup.Add(achievementBtn);
@@ -346,6 +356,10 @@ public class StatisticsGUI : BaseGUI
 
         expandBtn.RegisterCallback<MouseUpEvent>(ExpandGUI);
         _unregisterCallback += () => expandBtn.UnregisterCallback<MouseUpEvent>(ExpandGUI);
+        
+        close.RegisterCallback<MouseUpEvent>(Closed);
+        _unregisterCallback += () => close.UnregisterCallback<MouseUpEvent>(Closed);
+        
         return;
 
         void ToggleCompleted(MouseUpEvent evt)
@@ -365,15 +379,9 @@ public class StatisticsGUI : BaseGUI
             statBtn.ToggleInClassList("toggled");
             container.ToggleInClassList("hide-progress");
         }
-
-        void ExpandGUI(MouseUpEvent evt)
-        {
-            root.RemoveFromClassList("collapse");
-            _visible = Visibility.Visible;
-        }
     }
 
-    private VisualElement CreateWithClass(IEnumerable<string> classes)
+    private static VisualElement CreateWithClass(IEnumerable<string> classes)
     {
         VisualElement element = new();
         foreach (string className in classes)

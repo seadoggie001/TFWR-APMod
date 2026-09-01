@@ -74,7 +74,7 @@ public class UIManager : BaseComponent
         if (isOpen)
             statisticsGUI.Minimize();
         else
-            statisticsGUI.Show(false);
+            statisticsGUI.Show();
     }
 
     public bool MouseOverAnyWindow()
@@ -140,7 +140,7 @@ public class UIManager : BaseComponent
         settingsGUI.ConnectionAttempt(result);
         floatingActionButton.ConnectionStatus(result.Successful);
         if (!result.Successful) return;
-        statisticsGUI.Show(false);
+        statisticsGUI.Show();
     }
 
     private void OnGoalEvent(object sender, GoalEvent e) => statisticsGUI.MarkCompleted(e.Name);
