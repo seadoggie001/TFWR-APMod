@@ -235,7 +235,7 @@ public class APService : IAPService
 
     public void SubmitGrass(string grassName)
     {
-        if (!_options.GrassSanityEnabled()) return;
+        if (!Plugin.Instance.Enabled || _options is null || !_options.GrassSanityEnabled()) return;
         APLocation location = _allLocations.FirstOrDefault(m => m.name == grassName);
         if (location == null)
         {
