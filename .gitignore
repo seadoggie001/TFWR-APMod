@@ -62,3 +62,6 @@ global.json
 
 # Personal scripts
 *.sh
+
+# Custom property files
+*.props

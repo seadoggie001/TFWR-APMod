@@ -13,17 +13,12 @@
             https://api.nuget.org/v3/index.json;
             https://nuget.bepinex.dev/v3/index.json;
         </RestoreAdditionalProjectSources>
-
-        <!-- Paths to the game -->
-        <SteamPath>/home/seadoggie/.steam/steam</SteamPath>
-        <GamePath>$(SteamPath)/steamapps/common/The Farmer Was Replaced</GamePath>
-        <ManagedPath>$(GamePath)/TheFarmerWasReplaced_Data/Managed</ManagedPath>
-        <BepInExPath>$(GamePath)/BepInEx</BepInExPath>
-        <PluginsPath>$(BepInExPath)/plugins</PluginsPath>
-        <MyPluginPath>$(PluginsPath)/$(AssemblyName)</MyPluginPath>
         <IsPackable>false</IsPackable>
         <Authors>seadoggie</Authors>
     </PropertyGroup>
+
+    <!-- Import a settings file. See local.props.txt for more information -->
+    <Import Project="local.props" Condition="Exists('local.props')" />
 
     <ItemGroup>
         <PackageReference Include="Archipelago.MultiClient.Net" Version="6.6.1" />
@@ -66,20 +61,7 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
-
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Message Text="Updating Steam files -> 
-            From: $(ProjectDir)$(OutputPath)
-            To:   $(MyPluginPath)" Importance="high"  />
-        <RemoveDir Directories="$(MyPluginPath)" />
-        <MakeDir Directories="$(MyPluginPath)" />
-        <ItemGroup>
-            <FilesToCopy Include="$(ProjectDir)$(OutputPath)**/*"/>
-        </ItemGroup>
-        <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(MyPluginPath)/%(RecursiveDir)" />
-    </Target>
-
-
+    
     <Target Name="EmptyPublishFolder" BeforeTargets="PrepareForPublish">
         <Message Text="Emptying target folder: $(PublishDir)" Importance="high" />
         <RemoveDir Directories="$(PublishDir)" />

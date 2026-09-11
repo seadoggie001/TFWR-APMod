@@ -1,0 +1,49 @@
+<!-- 
+    Copy this file and rename it to local.props to set property values in the csproj file
+    Change the values below to match your current configuration
+    -->
+<Project>
+    <PropertyGroup>
+        <!-- Path to Steam -->
+        <SteamPath>/home/seadoggie/.steam/steam</SteamPath>
+        <!-- Path to the game -->
+        <GamePath>$(SteamPath)/steamapps/common/The Farmer Was Replaced</GamePath>
+        <!-- Path to the game's dlls -->
+        <ManagedPath>$(GamePath)/TheFarmerWasReplaced_Data/Managed</ManagedPath>
+
+        <!-- Other paths, probably not used here -->
+        <BepInExPath>$(GamePath)/BepInEx</BepInExPath>
+        <PluginsPath>$(BepInExPath)/plugins</PluginsPath>
+        <MyPluginPath>$(PluginsPath)/$(AssemblyName)</MyPluginPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- These are the internal game files. They allow you to reference internal types and functions --> 
+        <Reference Include="$(ManagedPath)/Core.dll" Publicize="true" />
+        <Reference Include="$(ManagedPath)/Utils.dll" Publicize="true" />
+        
+        <!-- I don't know why these are here, but the template has them too -->
+        <Reference Include="UnityEngine.UI">
+            <HintPath>$(ManagedPath)\UnityEngine.UI.dll</HintPath>
+        </Reference>
+        <Reference Include="Unity.TextMeshPro">
+            <HintPath>$(ManagedPath)\Unity.TextMeshPro.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <!-- Copies files to your steam directory after each build -->
+    <Target Name="CopyFilesToSteamDirectory" AfterTargets="PostBuildEvent">
+        <Message Text="Updating Steam files -> 
+            From: $(ProjectDir)$(OutputPath)
+            To:   $(MyPluginPath)" Importance="high"  />
+        <RemoveDir Directories="$(MyPluginPath)" />
+        <MakeDir Directories="$(MyPluginPath)" />
+        <ItemGroup>
+            <FilesToCopy Include="$(ProjectDir)$(OutputPath)**/*"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(MyPluginPath)/%(RecursiveDir)" />
+        
+        <!-- Use a command like this to auto-start the game after builds -->
+<!--        <Exec Command="steam steam://run/2060160" />-->
+    </Target>
+</Project>
