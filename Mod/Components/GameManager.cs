@@ -29,12 +29,18 @@ public class GameManager : BaseComponent
 
     public event EventHandler<Notification> NewItemReceived;
 
+    private Dictionary<string, Action<Simulation>> _fillerHandlers;
+
     protected override void OnEnable()
     {
         base.OnEnable();
         Instance = this;
         TfwrConfig.SetupConfig(Plugin.Instance.Config);
         GameService = InjectionService.Inject(new GameService());
+        _fillerHandlers = new Dictionary<string, Action<Simulation>>
+        {
+            { APItem.FreeHay, Filler_FreeHay }
+        };
     }
 
     private void Start()
@@ -123,11 +129,17 @@ public class GameManager : BaseComponent
         public bool processed { get; set; } = processed;
         public bool given { get; set; } = given;
     }
-
+    
     private ItemProcessed GivePlayerItem(string itemName)
     {
         try
         {
+            if (_fillerHandlers.TryGetValue(itemName, out Action<Simulation> action))
+            {
+                action.Invoke(MainSimPatch.GetMainSim());
+                return new ItemProcessed(true, true);
+            }
+            
             string unlockName = Unlocks.ItemToUnlock(itemName);
             if (string.IsNullOrWhiteSpace(unlockName))
             {
@@ -171,6 +183,26 @@ public class GameManager : BaseComponent
         }
     }
 
+    private void Filler_FreeHay(Simulation sim)
+    {
+        try
+        {
+            int? hayId = ResourceManager.GetAllItems().FirstOrDefault(m => m.itemName == "hay")?.itemId;
+            if (hayId is null)
+            {
+                Log.LogError($"Failed to locate {APItem.FreeHay} itemId!");
+                return;
+            }
+
+            double gifted = sim.farm.Items.GetNumber((int)hayId) * 0.2;
+            sim.farm.Items.AddItem((int)hayId, Math.Floor(gifted));
+        }
+        catch (Exception ex)
+        {
+            Log.LogException($"{nameof(Filler_FreeHay)}", ex);
+        }
+    }
+    
     public static string DefaultSaveName() => OptionHolder.GetString("activeSave", "Save0");
 
     public void RickRoll() => Application.OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
