@@ -1,12 +1,14 @@
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
-using BepInEx.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
+/// <summary>
+/// Queues received Archipelago items until the mod is ready to process them  
+/// </summary>
+/// <param name="processItemCallback"></param>
 public class ItemQueue(Func<string, int, bool> processItemCallback) : IItemQueue
 {
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.ItemQ");
     private int _itemsReceived;
     private readonly List<string> _itemQueue = [];
 

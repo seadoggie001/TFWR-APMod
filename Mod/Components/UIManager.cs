@@ -1,16 +1,25 @@
 using Archipelago.MultiClient.Net;
-using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
+using com.seadoggie.TFWRArchipelago.Service;
 using com.seadoggie.TFWRArchipelago.UI;
 using JetBrains.Annotations;
 using UnityEngine;
+using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
 public class UIManager : BaseComponent
 {
     [CanBeNull] public static UIManager Instance;
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.UIMgr");
+
+    [ModInject]
+    public ILogService LogService
+    {
+        set => Log = value.CreateLog("TFWRAP.UIMgr");
+    }
+
+    private ILogger Log;
 
     public ProgressGUI progressGUI;
     public ArchipelagoSettingsGUI settingsGUI;
@@ -19,8 +28,8 @@ public class UIManager : BaseComponent
 
     protected override void OnEnable()
     {
-        Instance = this;
         base.OnEnable();
+        Instance = this;
     }
 
     public override void OnDisable()
@@ -63,9 +72,14 @@ public class UIManager : BaseComponent
         settingsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
         settingsGUI.DisplayingWindow = false;
         settingsGUI.debugMode = GameManager.Instance?.TfwrConfig.Debug ?? false;
-        
+
         notificationPopup = new GameObject("Notification").AddComponent<NotificationPopup>();
         notificationPopup.transform.SetParent(Plugin.Instance.MainGameObject.transform);
+
+        InjectionService.Inject(progressGUI);
+        InjectionService.Inject(floatingActionButton);
+        InjectionService.Inject(settingsGUI);
+        InjectionService.Inject(notificationPopup);
     }
 
     private void OnOptionsLoaded(object sender, APOptions options)
@@ -96,15 +110,12 @@ public class UIManager : BaseComponent
         // }
 
         return settingsGUI && settingsGUI.DisplayingWindow
-                                       && settingsGUI.IsMouseOverWindow();
+                           && settingsGUI.IsMouseOverWindow();
     }
 
     public void OpenConnectionSettings()
     {
-        Task.Run(() =>
-        {
-            settingsGUI.Show(GameManager.Instance?.TfwrConfig.ConnectionInfo);
-        });
+        Task.Run(() => { settingsGUI.Show(GameManager.Instance?.TfwrConfig.ConnectionInfo); });
     }
 
     private void OnGameLoaded(object sender, ModSaveGame modSaveGame)
@@ -132,8 +143,8 @@ public class UIManager : BaseComponent
 
     private void OnAPLocationGiven(object sender, APLocation location)
     {
-        if(location.region != "GrassSanity") progressGUI.MarkCompleted(location.name);
-    } 
+        if (location.region != "GrassSanity") progressGUI.MarkCompleted(location.name);
+    }
 
     // ToDo: tell the user (somehow) why the connection was cancelled? Launch the GUI?
     private void OnAPDisconnected(object sender, string reason)

@@ -1,13 +1,18 @@
 using System.Collections.ObjectModel;
-using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
-using com.seadoggie.TFWRArchipelago.Utils;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
+/// <inheritdoc/>
 public class LocationQueue(IEnumerable<APLocation> allLocations) : ILocationQueue
 {
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.LocQ");
+    [ModInject]
+    private ILogService LogSource
+    {
+        set => Log = value.CreateLog("TFWRAP.LocQ");
+    }
+    private ILogger Log;
     private readonly HashSet<long> _locationQueue = [];
 
     public event EventHandler<APLocation> APLocationGiven;
@@ -40,8 +45,6 @@ public class LocationQueue(IEnumerable<APLocation> allLocations) : ILocationQueu
                 return false;
             }
 
-            Log.LogInfo($"Giving player location: {apLocation.name}");
-
             APLocationGiven?.Invoke(this, apLocation);
 
             return true;
@@ -60,9 +63,24 @@ public class LocationQueue(IEnumerable<APLocation> allLocations) : ILocationQueu
     }
 }
 
+/// <summary>
+/// Queues received Archipelago locations until the mod is ready to process them
+/// </summary>
 public interface ILocationQueue
 {
+    /// <summary>
+    /// Raised when a Location should be given to the player
+    /// </summary>
     event EventHandler<APLocation> APLocationGiven;
+
+    /// <summary>
+    /// Attempt to process a single queued location
+    /// </summary>
     void Process();
+
+    /// <summary>
+    /// Add locations to the queue
+    /// </summary>
+    /// <param name="locations"></param>
     void OnLocationsReceived(ReadOnlyCollection<long> locations);
 }

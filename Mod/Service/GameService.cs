@@ -1,8 +1,8 @@
-using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
-using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
 using UnityEngine;
+using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
@@ -16,7 +16,14 @@ public class GameService : IGameService
     public event EventHandler<bool> MenuOpen;
     public event EventHandler<string> GrassSanity;
 
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.GameSvc");
+    private ILogger Log;
+
+    [ModInject]
+    public ILogService LogService
+    {
+        set => Log = value.CreateLog("TFWRAP.GameSvc");
+    }
+
     public static string GetFilePath(string saveName) => Path.Combine(Saver.GetPathOfSaveDirectory(saveName), FileName);
 
     /// <summary>
@@ -117,7 +124,6 @@ public class GameService : IGameService
                 if (!_modSaveGame.Grass.Add(position)) return;
 
                 string locName = $"Grass ({position.x}, {position.y})";
-                Log.LogInfo($"Grass insanity was triggered. Name: {locName}");
                 GrassSanity?.Invoke(this, locName);
             }
             catch (Exception ex)
@@ -149,15 +155,15 @@ public interface IGameService
     event EventHandler<ModSaveGame> GameLoaded;
 
     event EventHandler<bool> MenuOpen;
-    
+
     event EventHandler<string> GrassSanity;
 
     /// <inheritdoc cref="GameService.SaveProgress(List{Pair{string, double}}, string)" />
     void SaveProgress(List<Pair<string, double>> statistics, string fileName);
-    
+
     /// <inheritdoc cref="GameService.Load(string)" />
     void Load(string fileName);
-    
+
     GameService.Result CanGivePlayerItem(string itemName, int itemsReceived);
     void RaiseMenuOpen(bool open);
     void RaiseGrassSanity(Vector2Int position);

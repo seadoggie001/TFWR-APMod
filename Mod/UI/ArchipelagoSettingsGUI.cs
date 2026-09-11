@@ -1,9 +1,11 @@
 using Archipelago.MultiClient.Net;
-using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Patches;
+using com.seadoggie.TFWRArchipelago.Service;
 using JetBrains.Annotations;
 using UnityEngine;
+using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
 
@@ -12,7 +14,12 @@ namespace com.seadoggie.TFWRArchipelago.UI;
 /// </summary>
 public class ArchipelagoSettingsGUI : BaseGUI
 {
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APConnGUI");
+    [ModInject]
+    public ILogService LogService
+    {
+        set => Log = value.CreateLog("TFWRAP.APConnGUI");
+    }
+    private ILogger Log;
 
     public event EventHandler<ConnectionInfo> ConnectionAttemptEvent;
     public event EventHandler<EventArgs> DisconnectRequestEvent;

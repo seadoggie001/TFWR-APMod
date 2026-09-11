@@ -1,15 +1,19 @@
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
-using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
-using com.seadoggie.TFWRArchipelago.Utils;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
 public class APService : IAPService
 {
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APSrv");
+    [ModInject]
+    public ILogService LogService
+    {
+        set => Log = value.CreateLog("TFWRAP.APSrv");
+    }
+    private ILogger Log;
 
     private readonly HashSet<string> _achievementCache = [];
 

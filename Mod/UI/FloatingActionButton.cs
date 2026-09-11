@@ -1,16 +1,23 @@
-using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Components;
-using com.seadoggie.TFWRArchipelago.Utils;
+using com.seadoggie.TFWRArchipelago.Logging;
+using com.seadoggie.TFWRArchipelago.Service;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UIElements;
+using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
 
 public class FloatingActionButton : BaseGUI
 {
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.UI-FAB");
+    [ModInject]
+    public ILogService LogService
+    {
+        set => Log = value.CreateLog("TFWRAP.UI-FAB");
+    }
+
+    private ILogger Log;
     private UIDocument _uiDocument;
     private VisualElement _rootElement;
     private VisualElement _fab;
@@ -94,7 +101,7 @@ public class FloatingActionButton : BaseGUI
         Log.LogInfo("Completed initializing FAB");
     }
 
-    private static void Clicked(PointerDownEvent _)
+    private void Clicked(PointerDownEvent _)
     {
         Log.LogInfo("Clicked FAB");
         UIManager.Instance?.OpenConnectionSettings();

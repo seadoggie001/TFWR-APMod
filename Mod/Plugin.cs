@@ -17,7 +17,7 @@ public class Plugin : BaseUnityPlugin
 
     private static readonly ILogService LogService = new LogService();
     public static readonly ILogger Log = LogService.CreateLog("TFWRAP.Main");
-    
+
     private readonly Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
 
     /// <summary>
@@ -28,20 +28,19 @@ public class Plugin : BaseUnityPlugin
     private void Awake()
     {
         Instance = this;
-        
+
         // Use field dependency injection (for testing and my sanity)
         InjectionService.Register(typeof(ILogService), LogService);
         InjectionService.Register(typeof(ILogger), Log);
         InjectionService.Register(typeof(IEnabledService), new EnabledService());
-        
-        
+
         // Create Managers
         MainGameObject = new GameObject("Archipelago");
         MainGameObject.AddComponent<UIManager>();
         MainGameObject.AddComponent<APManager>();
         MainGameObject.AddComponent<GoalManager>();
         MainGameObject.AddComponent<GameManager>();
-        
+
         // Apply game patches
         try
         {
@@ -52,7 +51,7 @@ public class Plugin : BaseUnityPlugin
             Log.LogException($"Plugin {MyPluginInfo.PLUGIN_GUID} failed to load properly! Harmony patch issues.", e);
             return;
         }
-        
+
         Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running version {MyPluginInfo.PLUGIN_VERSION}");
     }
 }

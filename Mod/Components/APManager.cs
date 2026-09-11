@@ -1,8 +1,7 @@
 using System.Reflection;
-using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
-using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -11,7 +10,12 @@ namespace com.seadoggie.TFWRArchipelago.Components;
 public class APManager : BaseComponent
 {
     [CanBeNull] public static APManager Instance { get; private set; }
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.APMgr");
+    [ModInject]
+    public ILogService LogService
+    {
+        set => Log = value.CreateLog("TFWRAP.APMgr");
+    }
+    private ILogger Log;
 
     public IAPService APService;
     public ILocationQueue LocationQueue;
@@ -21,15 +25,15 @@ public class APManager : BaseComponent
 
     protected override void OnEnable()
     {
+        base.OnEnable();
         Instance = this;
         _apLocations = InitializeLocations();
         List<APLocation> locations = _apLocations.ToList();
-        APService = new APService(locations);
-        LocationQueue = new LocationQueue(locations);
+        APService = InjectionService.Inject(new APService(locations));
+        LocationQueue = InjectionService.Inject(new LocationQueue(locations));
         _itemQueue = new ItemQueue((itemName, itemsReceived) =>
             GameManager.Instance?.GiveItem(itemName, itemsReceived) ?? false);
-
-        base.OnEnable();
+        InjectionService.Inject(_itemQueue);
     }
 
     private void Start()
@@ -50,12 +54,10 @@ public class APManager : BaseComponent
         OnDisabled += () => UIManager.Instance?.settingsGUI.DisconnectRequestEvent -= APService.Disconnect;
         
         APService.APDisconnected += OnAPDisconnected;
+        OnDisabled += () => APService.APDisconnected -= OnAPDisconnected;
     }
 
-    private void OnAPDisconnected(object sender, string e)
-    {
-        _itemQueue.Reset();
-    }
+    private void OnAPDisconnected(object sender, string e) => _itemQueue.Reset();
 
     private void Update()
     {
@@ -80,7 +82,7 @@ public class APManager : BaseComponent
     /// <summary>
     /// Loads all Locations from data.yaml
     /// </summary>
-    private static IEnumerable<APLocation> InitializeLocations()
+    private IEnumerable<APLocation> InitializeLocations()
     {
         try
         {

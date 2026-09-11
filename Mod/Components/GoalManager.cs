@@ -1,7 +1,6 @@
-using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
-using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
@@ -10,16 +9,20 @@ namespace com.seadoggie.TFWRArchipelago.Components;
 public class GoalManager : BaseComponent
 {
     [CanBeNull] public static GoalManager Instance;
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.GoalMgr");
+    [ModInject]
+    public ILogService LogService
+    {
+        set => Log = value.CreateLog("TFWRAP.GoalMgr");
+    }
+    private ILogger Log;
     
     public IStatsService StatsService;
 
     protected override void OnEnable()
     {
-        Instance = this;
-        StatsService = new StatsService();
-        InjectionService.Inject(StatsService);
         base.OnEnable();
+        Instance = this;
+        StatsService = InjectionService.Inject(new StatsService());
     }
 
     private void Start()

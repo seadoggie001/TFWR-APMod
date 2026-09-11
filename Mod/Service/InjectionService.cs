@@ -25,7 +25,7 @@ public static class InjectionService
     /// </summary>
     /// <param name="target">Object to inject services into</param>
     /// <exception cref="Exception"></exception>
-    public static void Inject(object target)
+    public static T Inject<T>(T target)
     {
         // Get all properties on the object
         PropertyInfo[] properties = target.GetType()
@@ -45,6 +45,8 @@ public static class InjectionService
             // Set the value of the property (ie: inject the value)
             propertyInfo.SetValue(target, value);
         }
+
+        return target;
     }
 }
 

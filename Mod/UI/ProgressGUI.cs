@@ -1,18 +1,24 @@
 using System.Collections.Concurrent;
-using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
-using com.seadoggie.TFWRArchipelago.Utils;
+using com.seadoggie.TFWRArchipelago.Service;
 using HarmonyLib;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UIElements;
+using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
 
 public class ProgressGUI : BaseGUI
 {
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.ProgGUI");
+    [ModInject]
+    public ILogService LogService
+    {
+        set => Log = value.CreateLog("TFWRAP.ProgGUI");
+    }
+    private ILogger Log;
     private const float RefreshRate = 2.0f; // Every 2 seconds
 
     private UIDocument _uiDocument;
@@ -79,8 +85,9 @@ public class ProgressGUI : BaseGUI
 
     public VisualElement RootElement;
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         Log.LogInfo("Initializing Statistics GUI");
 
         // Create the GUI and setup styles

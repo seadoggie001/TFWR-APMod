@@ -1,19 +1,27 @@
 using Archipelago.MultiClient.Net;
-using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Configuration;
+using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Patches;
 using com.seadoggie.TFWRArchipelago.Service;
 using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
 using UnityEngine;
+using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
 public class GameManager : BaseComponent
 {
     [CanBeNull] public static GameManager Instance;
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.GameMgr");
+
+    [ModInject]
+    public ILogService LogService
+    {
+        set => Log = value.CreateLog("TFWRAP.GameMgr");
+    }
+
+    private ILogger Log;
 
     public readonly TfwrConfig TfwrConfig = new();
 
@@ -23,10 +31,10 @@ public class GameManager : BaseComponent
 
     protected override void OnEnable()
     {
+        base.OnEnable();
         Instance = this;
         TfwrConfig.SetupConfig(Plugin.Instance.Config);
-        GameService = new GameService();
-        base.OnEnable();
+        GameService = InjectionService.Inject(new GameService());
     }
 
     private void Start()
@@ -116,7 +124,7 @@ public class GameManager : BaseComponent
         public bool given { get; set; } = given;
     }
 
-    private static ItemProcessed GivePlayerItem(string itemName)
+    private ItemProcessed GivePlayerItem(string itemName)
     {
         try
         {

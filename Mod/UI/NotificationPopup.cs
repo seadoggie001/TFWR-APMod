@@ -1,16 +1,23 @@
 using System.Collections;
 using System.Collections.Concurrent;
-using BepInEx.Logging;
-using com.seadoggie.TFWRArchipelago.Utils;
+using com.seadoggie.TFWRArchipelago.Logging;
+using com.seadoggie.TFWRArchipelago.Service;
 using UnityEngine;
 using UnityEngine.UIElements;
+using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
 
 public class NotificationPopup : BaseGUI
 {
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.UI-Notif");
+    [ModInject]
+    public ILogService LogService
+    {
+        set => Log = value.CreateLog("TFWRAP.UI-Notif");
+    }
+
+    private ILogger Log;
     private const string TransitionClassName = "expanded";
     private UIDocument _uiDocument;
     private VisualElement _rootElement;
@@ -21,14 +28,14 @@ public class NotificationPopup : BaseGUI
     private bool _isDisplayed;
 
     private readonly ConcurrentQueue<string> _messageQueue = new();
-    
+
     private void Start()
     {
         GameObject root = new("TFWRAP-Notif");
         DontDestroyOnLoad(root);
 
         _uiDocument = root.AddComponent<UIDocument>();
-        
+
         PanelSettings settings = Resources.PanelSettings;
         if (settings is null)
         {
@@ -55,11 +62,11 @@ public class NotificationPopup : BaseGUI
         _notification = new VisualElement();
         _notification.AddToClassList("notification");
         _container.Add(_notification);
-        
+
         _title = new Label();
         _title.AddToClassList("notification-title");
         _notification.Add(_title);
-        
+
         _text = new Label();
         _text.AddToClassList("notification-text");
         _notification.Add(_text);
@@ -68,13 +75,13 @@ public class NotificationPopup : BaseGUI
     private void Update()
     {
         if (_isDisplayed || _messageQueue.IsEmpty) return;
-        if(!_messageQueue.TryDequeue(out string text)) return;
+        if (!_messageQueue.TryDequeue(out string text)) return;
         _isDisplayed = true;
         string left = text.Split('|')[0];
         string right = text.Split('|')[1];
         _title.text = left;
         _text.text = right;
-        
+
         StartCoroutine(Transition());
     }
 
@@ -90,7 +97,7 @@ public class NotificationPopup : BaseGUI
         yield return new WaitForSeconds(1);
         _isDisplayed = false;
     }
-    
+
     public void Show(string title, string text)
     {
         _messageQueue.Enqueue(title + "|" + text);
