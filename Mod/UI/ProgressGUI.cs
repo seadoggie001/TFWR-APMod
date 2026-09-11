@@ -2,6 +2,8 @@ using System.Collections.Concurrent;
 using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
+using HarmonyLib;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
@@ -14,8 +16,7 @@ public class ProgressGUI : BaseGUI
     private const float RefreshRate = 2.0f; // Every 2 seconds
 
     private UIDocument _uiDocument;
-    private readonly Dictionary<string, List<RowElements>> _statisticRows = new();
-    private readonly Dictionary<string, RowElements> _goalRowsByLocation = new();
+    private IEnumerable<Row> _rows;
     private Visibility _visible;
 
     private enum Visibility
@@ -38,8 +39,9 @@ public class ProgressGUI : BaseGUI
     /// <summary>Queue of statistic changes to be processed</summary>
     private ConcurrentQueue<Stat> _statQueue = new();
 
+    /// <summary>Used to signal the UI should be rebuilt</summary>
     private bool _reload = false;
-    private UpdateInformation _updateInformation = null;
+    private UpdateInformation _updateInformation;
 
     private class UpdateInformation
     {
@@ -48,11 +50,31 @@ public class ProgressGUI : BaseGUI
         public IEnumerable<APLocation> AllLocations { get; set; }
     }
 
-    private class RowElements
+    private class Row
     {
-        public GroupBox Row;
-        public ProgressBar ProgressBar;
+        public GroupBox GroupBox;
+        [CanBeNull] public ProgressBar ProgressBar;
         public Toggle Toggle;
+
+        [CanBeNull] public Milestone Milestone;
+        [CanBeNull] public APLocation APLocation;
+
+        public void Completed(bool completed)
+        {
+            Toggle.value = completed;
+            if (completed)
+                GroupBox.AddToClassList("complete");
+            else
+                GroupBox.RemoveFromClassList("complete");
+        }
+
+        public void UpdateProgress(double? current = null, double? target = null)
+        {
+            if (ProgressBar is null) return;
+            if (current is not null) ProgressBar.value = (float)current;
+            if (target is not null) ProgressBar.highValue = (float)target;
+            ProgressBar.title = $"{ProgressBar.value:N0} / {ProgressBar.highValue:N0}";
+        }
     }
 
     public VisualElement RootElement;
@@ -65,11 +87,10 @@ public class ProgressGUI : BaseGUI
         Initialize();
     }
 
-    private void Start()
-    {
-        // Repeatedly invoke RefreshUI. After RefreshRate seconds, repeat every RefreshRate seconds
-        InvokeRepeating(nameof(RefreshUI), RefreshRate, RefreshRate);
-    }
+    // Repeatedly invoke RefreshUI. After RefreshRate seconds, repeat every RefreshRate seconds
+    private void Start() => InvokeRepeating(nameof(RefreshUI), RefreshRate, RefreshRate);
+
+    #region button presses
 
     public void Show() => ChangeVisibility(Visibility.Visible, false);
 
@@ -80,22 +101,20 @@ public class ProgressGUI : BaseGUI
     public void Enable() => ChangeVisibility(Visibility.Hidden, false, true);
 
     private void Closed(MouseUpEvent _) => ChangeVisibility(Visibility.Closed, true);
-    
+
     private void ExpandGUI(MouseUpEvent _) => ChangeVisibility(Visibility.Visible, true);
+
+    #endregion
 
     public void MarkCompleted(string key, double value)
     {
-        if (!_statisticRows.TryGetValue(key, out List<RowElements> row))
+        foreach (Row matchingRow in _rows.Where(m =>
+                     m.Milestone != null
+                     && m.ProgressBar != null
+                     && m.Milestone.APLocation.statistic?.key == key
+                     && Math.Abs(m.ProgressBar.highValue - value) < 1))
         {
-            Log.LogError("There are no rows matching: " + key);
-            return;
-        }
-
-        foreach (RowElements rowElements in row.Where(rowElements =>
-                     Math.Abs(rowElements.ProgressBar.highValue - (float)value) < 1))
-        {
-            rowElements.Toggle.value = true;
-            rowElements.Row.AddToClassList("complete");
+            matchingRow.Completed(true);
             return;
         }
 
@@ -104,24 +123,19 @@ public class ProgressGUI : BaseGUI
 
     public void MarkCompleted(string key)
     {
-        _goalRowsByLocation.TryGetValue(key, out RowElements rowElements);
-        if (rowElements is null)
+        foreach (Row row in _rows.Where(m => m.APLocation?.name == key))
         {
-            Log.LogError("There are no achievements matching: " + key);
+            row.Completed(true);
             return;
         }
 
-        rowElements.Toggle.value = true;
-        rowElements.Row.AddToClassList("complete");
+        Log.LogError("There are no achievements matching: " + key);
     }
 
     public override bool IsMouseOverWindow() =>
         RootElement.worldBound.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
 
-    public void StatUpdate(string item, double value)
-    {
-        _statQueue.Enqueue(new Stat(item, value));
-    }
+    public void StatUpdate(string item, double value) => _statQueue.Enqueue(new Stat(item, value));
 
     /// <summary>
     /// This is called to alert the GUI that a new set of statistics needs to be processed
@@ -189,6 +203,7 @@ public class ProgressGUI : BaseGUI
         }
     }
 
+    //ToDo: Destroy the object and recreate it instead. This is pain.
     private void RebuildUI()
     {
         // Unregister all callbacks
@@ -196,20 +211,15 @@ public class ProgressGUI : BaseGUI
         // Reset unregister callback
         _unregisterCallback = () => { };
         if (_uiDocument?.rootVisualElement is null)
-        {
             Initialize();
-        }
         else
-        {
-            // Remove all stats
+            // Remove all elements from the GUI
             _uiDocument.rootVisualElement.Clear();
-        }
 
         // clear internal data
-        _statisticRows.Clear();
-        _goalRowsByLocation.Clear();
+        _rows = [];
         // Create the layout again
-        CreateLayout(_updateInformation.GroupedMilestones, _updateInformation.Stats, _updateInformation.AllLocations);
+        CreateLayout(_updateInformation.GroupedMilestones, _updateInformation.AllLocations);
 
         _reload = false;
         _updateInformation = null;
@@ -239,7 +249,6 @@ public class ProgressGUI : BaseGUI
     }
 
     private void CreateLayout(IEnumerable<KeyValuePair<string, List<Milestone>>> groupedMilestones,
-        Dictionary<string, double> stats,
         IEnumerable<APLocation> allLocations)
     {
         VisualElement root = _uiDocument.rootVisualElement;
@@ -327,11 +336,10 @@ public class ProgressGUI : BaseGUI
 
         foreach (KeyValuePair<string, List<Milestone>> statistic in groupedMilestones)
         {
-            List<Milestone> milestones = statistic.Value.OrderBy(milestone => milestone.Target).ToList();
-            if (!stats.TryGetValue(statistic.Key, out double value)) value = 0;
+            List<Milestone> milestones = statistic.Value.OrderBy(milestone => milestone.BaseNumber).ToList();
             foreach (Milestone milestone in milestones)
             {
-                container.Add(CreateMilestoneRow(statistic.Key, milestone, first, value));
+                container.Add(CreateMilestoneRow(milestone, first));
                 first = false;
             }
         }
@@ -356,10 +364,10 @@ public class ProgressGUI : BaseGUI
 
         expandBtn.RegisterCallback<MouseUpEvent>(ExpandGUI);
         _unregisterCallback += () => expandBtn.UnregisterCallback<MouseUpEvent>(ExpandGUI);
-        
+
         close.RegisterCallback<MouseUpEvent>(Closed);
         _unregisterCallback += () => close.UnregisterCallback<MouseUpEvent>(Closed);
-        
+
         return;
 
         void ToggleCompleted(MouseUpEvent evt)
@@ -384,22 +392,18 @@ public class ProgressGUI : BaseGUI
     private static VisualElement CreateWithClass(IEnumerable<string> classes)
     {
         VisualElement element = new();
-        foreach (string className in classes)
-        {
-            element.AddToClassList(className);
-        }
-
+        foreach (string className in classes) element.AddToClassList(className);
         return element;
     }
 
-    private VisualElement CreateMilestoneRow(string key, Milestone milestone, bool first, double value)
+    private VisualElement CreateMilestoneRow(Milestone milestone, bool first)
     {
-        GroupBox row = new();
-        row.AddToClassList("statistic");
-        row.AddToClassList("progress");
-        row.AddToClassList("border");
-        if (milestone.Triggered) row.AddToClassList("complete");
-        if (first) row.AddToClassList("border-first");
+        GroupBox groupBox = new();
+        groupBox.AddToClassList("statistic");
+        groupBox.AddToClassList("progress");
+        groupBox.AddToClassList("border");
+        if (milestone.Triggered) groupBox.AddToClassList("complete");
+        if (first) groupBox.AddToClassList("border-first");
 
         // Title row
         VisualElement titleRow = new();
@@ -430,35 +434,27 @@ public class ProgressGUI : BaseGUI
         ProgressBar progressBar = new()
         {
             lowValue = 0,
-            highValue = (float)milestone.Target,
+            highValue = (float)(milestone.Target ?? Math.Pow(10, 9)),
         };
         progressBar.AddToClassList("progress-bar");
         progressRow.Add(progressBar);
 
-        row.Add(titleRow);
-        row.Add(descriptionRow);
-        row.Add(progressRow);
+        groupBox.Add(titleRow);
+        groupBox.Add(descriptionRow);
+        groupBox.Add(progressRow);
 
-        RowElements rowElements = new()
+        Row row = new()
         {
-            Row = row,
             ProgressBar = progressBar,
+            GroupBox = groupBox,
             Toggle = toggle,
+            Milestone = milestone,
+            APLocation = milestone.APLocation,
         };
-        if (_statisticRows.TryGetValue(key, out List<RowElements> statisticRow))
-        {
-            statisticRow.Add(rowElements);
-        }
-        else
-        {
-            _statisticRows[key] = [rowElements];
-        }
+        row.UpdateProgress();
+        _rows = _rows.AddItem(row);
 
-        _goalRowsByLocation.Add(milestone.Location, rowElements);
-
-        UpdateValues(rowElements, value);
-
-        return row;
+        return groupBox;
     }
 
     private VisualElement CreateActionRow(APLocation apLocation)
@@ -493,28 +489,34 @@ public class ProgressGUI : BaseGUI
 
         row.Add(titleRow);
         row.Add(descriptionRow);
-        _goalRowsByLocation.Add(apLocation.name, new RowElements() { ProgressBar = null, Row = row, Toggle = toggle });
+
+        _rows = _rows.AddItem(new Row()
+        {
+            ProgressBar = null,
+            GroupBox = row,
+            Toggle = toggle,
+            APLocation = apLocation
+        });
 
         return row;
     }
 
-    private static void UpdateValues(RowElements rowElements, double value)
+    public void ApplyOptions(Dictionary<double, double> modifiedValues)
     {
         try
         {
-            rowElements.ProgressBar.value = (float)value;
-            rowElements.ProgressBar.title = $"{value:N0} / {rowElements.ProgressBar.highValue:N0}";
-
-            rowElements.Toggle.value = value > rowElements.ProgressBar.highValue;
-        }
-        catch (InvalidOperationException ex)
-        {
-            // This message gets thrown because I'm updating the GUI too quickly sometimes, I'm pretty sure
-            if (ex.Message !=
-                "VisualElements cannot be marked for dirty repaint under an active visual tree during generateVisualContent callback execution nor during visual tree rendering")
+            foreach (KeyValuePair<double, double> modifiedValue in modifiedValues)
             {
-                Log.LogException("Failed to update values", ex);
+                foreach (Row row in _rows.Where(m => 
+                             m.Milestone != null && Math.Abs(m.Milestone.BaseNumber - modifiedValue.Key) < 1))
+                {
+                    row.UpdateProgress(null, modifiedValue.Value);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Log.LogException("Failed to update values", ex);
         }
     }
 
@@ -544,10 +546,9 @@ public class ProgressGUI : BaseGUI
         // For each stat to refresh
         foreach (KeyValuePair<string, double> stat in refreshStats)
         {
-            if (!_statisticRows.TryGetValue(stat.Key, out List<RowElements> row)) return;
-            foreach (RowElements rowElements in row)
+            foreach (Row row in _rows.Where(m => m.Milestone?.APLocation.statistic?.key == stat.Key))
             {
-                UpdateValues(rowElements, stat.Value);
+                row.UpdateProgress(stat.Value);
             }
         }
     }

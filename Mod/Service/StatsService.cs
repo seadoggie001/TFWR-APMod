@@ -1,4 +1,4 @@
-using BepInEx.Logging;
+using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
 
@@ -9,15 +9,35 @@ namespace com.seadoggie.TFWRArchipelago.Service;
 /// </summary>
 public class StatsService : IStatsService
 {
-    private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.StatsService");
+    [ModInject]
+    // ReSharper disable once UnusedMember.Local
+    private ILogService LogService
+    {
+        set => Log = value.CreateLog("TFWRAP.StatsService");
+    }
 
+    [ModInject] private IEnabledService EnabledService { get; set; }
+
+    private ILogger Log { get; set; }
+
+    /// <summary>
+    /// The statistics being tracked
+    /// </summary>
     private readonly Dictionary<string, double> _stats = new();
+
+    /// <summary>
+    /// A flag to control the raising of events. If the APOptions haven't been determined yet, it cannot raise events.
+    /// </summary>
+    private bool _canRaiseStatisticEvents = false;
 
     /// <summary>
     /// The Milestones to unlock. Sorted by Target (low to high). Key is an ItemName
     /// </summary>
     private readonly Dictionary<string, List<Milestone>> _milestones = new();
 
+    /// <summary>
+    /// Used to access the dictionary safely (because of multiple threads?)
+    /// </summary>
     private readonly object _lockObject = new();
 
     /// <summary>
@@ -31,7 +51,7 @@ public class StatsService : IStatsService
     public event EventHandler<Stat> StatTotalEvent;
 
     /// <summary>
-    ///     Uses APLocations to determine which statistics to track
+    /// Uses APLocations to determine which statistics to track
     /// </summary>
     public void Initialize(IEnumerable<APLocation> locations)
     {
@@ -47,13 +67,14 @@ public class StatsService : IStatsService
                 APLocation = location,
                 Achievement = location.achievement,
                 Location = location.name,
-                Target = value
+                BaseNumber = value,
+                Target = Math.Abs(value - 1) < 1 ? 1 : null,
             };
             // Check if the list already has this key
             if (_milestones.TryGetValue(location.statistic.key, out List<Milestone> milestones))
             {
                 // If there's not already a milestone with this target value, add it
-                if (!milestones.Any(m => Math.Abs(m.Target - value) < 5)) milestones.Add(milestone);
+                if (!milestones.Any(m => Math.Abs(m.BaseNumber - value) < 5)) milestones.Add(milestone);
             }
             else
             {
@@ -68,6 +89,8 @@ public class StatsService : IStatsService
 
         Log.LogInfo("Tracking stats for: " + string.Join(", ", _milestones.Keys));
     }
+
+    public void Stop() => _canRaiseStatisticEvents = false;
 
     public void Add(string name, double count)
     {
@@ -109,7 +132,7 @@ public class StatsService : IStatsService
     }
 
     /// <summary>
-    ///     Load a new set of statistics
+    /// Load a new set of statistics
     /// </summary>
     /// <param name="newStats"></param>
     public void Load(List<Pair<string, double>> newStats)
@@ -129,10 +152,8 @@ public class StatsService : IStatsService
         }
     }
 
-    public Dictionary<string, List<Milestone>> MilestoneCopy()
-    {
-        return new Dictionary<string, List<Milestone>>(_milestones.ToDictionary(m => m.Key, m => m.Value));
-    }
+    public Dictionary<string, List<Milestone>> MilestoneCopy() =>
+        new(_milestones.ToDictionary(m => m.Key, m => m.Value));
 
     public Dictionary<string, double> StatCopy()
     {
@@ -143,17 +164,19 @@ public class StatsService : IStatsService
     }
 
     /// <summary>
-    ///     Grants Stat-based Achievements similar to Steam
+    /// Grants Stat-based Achievements similar to Steam
     /// </summary>
     /// <param name="stat"></param>
     /// <param name="count"></param>
     private void GrantAchievements(string stat, double count)
     {
-        if (!Plugin.Instance.Enabled)
+        if (!EnabledService.PluginIsEnabled())
         {
             Log.LogWarning("Not tracking stats, currently disabled");
             return;
         }
+
+        if (!_canRaiseStatisticEvents) return;
 
         // Find the milestone
         if (!_milestones.TryGetValue(stat, out List<Milestone> milestones))
@@ -170,7 +193,9 @@ public class StatsService : IStatsService
         }
 
         // Loop through possible achievements
-        foreach (Milestone milestone in milestones.Where(milestone => !milestone.Triggered).OrderBy(m => m.Target))
+        foreach (Milestone milestone in milestones
+                     .Where(milestone => !milestone.Triggered && milestone.Target is not null)
+                     .OrderBy(m => m.Target))
         {
             // If it's too much, stop checking
             if (milestone.Target > count) break;
@@ -191,36 +216,55 @@ public class StatsService : IStatsService
             return _stats.TryGetValue(stat, out value);
         }
     }
+
+    /// <summary>
+    /// Use the APOptions to set the Milestone's target values.
+    /// </summary>
+    /// <param name="apOptions"></param>
+    public void LoadOptions(APOptions apOptions)
+    {
+        foreach (Milestone milestone in _milestones.SelectMany(milestoneGroup => milestoneGroup.Value))
+            milestone.Target = apOptions.ModifiedValues.TryGetValue(milestone.BaseNumber, out double actualValue)
+                ? actualValue
+                : milestone.BaseNumber;
+
+        _canRaiseStatisticEvents = true;
+    }
 }
 
+/// <inheritdoc cref="StatsService" />
 public interface IStatsService
 {
     /// <inheritdoc cref="StatsService.GoalEvent" />
     event EventHandler<GoalEvent> GoalEvent;
-    
+
     /// <inheritdoc cref="StatsService.StatTotalEvent" />
     event EventHandler<Stat> StatTotalEvent;
-    
-    /// <summary>
-    ///     Uses APLocations to determine which statistics to track
-    /// </summary>
+
+    /// <inheritdoc cref="StatsService.Initialize"/>
     void Initialize(IEnumerable<APLocation> locations);
 
+    /// <inheritdoc cref="StatsService.Add"/>
     void Add(string name, double count);
 
-    /// <summary>
-    ///     Gets a list of KeyValuePairs to save
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc cref="StatsService.Save"/>
     List<Pair<string, double>> Save();
 
-    /// <summary>
-    ///     Load a new set of statistics
-    /// </summary>
-    /// <param name="newStats"></param>
+    /// <inheritdoc cref="StatsService.Load"/>
     void Load(List<Pair<string, double>> newStats);
 
+    /// <inheritdoc cref="StatsService.MilestoneCopy"/>
     Dictionary<string, List<Milestone>> MilestoneCopy();
+
+    /// <inheritdoc cref="StatsService.StatCopy"/>
     Dictionary<string, double> StatCopy();
+
+    /// <inheritdoc cref="StatsService.TryGetValue"/>
     bool TryGetValue(string stat, out double value);
+
+    /// <inheritdoc cref="StatsService.LoadOptions"/>
+    void LoadOptions(APOptions apOptions);
+
+    /// <inheritdoc cref="StatsService.Stop"/>
+    void Stop();
 }

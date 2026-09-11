@@ -11,14 +11,14 @@ public class GoalManager : BaseComponent
 {
     [CanBeNull] public static GoalManager Instance;
     private static readonly ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.GoalMgr");
-
-
+    
     public IStatsService StatsService;
 
     protected override void OnEnable()
     {
         Instance = this;
         StatsService = new StatsService();
+        InjectionService.Inject(StatsService);
         base.OnEnable();
     }
 
@@ -28,10 +28,20 @@ public class GoalManager : BaseComponent
 
         StatEvent += OnStatEvent;
         OnDisabled += () => StatEvent -= OnStatEvent;
+        
+        APManager.Instance?.APService.OptionsLoaded += OnConnectionResult;
+        OnDisabled += () => APManager.Instance?.APService.OptionsLoaded -= OnConnectionResult;
+        
+        APManager.Instance?.APService.APDisconnected += OnAPDisconnected;
+        OnDisabled += () => APManager.Instance?.APService.APDisconnected -= OnAPDisconnected;
 
         GameManager.Instance?.GameService.GameLoaded += OnGameLoaded;
         OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
     }
+
+    private void OnAPDisconnected(object sender, string e) => StatsService.Stop();
+
+    private void OnConnectionResult(object _, APOptions apOptions) => StatsService.LoadOptions(apOptions);
 
     /// <summary>
     /// Raised to add a value to a stat
@@ -55,7 +65,11 @@ public class GoalManager : BaseComponent
 
     public List<Pair<string, double>> UserStatsSave() => StatsService.Save();
 
-    private void OnGameLoaded(object sender, ModSaveGame e) => StatsService.Load(e?.Statistics);
+    private void OnGameLoaded(object _, ModSaveGame e)
+    {
+        StatsService.Stop();
+        StatsService.Load(e?.Statistics);
+    }
 
-    private void OnStatEvent(object sender, Stat e) => StatsService.Add(e.Name, e.Value);
+    private void OnStatEvent(object _, Stat e) => StatsService.Add(e.Name, e.Value);
 }

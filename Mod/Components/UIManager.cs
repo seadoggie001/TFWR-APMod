@@ -42,6 +42,8 @@ public class UIManager : BaseComponent
         OnDisabled += () => APManager.Instance?.LocationQueue.APLocationGiven -= OnAPLocationGiven;
         APManager.Instance?.APService.ConnectionResult += OnConnectionResult;
         OnDisabled += () => APManager.Instance?.APService.ConnectionResult -= OnConnectionResult;
+        APManager.Instance?.APService.OptionsLoaded += OnOptionsLoaded;
+        OnDisabled += () => APManager.Instance?.APService.OptionsLoaded -= OnOptionsLoaded;
 
         GameManager.Instance?.GameService.GameLoaded += OnGameLoaded;
         OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
@@ -64,6 +66,11 @@ public class UIManager : BaseComponent
         
         notificationPopup = new GameObject("Notification").AddComponent<NotificationPopup>();
         notificationPopup.transform.SetParent(Plugin.Instance.MainGameObject.transform);
+    }
+
+    private void OnOptionsLoaded(object sender, APOptions options)
+    {
+        progressGUI.ApplyOptions(options.ModifiedValues);
     }
 
     private void NotifyItemReceived(object sender, Notification notification) =>

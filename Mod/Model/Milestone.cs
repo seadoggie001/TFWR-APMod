@@ -11,9 +11,14 @@ public record Milestone
     public APLocation APLocation;
 
     /// <summary>
+    /// The original number
+    /// </summary>
+    public double BaseNumber;
+    
+    /// <summary>
     /// The required number
     /// </summary>
-    public double Target;
+    public double? Target;
 
     /// <summary>
     /// Has the target been reached yet?

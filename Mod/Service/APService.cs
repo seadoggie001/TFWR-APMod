@@ -42,6 +42,11 @@ public class APService : IAPService
     /// </summary>
     public event EventHandler<string> AchievementUnlocked;
 
+    /// <summary>
+    /// Fired when options are loaded from the slot data
+    /// </summary>
+    public event EventHandler<APOptions> OptionsLoaded;
+    
     public void ResetAchievementCache(object sender, ModSaveGame modSaveGame) => _achievementCache.Clear();
 
     /// <summary>
@@ -136,7 +141,9 @@ public class APService : IAPService
                 _slotData = await Session.DataStorage.GetSlotDataAsync();
 
                 // Load necessary options
-                _options = new APOptions(_slotData);
+                _options = new APOptions();
+                InjectionService.Inject(_options);
+                _options.LoadSlotData(_slotData);
 
                 Log.LogInfo(_options);
 
@@ -145,6 +152,8 @@ public class APService : IAPService
 
                 Log.LogInfo("Goal name was set to " + _options.GoalName());
                 if (_goal is null) Log.LogError("_goal is null!");
+
+                OptionsLoaded?.Invoke(this, _options);
 
                 return true;
             }
@@ -257,6 +266,9 @@ public interface IAPService
 
     /// <inheritdoc cref="APService.AchievementUnlocked" />
     event EventHandler<string> AchievementUnlocked;
+    
+    /// <inheritdoc cref="APService.OptionsLoaded" />
+    event EventHandler<APOptions> OptionsLoaded;
 
     void ResetAchievementCache(object sender, ModSaveGame modSaveGame);
     void UnlockAchievement(string achievementName);

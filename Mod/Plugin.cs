@@ -1,9 +1,10 @@
 ﻿using BepInEx;
-using BepInEx.Logging;
 using com.seadoggie.TFWRArchipelago.Components;
-using com.seadoggie.TFWRArchipelago.Utils;
+using com.seadoggie.TFWRArchipelago.Logging;
+using com.seadoggie.TFWRArchipelago.Service;
 using HarmonyLib;
 using UnityEngine;
+using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 
 namespace com.seadoggie.TFWRArchipelago;
 
@@ -12,9 +13,10 @@ public class Plugin : BaseUnityPlugin
 {
     public const string GameName = "The Farmer Was Replaced";
     public static Plugin Instance { get; private set; } = null!;
-    public static ManualLogSource Log { get; } = BepInEx.Logging.Logger.CreateLogSource("TFWRAP.Main");
-    
     public GameObject MainGameObject { get; private set; }
+
+    private static readonly ILogService LogService = new LogService();
+    public static readonly ILogger Log = LogService.CreateLog("TFWRAP.Main");
     
     private readonly Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
 
@@ -26,7 +28,13 @@ public class Plugin : BaseUnityPlugin
     private void Awake()
     {
         Instance = this;
-
+        
+        // Use field dependency injection (for testing and my sanity)
+        InjectionService.Register(typeof(ILogService), LogService);
+        InjectionService.Register(typeof(ILogger), Log);
+        InjectionService.Register(typeof(IEnabledService), new EnabledService());
+        
+        
         // Create Managers
         MainGameObject = new GameObject("Archipelago");
         MainGameObject.AddComponent<UIManager>();
