@@ -196,6 +196,7 @@ public class GameManager : BaseComponent
 
             double gifted = sim.farm.Items.GetNumber((int)hayId) * 0.2;
             sim.farm.Items.AddItem((int)hayId, Math.Floor(gifted));
+            GoalManager.Instance?.RaiseStatEvent("hay", Math.Floor(gifted));
         }
         catch (Exception ex)
         {
