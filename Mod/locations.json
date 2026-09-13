@@ -206,6 +206,14 @@
     "region": "Dinos",
     "requirements": [
       {
+        "name": "Drone Speed",
+        "count": 5
+      },
+      {
+        "name": "Dinosaurs",
+        "count": 4
+      },
+      {
         "name": "Expand",
         "count": 9
       }
@@ -671,6 +679,16 @@
     "name": "Must be a bunny",
     "description": "Farm 100 carrots",
     "region": "Carrot",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 1
+      },
+      {
+        "name": "Carrot",
+        "count": 2
+      }
+    ],
     "statistic": {
       "key": "carrot",
       "value": "100"
@@ -687,8 +705,8 @@
         "count": 2
       },
       {
-        "name": "Expand",
-        "count": 1
+        "name": "Carrot",
+        "count": 2
       }
     ],
     "statistic": {
@@ -1326,6 +1344,14 @@
         "count": 1
       },
       {
+        "name": "Megafarm",
+        "count": 2
+      },
+      {
+        "name": "Drone Speed",
+        "count": 2
+      },
+      {
         "name": "Expand",
         "count": 4
       }
@@ -1347,7 +1373,11 @@
       },
       {
         "name": "Megafarm",
-        "count": 2
+        "count": 3
+      },
+      {
+        "name": "Drone Speed",
+        "count": 3
       },
       {
         "name": "Expand",
@@ -1669,6 +1699,12 @@
     "name": "Bone Farmer",
     "description": "Farm 100 Bones",
     "region": "Dinos",
+    "requirements": [
+      {
+        "name": "Loop",
+        "count": 1
+      }
+    ],
     "statistic": {
       "key": "bone",
       "value": "100"
@@ -1679,6 +1715,16 @@
     "name": "1K Bones",
     "description": "Farm 1K Bones",
     "region": "Dinos",
+    "requirements": [
+      {
+        "name": "Expand",
+        "count": 3
+      },
+      {
+        "name": "Loop",
+        "count": 1
+      }
+    ],
     "statistic": {
       "key": "bone",
       "value": "1K"
@@ -1691,8 +1737,16 @@
     "region": "Dinos",
     "requirements": [
       {
+        "name": "Expand",
+        "count": 4
+      },
+      {
         "name": "Dinosaurs",
         "count": 2
+      },
+      {
+        "name": "Loop",
+        "count": 1
       }
     ],
     "statistic": {
@@ -1713,6 +1767,10 @@
       {
         "name": "Dinosaurs",
         "count": 3
+      },
+      {
+        "name": "Loop",
+        "count": 1
       }
     ],
     "statistic": {
@@ -1733,6 +1791,10 @@
       {
         "name": "Dinosaurs",
         "count": 4
+      },
+      {
+        "name": "Loop",
+        "count": 1
       }
     ],
     "statistic": {
@@ -1753,6 +1815,10 @@
       {
         "name": "Dinosaurs",
         "count": 4
+      },
+      {
+        "name": "Loop",
+        "count": 1
       }
     ],
     "statistic": {
@@ -1773,6 +1839,10 @@
       {
         "name": "Dinosaurs",
         "count": 5
+      },
+      {
+        "name": "Loop",
+        "count": 1
       }
     ],
     "statistic": {
@@ -1783,7 +1853,7 @@
   {
     "id": 21008,
     "name": "Dino Master",
-    "description": "Farm 100M bones",
+    "description": "Farm 1M bones in 1 minute",
     "region": "Dinos",
     "requirements": [
       {
@@ -1793,6 +1863,10 @@
       {
         "name": "Dinosaurs",
         "count": 5
+      },
+      {
+        "name": "Loop",
+        "count": 1
       }
     ],
     "timed": {
