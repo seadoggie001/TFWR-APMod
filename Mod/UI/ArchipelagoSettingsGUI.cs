@@ -38,6 +38,7 @@ public class ArchipelagoSettingsGUI : BaseGUI
     private string _archUsername = "";
     private string _archPassword = "";
 
+    private Vector2 DesignResolution = new(1920f, 1080f);
     private Rect _windowRect;
     private CursorLockMode _prevCursorLockMode;
     private bool _prevCursorVisible;
@@ -95,8 +96,8 @@ public class ArchipelagoSettingsGUI : BaseGUI
     {
         int width = Mathf.Min(Screen.width, WindowWidth);
         int height = WindowHeight > Screen.height ? Screen.height - 100 : WindowHeight;
-        int offsetX = Mathf.RoundToInt((Screen.width - width) / 2f);
-        int offsetY = Mathf.RoundToInt((Screen.height - height) / 2f);
+        int offsetX = Mathf.RoundToInt((DesignResolution.x - width) / 2f);
+        int offsetY = Mathf.RoundToInt((DesignResolution.y - height) / 2f);
         _windowRect = new Rect(offsetX, offsetY, width, height);
     }
 
@@ -104,6 +105,23 @@ public class ArchipelagoSettingsGUI : BaseGUI
     {
         Cursor.lockState = mode;
         Cursor.visible = visible;
+    }
+
+    private Rect DrawWindowWithScaling(int id, Rect clientRect, GUI.WindowFunction func, string text)
+    {
+        Matrix4x4 originalMatrix = GUI.matrix;
+
+        float scale = Screen.height / DesignResolution.y;
+        float scaledWidth = DesignResolution.x * scale;
+        float offsetX = (Screen.width - scaledWidth) * 0.5f;
+
+        GUI.matrix = Matrix4x4.TRS(new Vector3(offsetX, 0, 0), Quaternion.identity, new Vector3(scale, scale, 1f));
+
+        Rect windowRect = GUILayout.Window(id, clientRect, func, text);
+
+        GUI.matrix = originalMatrix;
+
+        return windowRect;
     }
 
     private void OnGUI()
@@ -120,7 +138,7 @@ public class ArchipelagoSettingsGUI : BaseGUI
             }
         }
 
-        _windowRect = GUILayout.Window(-619, _windowRect, DrawWindow, "Archipelago Settings");
+        _windowRect = DrawWindowWithScaling(-619, _windowRect, DrawWindow, "Archipelago Settings");
     }
 
     public override bool IsMouseOverWindow() =>
