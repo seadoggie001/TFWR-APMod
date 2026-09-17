@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using com.seadoggie.TFWRArchipelago.Components;
-using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 using UnityEngine;
 

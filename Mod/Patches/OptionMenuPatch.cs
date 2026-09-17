@@ -1,5 +1,4 @@
 using com.seadoggie.TFWRArchipelago.Components;
-using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;

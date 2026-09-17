@@ -1,6 +1,5 @@
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
-using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;

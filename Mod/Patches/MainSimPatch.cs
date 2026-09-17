@@ -1,5 +1,4 @@
 using System.Reflection;
-using com.seadoggie.TFWRArchipelago.Utils;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
