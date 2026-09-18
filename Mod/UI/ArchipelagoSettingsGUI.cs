@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Archipelago.MultiClient.Net;
 using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
@@ -38,7 +40,7 @@ public class ArchipelagoSettingsGUI : BaseGUI
     private string _archUsername = "";
     private string _archPassword = "";
 
-    private Vector2 DesignResolution = new(1920f, 1080f);
+    private readonly Vector2 _designResolution = new(1920f, 1080f);
     private Rect _windowRect;
     private CursorLockMode _prevCursorLockMode;
     private bool _prevCursorVisible;
@@ -96,8 +98,8 @@ public class ArchipelagoSettingsGUI : BaseGUI
     {
         int width = Mathf.Min(Screen.width, WindowWidth);
         int height = WindowHeight > Screen.height ? Screen.height - 100 : WindowHeight;
-        int offsetX = Mathf.RoundToInt((DesignResolution.x - width) / 2f);
-        int offsetY = Mathf.RoundToInt((DesignResolution.y - height) / 2f);
+        int offsetX = Mathf.RoundToInt((_designResolution.x - width) / 2f);
+        int offsetY = Mathf.RoundToInt((_designResolution.y - height) / 2f);
         _windowRect = new Rect(offsetX, offsetY, width, height);
     }
 
@@ -111,8 +113,8 @@ public class ArchipelagoSettingsGUI : BaseGUI
     {
         Matrix4x4 originalMatrix = GUI.matrix;
 
-        float scale = Screen.height / DesignResolution.y;
-        float scaledWidth = DesignResolution.x * scale;
+        float scale = Screen.height / _designResolution.y;
+        float scaledWidth = _designResolution.x * scale;
         float offsetX = (Screen.width - scaledWidth) * 0.5f;
 
         GUI.matrix = Matrix4x4.TRS(new Vector3(offsetX, 0, 0), Quaternion.identity, new Vector3(scale, scale, 1f));

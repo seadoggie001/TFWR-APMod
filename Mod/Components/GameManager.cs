@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
 using com.seadoggie.TFWRArchipelago.Configuration;
 using com.seadoggie.TFWRArchipelago.Logging;

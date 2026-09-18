@@ -1,3 +1,4 @@
+using System.IO;
 using System.Reflection;
 using BepInEx.Logging;
 using UnityEngine;
@@ -71,7 +72,7 @@ public static class Resources
         return null;
     }
     
-    private static T LoadAsset<T>(string assetName) where T : UnityEngine.Object
+    private static T LoadAsset<T>(string assetName) where T : Object
     {
         if(Bundle == null) Log.LogError($"No bundle named '{BundleName}'.");
         T asset = Bundle?.LoadAsset<T>(assetName);

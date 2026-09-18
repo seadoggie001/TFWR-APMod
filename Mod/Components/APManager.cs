@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;

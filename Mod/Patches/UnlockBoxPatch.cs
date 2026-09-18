@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using HarmonyLib;
 using TMPro;
@@ -23,7 +25,8 @@ public class UnlockBoxPatch
         [typeof(bool), typeof(HashSet<string>), typeof(ItemBlock), typeof(Dictionary<string, int>), typeof(bool)],
         [ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Out]
     )]
-    public static void SetupRec(UnlockBox __instance, ref Image ___image, ref TextMeshProUGUI ___codeText, ref ItemBlock ___currentCost)
+    public static void SetupRec(UnlockBox __instance, ref Image ___image, ref TextMeshProUGUI ___codeText,
+        ref ItemBlock ___currentCost)
     {
         try
         {

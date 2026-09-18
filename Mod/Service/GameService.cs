@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using JetBrains.Annotations;
@@ -5,6 +10,8 @@ using UnityEngine;
 using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
+
+//ToDo: Replace UnityEngine.JsonUtility and UnityEngine.Vector2Int to allow testing of the GameService
 
 public class GameService : IGameService
 {
@@ -93,7 +100,7 @@ public class GameService : IGameService
         Log.LogInfo("Only unlocked " + _modSaveGame.ItemsReceived);
         _modSaveGame.ItemsReceived += 1;
 
-        return APTrapItems.AllTrapItems.Contains(itemName)
+        return APTrapItems.AllTrapItems.ToList().Contains(itemName)
             ? Result.ItsATrap
             : Result.ProcessItem;
     }

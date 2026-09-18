@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using com.seadoggie.TFWRArchipelago.Components;
 using HarmonyLib;
 
@@ -19,7 +21,7 @@ public class OptionMenuPatch
         try
         {
             if (!(GameManager.Instance?.TfwrConfig?.Debug ?? false) ||
-                !ResourceManagerPatch.CustomOptions.Contains(optionName))
+                !ResourceManagerPatch.CustomOptions.ToList().Contains(optionName))
                 return;
 
             Plugin.Log.LogInfo("CustomOption Changed. Name: " + optionName);

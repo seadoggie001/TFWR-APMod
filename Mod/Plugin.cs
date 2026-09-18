@@ -1,9 +1,9 @@
-﻿using BepInEx;
+﻿using System;
+using BepInEx;
 using com.seadoggie.TFWRArchipelago.Components;
+using com.seadoggie.TFWRArchipelago.Functions;
 using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Service;
-using com.seadoggie.TFWRArchipelago.Functions;
-using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 using UnityEngine;
 using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
@@ -46,7 +46,7 @@ public class Plugin : BaseUnityPlugin
         // Apply game patches
         try
         {
-            DroneLib.Plugin.PatchAll();
+            DroneLib.Main.PatchAll();
             _harmony.PatchAll();
         }
         catch (Exception e)
@@ -60,8 +60,8 @@ public class Plugin : BaseUnityPlugin
 
     private void Start()
     {
-        DroneLib.Functions.Registration.RegisterFunction(new FastFlip());
-        DroneLib.Functions.Registration.RegisterFunction(new Teleport());
+        DroneLib.Function.Registration.RegisterFunction(new FastFlip());
+        DroneLib.Function.Registration.RegisterFunction(new Teleport());
         DroneLib.Item.Registration.RegisterItem(new FakeAPItem());
     }
 }

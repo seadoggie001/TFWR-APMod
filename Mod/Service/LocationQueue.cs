@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 
@@ -12,6 +15,7 @@ public class LocationQueue(IEnumerable<APLocation> allLocations) : ILocationQueu
     {
         set => Log = value.CreateLog("TFWRAP.LocQ");
     }
+
     private ILogger Log;
     private readonly HashSet<long> _locationQueue = [];
 

@@ -19,15 +19,25 @@
 
     <ItemGroup>
         <!-- These are the internal game files. They allow you to reference internal types and functions --> 
-        <Reference Include="$(ManagedPath)/Core.dll" Publicize="true" />
-        <Reference Include="$(ManagedPath)/Utils.dll" Publicize="true" />
-        
-        <!-- I don't know why these are here, but the template has them too -->
+        <Reference Include="$(ManagedPath)/Core.dll">
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(ManagedPath)/Utils.dll">
+            <Private>False</Private>
+        </Reference>
+
+        <!-- These are to reference BepInEx and Unity in code -->
+        <Reference Include="BepInEx">
+            <HintPath>$(BepInExPath)\core\BepInEx.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
         <Reference Include="UnityEngine.UI">
             <HintPath>$(ManagedPath)\UnityEngine.UI.dll</HintPath>
+            <Private>False</Private>
         </Reference>
         <Reference Include="Unity.TextMeshPro">
             <HintPath>$(ManagedPath)\Unity.TextMeshPro.dll</HintPath>
+            <Private>False</Private>
         </Reference>
     </ItemGroup>
 

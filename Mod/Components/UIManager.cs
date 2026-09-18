@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
 using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
@@ -146,7 +147,6 @@ public class UIManager : BaseComponent
         if (location.region != "GrassSanity") progressGUI.MarkCompleted(location.name);
     }
 
-    // ToDo: tell the user (somehow) why the connection was cancelled? Launch the GUI?
     private void OnAPDisconnected(object sender, string reason)
     {
         floatingActionButton.ConnectionStatus(false);

@@ -1,3 +1,4 @@
+using System;
 using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 

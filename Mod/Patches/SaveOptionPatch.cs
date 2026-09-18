@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using com.seadoggie.TFWRArchipelago.Service;
 using HarmonyLib;
 using UnityEngine;

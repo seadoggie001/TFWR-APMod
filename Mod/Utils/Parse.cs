@@ -1,3 +1,5 @@
+using System;
+
 namespace com.seadoggie.TFWRArchipelago.Utils;
 
 public static class Parse

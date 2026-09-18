@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
