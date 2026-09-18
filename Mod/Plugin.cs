@@ -2,6 +2,8 @@
 using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Service;
+using com.seadoggie.TFWRArchipelago.Functions;
+using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 using UnityEngine;
 using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
@@ -44,6 +46,7 @@ public class Plugin : BaseUnityPlugin
         // Apply game patches
         try
         {
+            DroneLib.Plugin.PatchAll();
             _harmony.PatchAll();
         }
         catch (Exception e)
@@ -53,5 +56,12 @@ public class Plugin : BaseUnityPlugin
         }
 
         Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running version {MyPluginInfo.PLUGIN_VERSION}");
+    }
+
+    private void Start()
+    {
+        DroneLib.Functions.Registration.RegisterFunction(new FastFlip());
+        DroneLib.Functions.Registration.RegisterFunction(new Teleport());
+        DroneLib.Item.Registration.RegisterItem(new FakeAPItem());
     }
 }

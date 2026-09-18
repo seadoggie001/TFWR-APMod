@@ -64,7 +64,7 @@ public class FarmPatch
         try
         {
             if (!Plugin.Instance.Enabled) return !BepInExHelper.HarmonySkipFunction;
-            __result = new ItemBlock(StringIdsPatch.ArchipelagoItem, 1);
+            __result = new ItemBlock(FakeAPItem.Instance.ItemSO.itemId, 1);
             return BepInExHelper.HarmonySkipFunction;
         }
         catch (Exception e)

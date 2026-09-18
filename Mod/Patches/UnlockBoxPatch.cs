@@ -36,7 +36,7 @@ public class UnlockBoxPatch
             ___codeText.alignment = TextAlignmentOptions.Baseline;
             ___codeText.fontSize = 24f;
             ___codeText.verticalAlignment = VerticalAlignmentOptions.Baseline;
-            ___currentCost = new ItemBlock(StringIdsPatch.ArchipelagoItem, 1);
+            ___currentCost = new ItemBlock(FakeAPItem.Instance.ItemSO.itemId, 1);
         }
         catch (Exception e)
         {

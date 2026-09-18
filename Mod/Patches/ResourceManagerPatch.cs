@@ -21,22 +21,6 @@ public class ResourceManagerPatch
     {
         try
         {
-            // Skip this if we've already loaded our item
-            if(___items.Any(m => m.itemName == StringIdsPatch.ArchipelagoItemName)) return;
-            
-            // Install the Archipelago item
-            ItemSO item = ScriptableObject.CreateInstance<ItemSO>();
-            item.itemId = StringIdsPatch.ArchipelagoItem;
-            item.itemName = StringIdsPatch.ArchipelagoItemName;
-            // The rest of this is all nonsense?
-            item.description = "Archipelago Stuff";
-            item.docs = "I got some docs!?";
-            item.enabled = true;
-            item.name = "Some other Archipelago name?";
-            item.trackStats = true;
-            // Now tell the game about it
-            ___items = ___items.AddItem(item).ToArray();
-
             // Track stats for all items
             foreach (ItemSO itemSo in ___items)
             {
@@ -59,7 +43,7 @@ public class ResourceManagerPatch
     {
         try
         {
-            if(!(GameManager.Instance?.TfwrConfig?.Debug ?? false))
+            if (!(GameManager.Instance?.TfwrConfig?.Debug ?? false))
                 return;
             List<OptionSO> options = __result.ToList();
             _openArchipelagoOption ??= AddOption(ArchipelagoOptionToggle, "Open Archipelago settings", "general", 0f,
@@ -122,8 +106,8 @@ public class ResourceManagerPatch
             if (Plugin.Instance.Enabled && __result is not null && __result)
             {
                 // Everything costs an Archipelago item
-                __result.unlockCost = new ItemBlock(StringIdsPatch.ArchipelagoItem, 1);
-                
+                __result.unlockCost = new ItemBlock(FakeAPItem.Instance.ItemSO.itemId, 1);
+
                 // ToDo: Someday, check if there's a hint for this item. If there is a hint, display it here...
                 // __result.description = "Text describing a hint for this item";
             }
@@ -133,7 +117,7 @@ public class ResourceManagerPatch
             Plugin.Log.LogException($"{nameof(GetUnlock)}", e);
         }
     }
-    
+
     [HarmonyPostfix]
     [HarmonyPatch(nameof(ResourceManager.GetFarmObject))]
     public static void GetFarmObject(string name, ref FarmObjectSO __result)
@@ -142,13 +126,11 @@ public class ResourceManagerPatch
         {
             if (!Plugin.Instance.Enabled || __result is null || !__result) return;
             if (APManager.Instance is null) return;
-            if (!(APManager.Instance?.APService?.GetOptions()?.CropCosts?.TryGetValue(name, out List<string> items) ?? false)) return;
+            if (!(APManager.Instance?.APService?.GetOptions()?.CropCosts?.TryGetValue(name, out List<string> items) ??
+                  false)) return;
             ItemBlock cost = ItemBlock.CreateEmpty();
-            foreach (string item in items)
-            {
-                cost.AddItem(StringIds.GetItemId(item), 1);
-            }
-                    
+            foreach (string item in items) cost.AddItem(StringIds.GetItemId(item), 1);
+
             __result.cost = cost;
         }
         catch (Exception e)
