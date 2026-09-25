@@ -117,13 +117,11 @@ public class StatsService : IStatsService
     ///     Gets a list of KeyValuePairs to save
     /// </summary>
     /// <returns></returns>
-    public List<Pair<string, double>> Save()
+    public List<KeyValuePair<string, double>> Save()
     {
         lock (_lockObject)
         {
-            IEnumerable<Pair<string, double>> result =
-                _stats.Select(entry => new Pair<string, double>(entry.Key, entry.Value));
-            return result.ToList();
+            return _stats.ToList();
         }
     }
 
@@ -131,19 +129,19 @@ public class StatsService : IStatsService
     /// Load a new set of statistics
     /// </summary>
     /// <param name="newStats"></param>
-    public void Load(List<Pair<string, double>> newStats)
+    public void Load(List<KeyValuePair<string, double>> newStats)
     {
         lock (_lockObject)
         {
             _stats.Clear();
             if (newStats is null) return;
-            foreach (Pair<string, double> newStat in newStats)
+            foreach (KeyValuePair<string, double> newStat in newStats)
             {
-                if (_stats.ContainsKey(newStat.key))
-                    _stats.Add(newStat.key, newStat.value);
+                if (_stats.ContainsKey(newStat.Key))
+                    _stats.Add(newStat.Key, newStat.Value);
                 else
-                    _stats[newStat.key] = newStat.value;
-                StatTotalEvent?.Invoke(null, new Stat(newStat.key, newStat.value));
+                    _stats[newStat.Key] = newStat.Value;
+                StatTotalEvent?.Invoke(null, new Stat(newStat.Key, newStat.Value));
             }
         }
     }
@@ -244,10 +242,10 @@ public interface IStatsService
     void Add(string name, double count);
 
     /// <inheritdoc cref="StatsService.Save"/>
-    List<Pair<string, double>> Save();
+    List<KeyValuePair<string, double>> Save();
 
     /// <inheritdoc cref="StatsService.Load"/>
-    void Load(List<Pair<string, double>> newStats);
+    void Load(List<KeyValuePair<string, double>> newStats);
 
     /// <inheritdoc cref="StatsService.MilestoneCopy"/>
     Dictionary<string, List<Milestone>> MilestoneCopy();

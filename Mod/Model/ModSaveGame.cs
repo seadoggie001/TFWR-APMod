@@ -12,7 +12,7 @@ public class ModSaveGame
     /// <summary>
     /// Statistics by action performed
     /// </summary>
-    public List<Pair<string, double>> Statistics;
+    public List<KeyValuePair<string, double>> Statistics;
     /// <summary>
     /// Number of items received from AP
     /// </summary>

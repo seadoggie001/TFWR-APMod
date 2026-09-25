@@ -29,7 +29,7 @@ public class GameService : IGameService
     /// </summary>
     /// <param name="statistics"></param>
     /// <param name="fileName"></param>
-    public void SaveProgress(List<Pair<string, double>> statistics, string fileName)
+    public void SaveProgress(List<KeyValuePair<string, double>> statistics, string fileName)
     {
         try
         {
@@ -157,7 +157,7 @@ public interface IGameService
     event EventHandler<string> GrassSanity;
 
     /// <inheritdoc cref="GameService.SaveProgress(List{Pair{string, double}}, string)" />
-    void SaveProgress(List<Pair<string, double>> statistics, string fileName);
+    void SaveProgress(List<KeyValuePair<string, double>> statistics, string fileName);
 
     /// <inheritdoc cref="GameService.Load(string)" />
     void Load(string fileName);

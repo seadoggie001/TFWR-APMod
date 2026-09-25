@@ -63,7 +63,7 @@ public class GoalManager : BaseComponent
         });
     }
 
-    public List<Pair<string, double>> UserStatsSave() => StatsService.Save();
+    public List<KeyValuePair<string, double>> UserStatsSave() => StatsService.Save();
 
     private void OnGameLoaded(object _, ModSaveGame e)
     {
