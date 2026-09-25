@@ -79,22 +79,20 @@ public class GameService : IGameService
 
     public Result CanGivePlayerItem(string itemName, int itemsReceived)
     {
-        if (_modSaveGame is null)
-        {
-            _log.LogError($"Failed to give {itemName} because the ModSaveGame isn't loaded yet");
-            return Result.ModNotInitialized;
-        }
+        if (_modSaveGame is not null)
+            // Check if we've previously received this item
+            return itemsReceived < _modSaveGame.ItemsReceived
+                ? Result.ItemAlreadyReceived
+                : Result.ProcessItem;
 
-        // If we've previously received this item
-        if (itemsReceived < _modSaveGame.ItemsReceived) return Result.ItemAlreadyReceived;
-
-        _log.LogInfo("Only unlocked " + _modSaveGame.ItemsReceived);
-        _modSaveGame.ItemsReceived += 1;
-
-        return APTrapItems.AllTrapItems.ToList().Contains(itemName)
-            ? Result.ItsATrap
-            : Result.ProcessItem;
+        _log.LogError($"Failed to give {itemName} because the ModSaveGame isn't loaded yet");
+        return Result.ModNotInitialized;
     }
+
+    /// <summary>
+    /// Increment the number of items received
+    /// </summary>
+    public void IncrementItemCount() => _modSaveGame?.ItemsReceived += 1;
 
     public void RaiseMenuOpen(bool open)
     {
@@ -136,7 +134,6 @@ public class GameService : IGameService
         ModNotInitialized,
         ItemAlreadyReceived,
         ProcessItem,
-        ItsATrap,
     }
 }
 
@@ -156,13 +153,14 @@ public interface IGameService
 
     event EventHandler<string> GrassSanity;
 
-    /// <inheritdoc cref="GameService.SaveProgress(List{Pair{string, double}}, string)" />
+    /// <inheritdoc cref="GameService.SaveProgress(List{KeyValuePair{string, double}}, string)" />
     void SaveProgress(List<KeyValuePair<string, double>> statistics, string fileName);
 
     /// <inheritdoc cref="GameService.Load(string)" />
     void Load(string fileName);
 
     GameService.Result CanGivePlayerItem(string itemName, int itemsReceived);
+    void IncrementItemCount();
     void RaiseMenuOpen(bool open);
     void RaiseGrassSanity(Vector2Int position);
 }

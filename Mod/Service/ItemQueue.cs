@@ -11,20 +11,27 @@ namespace com.seadoggie.TFWRArchipelago.Service;
 /// <summary>
 /// Queues received Archipelago items until the mod is ready to process them  
 /// </summary>
-/// <param name="processItemCallback"></param>
 [Injectable(typeof(IItemQueue))]
-public class ItemQueue(Func<string, int, bool> processItemCallback) : IItemQueue
+public class ItemQueue : IItemQueue
 {
+    private const float RefreshRate = 0.1f;
+
     [Log] private readonly ILogger<ItemQueue> _log = null!;
 
     private int _itemsReceived;
     private readonly List<string> _itemQueue = [];
 
+    public event EventHandler<ItemReceivedData> ItemReady;
+
     public void Process()
     {
         if (_itemQueue.Count == 0) return;
         string item = _itemQueue.First();
-        if (!processItemCallback(item, _itemsReceived)) return;
+        ItemReady?.Invoke(this, new ItemReceivedData()
+        {
+            ItemName = item,
+            ItemCount = _itemsReceived,
+        });
         _itemQueue.Remove(item);
         _itemsReceived++;
     }
@@ -46,7 +53,14 @@ public class ItemQueue(Func<string, int, bool> processItemCallback) : IItemQueue
 
 public interface IItemQueue
 {
+    event EventHandler<ItemReceivedData> ItemReady;
     void Process();
     void OnItemReceived(IReceivedItemsHelper helper);
     void Reset();
 }
+
+public record ItemReceivedData
+{
+    public string ItemName;
+    public int ItemCount;
+};

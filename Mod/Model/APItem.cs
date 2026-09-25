@@ -2,6 +2,8 @@ namespace com.seadoggie.TFWRArchipelago.Model;
 
 public static class APItem
 {
+    #region Unlocks
+
     public const string Loop = "Loop";
     public const string DroneSpeed = "Drone Speed";
     public const string Hats = "Hats";
@@ -25,7 +27,6 @@ public static class APItem
     public const string MoreDebug = "More Debug";
     public const string Timing = "Timing";
     public const string Simulation = "Simulation";
-    public const string Leaderboard = "Leaderboard";
     public const string Operators = "Operators";
     public const string Senses = "Senses";
     public const string Variables = "Variables";
@@ -36,5 +37,28 @@ public static class APItem
     public const string Dictionaries = "Dictionaries";
     public const string Costs = "Costs";
     public const string Unlock = "Unlock";
+
+    // Leaderboard will never be used. Leaderboards are disabled.
+    // public const string Leaderboard = "Leaderboard";
+
+    #endregion
+
     public const string FreeHay = "Free Hay";
+
+    public const string RickRollTrap = "Rick Roll Trap";
+    public const string BigTrap = "Big Drone Trap";
+    public const string FlipTrap = "Flipped Farm Trap";
+    public const string FrozenTrap = "Frozen Drone Trap";
+    public const string NoHatTrap = "No Hat Trap";
+    public const string TinyTrap = "Tiny Drone Trap";
+    
+    /// <summary>
+    /// The items in this array are directly linked to unlocks in the game
+    /// </summary>
+    public static readonly string[] Unlocks =
+    [
+        Loop, DroneSpeed, Hats, Grass, Expand, Plant, Carrot, Watering, Fertilizer, Sunflowers, Mazes, TopHat, Trees,
+        Pumpkins, Polyculture, Cactus, Dinosaurs, TheFarmersRemains, Megafarm, Debug, MoreDebug, Timing, Simulation,
+        Operators, Senses, Variables, Functions, Import, Utilities, Lists, Dictionaries, Costs, Unlock,
+    ];
 }

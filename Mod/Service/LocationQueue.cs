@@ -8,12 +8,14 @@ using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
-/// <inheritdoc/>
+/// <inheritdoc cref="ILocationQueue" />
 [Injectable(typeof(ILocationQueue))]
-public class LocationQueue(IEnumerable<APLocation> allLocations) : ILocationQueue
+public class LocationQueue : ILocationQueue
 {
     [Log] private readonly ILogger<LocationQueue> _log = null!;
     private readonly HashSet<long> _locationQueue = [];
+
+    private IEnumerable<APLocation> _allLocations = null;
 
     public event EventHandler<APLocation> APLocationGiven;
 
@@ -23,13 +25,16 @@ public class LocationQueue(IEnumerable<APLocation> allLocations) : ILocationQueu
         long location = _locationQueue.ElementAt(0);
         try
         {
+            if (_allLocations is null) return;
             if (GivePlayerLocation(location)) _locationQueue.Remove(location);
         }
         catch (Exception e)
         {
-            Log.LogException($"Failed to process {location}", e);
+            _log.LogException($"Failed to process {location}", e);
         }
     }
+
+    public void SetLocations(IEnumerable<APLocation> locations) => _allLocations = locations;
 
     public void OnLocationsReceived(ReadOnlyCollection<long> locations) => _locationQueue.UnionWith(locations);
 
@@ -37,11 +42,11 @@ public class LocationQueue(IEnumerable<APLocation> allLocations) : ILocationQueu
     {
         try
         {
-            APLocation apLocation = allLocations.FirstOrDefault(m => m.id == location);
+            APLocation apLocation = _allLocations.FirstOrDefault(m => m.id == location);
 
             if (apLocation is null)
             {
-                _log.LogException($"Failed to find AP Location with ID: {location}");
+                _log.LogError($"Failed to find AP Location with ID: {location}");
                 return false;
             }
 
@@ -73,10 +78,13 @@ public interface ILocationQueue
     /// </summary>
     event EventHandler<APLocation> APLocationGiven;
 
-    /// <summary>
-    /// Attempt to process a single queued location
-    /// </summary>
     void Process();
+    
+    /// <summary>
+    /// Tell the queue which locations to process
+    /// </summary>
+    /// <param name="locations"></param>
+    void SetLocations(IEnumerable<APLocation> locations);
 
     /// <summary>
     /// Add locations to the queue

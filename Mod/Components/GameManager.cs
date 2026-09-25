@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
 using com.seadoggie.TFWRArchipelago.Configuration;
@@ -23,17 +21,11 @@ public class GameManager : BaseComponent
 
     public event EventHandler<Notification> NewItemReceived;
 
-    private Dictionary<string, Action<Simulation>> _fillerHandlers;
-
     protected override void OnEnable()
     {
         base.OnEnable();
         Instance = this;
         TfwrConfig.SetupConfig(Plugin.Instance.Config);
-        _fillerHandlers = new Dictionary<string, Action<Simulation>>
-        {
-            { APItem.FreeHay, Filler_FreeHay }
-        };
     }
 
     private void Start()
@@ -52,115 +44,78 @@ public class GameManager : BaseComponent
 
         UIManager.Instance?.settingsGUI.ConnectionAttemptEvent += OnConnectionAttempt;
         OnDisabled += () => UIManager.Instance?.settingsGUI.ConnectionAttemptEvent -= OnConnectionAttempt;
+
+        APManager.Instance?.ItemQueue.ItemReady += OnItemReceived;
     }
 
     /// <summary>Add the connection details to the config</summary>
-    private void OnConnectionAttempt(object _, ConnectionInfo e) => TfwrConfig.ConnectionInfo = e;
+    private void OnConnectionAttempt(object _, ConnectionInfo info) => TfwrConfig.ConnectionInfo = info;
 
     /// <summary>Save the config on success</summary>
-    private void OnConnectionResult(object _, LoginResult e)
+    private void OnConnectionResult(object _, LoginResult result)
     {
-        if (!e.Successful) return;
-        TfwrConfig.Save();
+        if (result.Successful) TfwrConfig.Save();
     }
 
     private void OnAchievementUnlocked(object sender, string achievement) => UnlockHat(achievement);
 
     // Disable the interprocess communication if the mod is loaded. Sorry, no tapping here.
-    private static void OnGameLoaded(object sender, ModSaveGame e) => IpcPatch.SetRunning(e is not null);
+    private static void OnGameLoaded(object sender, ModSaveGame saveGame) => IpcPatch.SetRunning(saveGame is not null);
 
-    private static void OnGoalEvent(object sender, GoalEvent e)
+    private static void OnGoalEvent(object sender, GoalEvent goalEvent)
     {
-        if (e.GoalType == GoalType.Achievement)
+        switch (goalEvent.GoalType)
         {
-            APManager.Instance?.APService.UnlockAchievement(e.Name);
-        }
-        else
-        {
-            APManager.Instance?.APService.SubmitLocationById(e.Id);
+            case GoalType.Achievement:
+                APManager.Instance?.APService.UnlockAchievement(goalEvent.Name);
+                break;
+            case GoalType.Statistic:
+                APManager.Instance?.APService.SubmitLocationById(goalEvent.Id);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(goalEvent.GoalType), "Unknown GoalType");
         }
     }
 
-    public bool GiveItem(string itemName, int itemsReceived)
+    public void OnItemReceived(object sender, ItemReceivedData itemData)
     {
+        string itemName = itemData.ItemName;
+        int itemsReceived = itemData.ItemCount;
         GameService.Result result = GameService.CanGivePlayerItem(itemName, itemsReceived);
         switch (result)
         {
             case Service.GameService.Result.ModNotInitialized:
-                return false;
+                return;
             case Service.GameService.Result.ItemAlreadyReceived:
-                return true;
+                return;
             case Service.GameService.Result.ProcessItem:
                 ItemProcessed item = GivePlayerItem(itemName);
-                if (item.given)
+                if (item.NotificationNeeded)
                     RaiseNewItemReceived(new Notification { Title = "You received an item!", Message = itemName });
-                return item.processed;
-            case Service.GameService.Result.ItsATrap:
-                ProcessTrapItem(itemName);
-                RaiseNewItemReceived(new Notification { Title = "It's a trap!", Message = itemName });
-                return true;
+                if (item.Processed) GameService.IncrementItemCount();
+                return;
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
 
-    public void ProcessTrapItem(string itemName)
+    private class ItemProcessed(bool processed, bool notificationNeeded)
     {
-        switch (itemName)
-        {
-            case APTrapItems.RickRoll:
-                RickRoll();
-                break;
-            default:
-                _log.LogError($"Unexpected trap name: {itemName}");
-                break;
-        }
+        public bool Processed { get; set; } = processed;
+        public bool NotificationNeeded { get; set; } = notificationNeeded;
     }
 
-    private class ItemProcessed(bool processed, bool given)
-    {
-        public bool processed { get; set; } = processed;
-        public bool given { get; set; } = given;
-    }
-    
     private ItemProcessed GivePlayerItem(string itemName)
     {
         try
         {
-            if (_fillerHandlers.TryGetValue(itemName, out Action<Simulation> action))
+            if (ItemService.CanProcess(itemName))
             {
-                action.Invoke(MainSimPatch.GetMainSim());
-                return new ItemProcessed(true, true);
+                return ItemService.Process(itemName)
+                    ? new ItemProcessed(true, true)
+                    : new ItemProcessed(false, false);
             }
-            
-            string unlockName = Unlocks.ItemToUnlock(itemName);
-            if (string.IsNullOrWhiteSpace(unlockName))
-            {
-                _log.LogWarning($"Failed to find unlock item: {itemName}");
-                // Don't keep it in the queue
-                return new ItemProcessed(true, false);
-            }
-
-            Farm farm = MainSimPatch.GetMainSim()?.farm;
-            if (farm is null)
-            {
-                _log.LogError("[GivePlayerItem] Failed to find Farm.");
-                return new ItemProcessed(false, false);
-            }
-
-            int count = farm.NumUnlocked(unlockName);
-            _log.LogInfo($"Found {count} unlocked {unlockName}");
-
-            // Hopefully we do not allow for "too many" items... but I think the game handles that internally
-            farm.Unlock(unlockName, count + 1);
-            UnlockSO unlock = farm.GetUnlockOf(unlockName);
-            foreach (string unlockItemName in unlock.unlocks)
-            {
-                _log.LogInfo("  - and unlocks " + unlockItemName);
-            }
-
-            farm.UnlockAllIn(unlock);
-            return new ItemProcessed(true, true);
+            _log.LogError($"Unable to process {itemName}. Not registered?");
         }
         catch (Exception e)
         {
@@ -172,34 +127,12 @@ public class GameManager : BaseComponent
             }
 
             _log.LogInfo(e.StackTrace);
-            return new ItemProcessed(false, false);
         }
+
+        return new ItemProcessed(false, false);
     }
 
-    private void Filler_FreeHay(Simulation sim)
-    {
-        try
-        {
-            int? hayId = ResourceManager.GetAllItems().FirstOrDefault(m => m.itemName == "hay")?.itemId;
-            if (hayId is null)
-            {
-                _log.LogError($"Failed to locate {APItem.FreeHay} itemId!");
-                return;
-            }
-
-            double gifted = sim.farm.Items.GetNumber((int)hayId) * 0.2;
-            sim.farm.Items.AddItem((int)hayId, Math.Floor(gifted));
-            GoalManager.Instance?.RaiseStatEvent("hay", Math.Floor(gifted));
-        }
-        catch (Exception ex)
-        {
-            _log.LogException($"{nameof(Filler_FreeHay)}", ex);
-        }
-    }
-    
     public static string DefaultSaveName() => OptionHolder.GetString("activeSave", "Save0");
-
-    public void RickRoll() => Application.OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
 
     public void RaiseNewItemReceived(Notification notification) => NewItemReceived?.Invoke(this, notification);
 

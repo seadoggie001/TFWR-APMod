@@ -14,8 +14,8 @@ namespace com.seadoggie.TFWRArchipelago.Components;
 public class APManager : BaseComponent, IInjectable
 {
     [CanBeNull] public static APManager Instance { get; private set; }
-    
-    [Log] private readonly ILogger<APManager> _log = null!; 
+
+    [Log] private readonly ILogger<APManager> _log = null!;
     [ModInject] public readonly IAPService APService = null!;
     [ModInject] public readonly ILocationQueue LocationQueue = null!;
     [ModInject] public readonly IItemQueue ItemQueue = null!;
@@ -56,19 +56,20 @@ public class APManager : BaseComponent, IInjectable
         LocationQueue.SetLocations(locations);
         APService.SetLocations(locations);
     }
-    
+
     private void OnAPDisconnected(object sender, string e) => ItemQueue.Reset();
 
     private void Update()
     {
+        if (!Plugin.Instance.Enabled) return;
         try
         {
-            _itemQueue.Process();
+            ItemQueue.Process();
             LocationQueue.Process();
         }
         catch (Exception e)
         {
-            Log.LogException("Failed to load update locations/items", e);
+            _log.LogException("Failed to load update locations/items", e);
         }
     }
 
