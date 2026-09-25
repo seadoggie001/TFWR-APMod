@@ -131,34 +131,6 @@ public static class InjectionService
     
         return target;
     }
-
-    public static Component CreateAndInjectComponent(Type target)
-    {
-        Component created = Plugin.Instance.MainGameObject.AddComponent(target);
-        if (!created)
-        {
-            throw new Exception($"Failed to create component of type: {target.FullName}");
-        }
-
-        created = Inject(created);
-        Log.LogInfo($"Created and Injected component: {target.Name}");
-        return created;
-    }
-
-    public static T CreateAndInjectComponent<T>() where T : MonoBehaviour
-    {
-        T created = Plugin.Instance.MainGameObject.AddComponent<T>();
-        created?.enabled = false;
-        if (created is null)
-        {
-            throw new Exception($"Failed to create component of type: {typeof(T).FullName}");
-        }
-
-        created = Inject(created);
-        Log.LogInfo($"Created and Injected component: {typeof(T).Name}");
-        created.enabled = true;
-        return created;
-    }
 }
 
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
@@ -175,7 +147,7 @@ public class LogAttribute : Attribute
 /// Use this attribute to mark an object as injectable for the interface. It will be automatically registered.
 /// </summary>
 /// <remarks>Must have a parameter-less constructor</remarks>
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class InjectableAttribute(Type interfaceFor) : Attribute
 {
     public Type Interface { get; set; } = interfaceFor;

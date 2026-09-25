@@ -26,12 +26,6 @@ public class UIManager : BaseComponent
         Instance = this;
     }
 
-    public override void OnDisable()
-    {
-        OnDisabled();
-        base.OnDisable();
-    }
-
     private void Start()
     {
         GoalManager.Instance?.StatsService.GoalEvent += OnGoalEvent;
@@ -56,24 +50,23 @@ public class UIManager : BaseComponent
         OnDisabled += () => GameManager.Instance?.NewItemReceived -= NotifyItemReceived;
 
         progressGUI = new GameObject("StatGUI").AddComponent<ProgressGUI>();
+        InjectionService.Inject(progressGUI);
         progressGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
         progressGUI.Disable();
 
         floatingActionButton = new GameObject("FabGUI").AddComponent<FloatingActionButton>();
+        InjectionService.Inject(floatingActionButton);
         floatingActionButton.transform.SetParent(Plugin.Instance.MainGameObject.transform);
 
         settingsGUI = new GameObject("SettingsGUI").AddComponent<ArchipelagoSettingsGUI>();
+        InjectionService.Inject(settingsGUI);
         settingsGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
         settingsGUI.DisplayingWindow = false;
         settingsGUI.debugMode = GameManager.Instance?.TfwrConfig.Debug ?? false;
 
         notificationPopup = new GameObject("Notification").AddComponent<NotificationPopup>();
-        notificationPopup.transform.SetParent(Plugin.Instance.MainGameObject.transform);
-
-        InjectionService.Inject(progressGUI);
-        InjectionService.Inject(floatingActionButton);
-        InjectionService.Inject(settingsGUI);
         InjectionService.Inject(notificationPopup);
+        notificationPopup.transform.SetParent(Plugin.Instance.MainGameObject.transform);
     }
 
     private void OnOptionsLoaded(object sender, APOptions options)
