@@ -1,35 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using UnityEngine;
-using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
 //ToDo: Replace UnityEngine.JsonUtility and UnityEngine.Vector2Int to allow testing of the GameService
-
+[Injectable(typeof(IGameService))]
 public class GameService : IGameService
 {
     private const string FileName = "tfwrap.json";
     [CanBeNull] private ModSaveGame _modSaveGame;
+    [Log] private readonly ILogger<GameService> _log = null!;
 
     public event EventHandler<ModSaveGame> GameLoaded;
     public event EventHandler<EventArgs> PreLoadGame;
     public event EventHandler<bool> MenuOpen;
     public event EventHandler<string> GrassSanity;
-
-    private ILogger Log;
-
-    [ModInject]
-    public ILogService LogService
-    {
-        set => Log = value.CreateLog("TFWRAP.GameSvc");
-    }
 
     public static string GetFilePath(string saveName) => Path.Combine(Saver.GetPathOfSaveDirectory(saveName), FileName);
 
@@ -49,7 +40,7 @@ public class GameService : IGameService
         }
         catch (Exception ex)
         {
-            Log.LogException(nameof(SaveProgress), ex);
+            _log.LogException(nameof(SaveProgress), ex);
         }
     }
 
@@ -82,7 +73,7 @@ public class GameService : IGameService
         }
         catch (Exception e)
         {
-            Log.LogException("Failed to load data", e);
+            _log.LogException("Failed to load data", e);
         }
     }
 
@@ -90,14 +81,14 @@ public class GameService : IGameService
     {
         if (_modSaveGame is null)
         {
-            Log.LogError($"Failed to give {itemName} because the ModSaveGame isn't loaded yet");
+            _log.LogError($"Failed to give {itemName} because the ModSaveGame isn't loaded yet");
             return Result.ModNotInitialized;
         }
 
         // If we've previously received this item
         if (itemsReceived < _modSaveGame.ItemsReceived) return Result.ItemAlreadyReceived;
 
-        Log.LogInfo("Only unlocked " + _modSaveGame.ItemsReceived);
+        _log.LogInfo("Only unlocked " + _modSaveGame.ItemsReceived);
         _modSaveGame.ItemsReceived += 1;
 
         return APTrapItems.AllTrapItems.ToList().Contains(itemName)
@@ -115,7 +106,7 @@ public class GameService : IGameService
             }
             catch (Exception ex)
             {
-                Log.LogException(nameof(RaiseMenuOpen), ex);
+                _log.LogException(nameof(RaiseMenuOpen), ex);
             }
         });
     }
@@ -135,7 +126,7 @@ public class GameService : IGameService
             }
             catch (Exception ex)
             {
-                Log.LogException(nameof(RaiseGrassSanity), ex);
+                _log.LogException(nameof(RaiseGrassSanity), ex);
             }
         });
     }

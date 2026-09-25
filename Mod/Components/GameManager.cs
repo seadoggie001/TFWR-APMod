@@ -4,32 +4,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
 using com.seadoggie.TFWRArchipelago.Configuration;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Patches;
 using com.seadoggie.TFWRArchipelago.Service;
-using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
-using UnityEngine;
-using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
+using Microsoft.Extensions.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
 public class GameManager : BaseComponent
 {
     [CanBeNull] public static GameManager Instance;
-
-    [ModInject]
-    public ILogService LogService
-    {
-        set => Log = value.CreateLog("TFWRAP.GameMgr");
-    }
-
-    private ILogger Log;
+    [Log] private readonly ILogger<GameManager> _log = null!;
+    [ModInject] public readonly IGameService GameService = null!;
+    [ModInject] public readonly IItemService ItemService = null!;
 
     public readonly TfwrConfig TfwrConfig = new();
-
-    public IGameService GameService;
 
     public event EventHandler<Notification> NewItemReceived;
 
@@ -40,7 +30,6 @@ public class GameManager : BaseComponent
         base.OnEnable();
         Instance = this;
         TfwrConfig.SetupConfig(Plugin.Instance.Config);
-        GameService = InjectionService.Inject(new GameService());
         _fillerHandlers = new Dictionary<string, Action<Simulation>>
         {
             { APItem.FreeHay, Filler_FreeHay }
@@ -123,7 +112,7 @@ public class GameManager : BaseComponent
                 RickRoll();
                 break;
             default:
-                Log.LogError($"Unexpected trap name: {itemName}");
+                _log.LogError($"Unexpected trap name: {itemName}");
                 break;
         }
     }
@@ -147,7 +136,7 @@ public class GameManager : BaseComponent
             string unlockName = Unlocks.ItemToUnlock(itemName);
             if (string.IsNullOrWhiteSpace(unlockName))
             {
-                Log.LogWarning($"Failed to find unlock item: {itemName}");
+                _log.LogWarning($"Failed to find unlock item: {itemName}");
                 // Don't keep it in the queue
                 return new ItemProcessed(true, false);
             }
@@ -155,19 +144,19 @@ public class GameManager : BaseComponent
             Farm farm = MainSimPatch.GetMainSim()?.farm;
             if (farm is null)
             {
-                Log.LogError("[GivePlayerItem] Failed to find Farm.");
+                _log.LogError("[GivePlayerItem] Failed to find Farm.");
                 return new ItemProcessed(false, false);
             }
 
             int count = farm.NumUnlocked(unlockName);
-            Log.LogInfo($"Found {count} unlocked {unlockName}");
+            _log.LogInfo($"Found {count} unlocked {unlockName}");
 
             // Hopefully we do not allow for "too many" items... but I think the game handles that internally
             farm.Unlock(unlockName, count + 1);
             UnlockSO unlock = farm.GetUnlockOf(unlockName);
             foreach (string unlockItemName in unlock.unlocks)
             {
-                Log.LogInfo("  - and unlocks " + unlockItemName);
+                _log.LogInfo("  - and unlocks " + unlockItemName);
             }
 
             farm.UnlockAllIn(unlock);
@@ -175,14 +164,14 @@ public class GameManager : BaseComponent
         }
         catch (Exception e)
         {
-            Log.LogInfo("GivePlayerItem");
-            Log.LogError(e.Message);
+            _log.LogInfo("GivePlayerItem");
+            _log.LogError(e.Message);
             if (e.InnerException != null)
             {
-                Log.LogError(e.InnerException.Message);
+                _log.LogError(e.InnerException.Message);
             }
 
-            Log.LogInfo(e.StackTrace);
+            _log.LogInfo(e.StackTrace);
             return new ItemProcessed(false, false);
         }
     }
@@ -194,7 +183,7 @@ public class GameManager : BaseComponent
             int? hayId = ResourceManager.GetAllItems().FirstOrDefault(m => m.itemName == "hay")?.itemId;
             if (hayId is null)
             {
-                Log.LogError($"Failed to locate {APItem.FreeHay} itemId!");
+                _log.LogError($"Failed to locate {APItem.FreeHay} itemId!");
                 return;
             }
 
@@ -204,7 +193,7 @@ public class GameManager : BaseComponent
         }
         catch (Exception ex)
         {
-            Log.LogException($"{nameof(Filler_FreeHay)}", ex);
+            _log.LogException($"{nameof(Filler_FreeHay)}", ex);
         }
     }
     
@@ -226,18 +215,15 @@ public class GameManager : BaseComponent
         if (hatName == null) return;
 
         HatSO hat = ResourceManager.GetHat(hatName);
-        if (hat is null) Log.LogError($"Failed to find hat: {hatName}");
+        if (hat is null) _log.LogError($"Failed to find hat: {hatName}");
 
         MainSim.Inst.UnlockHat(hat);
     }
 
-    public void Load()
-    {
-        Task.Run(() => { GameService.Load(DefaultSaveName()); });
-    }
+    public void Load() => Task.Run(() => { GameService.Load(DefaultSaveName()); });
 
-    public void SaveProgress()
+    public void SaveProgress() => Task.Run(() =>
     {
-        Task.Run(() => { GameService.SaveProgress(GoalManager.Instance?.UserStatsSave(), DefaultSaveName()); });
-    }
+        GameService.SaveProgress(GoalManager.Instance?.UserStatsSave(), DefaultSaveName());
+    });
 }

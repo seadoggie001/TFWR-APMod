@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Service;
+using Microsoft.Extensions.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Model;
 
 public class APOptions
 {
-    [ModInject] private ILogger Logger { get; set; }
+    [ModInject] private ILogger<APOptions> Logger { get; set; }
 
     public readonly Dictionary<double, double> ModifiedValues = [];
 

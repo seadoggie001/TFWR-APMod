@@ -1,33 +1,53 @@
 using System;
 using BepInEx.Logging;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace com.seadoggie.TFWRArchipelago.Logging;
 
 /// <inheritdoc />
-public class PluginLogger(ManualLogSource manualLogSource) : ILogger
+public class PluginLogger : ILogger
 {
-    public void Log(LogLevel level, object data) => manualLogSource.Log(level, data);
-
-    public void LogFatal(object data) => Log(LogLevel.Fatal, data);
-
-    public void LogError(object data) => Log(LogLevel.Error, data);
-
-    public void LogWarning(object data) => Log(LogLevel.Warning, data);
-
-    public void LogMessage(object data) => Log(LogLevel.Message, data);
-
-    public void LogInfo(object data) => Log(LogLevel.Info, data);
-
-    public void LogDebug(object data) => Log(LogLevel.Debug, data);
+    private readonly ManualLogSource _source;
     
-    public void LogException(string message, [CanBeNull] Exception ex = null)
+    public PluginLogger(string name)
     {
-        string exceptionMessage = $"{message}";
-        if (ex != null) exceptionMessage += $" [{ex.GetType().Name}] {ex.Message}\n{ex.StackTrace}";
-        if (ex is { InnerException: not null }) exceptionMessage += $"\n\t[InnerException] Message: {ex.InnerException.Message}\n{ex.InnerException.StackTrace}";
-        LogError(exceptionMessage);
+        _source = BepInEx.Logging.Logger.CreateLogSource(name);
     }
 
-    public void Dispose() => manualLogSource.Dispose();
+    public IDisposable BeginScope<TState>(TState state)
+        where TState : notnull => null!;
+    
+    public bool IsEnabled(LogLevel logLevel) => true;
+
+    public void Log<TState>(
+        LogLevel logLevel,
+        EventId eventId,
+        TState state,
+        Exception exception,
+        Func<TState, Exception, string> formatter)
+    {
+        if (!IsEnabled(logLevel)) return;
+        switch (logLevel)
+        {
+            case LogLevel.Trace:
+            case LogLevel.Debug:
+                break;
+            case LogLevel.Information:
+                _source.LogInfo(formatter.Invoke(state, exception));
+                break;
+            case LogLevel.Warning:
+                _source.LogWarning(formatter.Invoke(state, exception));
+                break;
+            case LogLevel.Error:
+            case LogLevel.Critical:
+                _source.LogError(formatter.Invoke(state, exception));
+                break;
+            case LogLevel.None:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
+        }
+    }
 }

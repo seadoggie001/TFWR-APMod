@@ -1,23 +1,16 @@
 using System.Collections;
 using System.Collections.Concurrent;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Service;
+using Microsoft.Extensions.Logging;
 using UnityEngine;
 using UnityEngine.UIElements;
-using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
 
 public class NotificationPopup : BaseGUI
 {
-    [ModInject]
-    public ILogService LogService
-    {
-        set => Log = value.CreateLog("TFWRAP.UI-Notif");
-    }
-
-    private ILogger Log;
+    [Log] private readonly ILogger<NotificationPopup> _log = null!;
     private const string TransitionClassName = "expanded";
     private UIDocument _uiDocument;
     private VisualElement _rootElement;
@@ -39,19 +32,19 @@ public class NotificationPopup : BaseGUI
         PanelSettings settings = Resources.PanelSettings;
         if (settings is null)
         {
-            Log.LogException("Failed to actually load PanelSettings!");
+            _log.LogError("Failed to actually load PanelSettings!");
             return;
         }
 
         ThemeStyleSheet themeStyleSheet = Resources.ThemeStyleSheet;
-        if (themeStyleSheet is null) Log.LogException("Failed to load ThemeStyleSheet!");
+        if (themeStyleSheet is null) _log.LogError("Failed to load ThemeStyleSheet!");
 
         settings.themeStyleSheet = themeStyleSheet;
         _uiDocument.panelSettings = settings;
         _rootElement = _uiDocument.rootVisualElement;
 
         StyleSheet styleSheet = Resources.AchievementStyleSheet;
-        if (styleSheet is null) Log.LogException("Failed to load StyleSheet!");
+        if (styleSheet is null) _log.LogError("Failed to load StyleSheet!");
 
         _rootElement.styleSheets.Add(styleSheet);
 

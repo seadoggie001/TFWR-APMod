@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
+using Microsoft.Extensions.Logging;
+using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
@@ -10,8 +12,11 @@ namespace com.seadoggie.TFWRArchipelago.Service;
 /// Queues received Archipelago items until the mod is ready to process them  
 /// </summary>
 /// <param name="processItemCallback"></param>
+[Injectable(typeof(IItemQueue))]
 public class ItemQueue(Func<string, int, bool> processItemCallback) : IItemQueue
 {
+    [Log] private readonly ILogger<ItemQueue> _log = null!;
+
     private int _itemsReceived;
     private readonly List<string> _itemQueue = [];
 

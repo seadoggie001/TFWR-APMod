@@ -1,12 +1,11 @@
 using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
 using com.seadoggie.TFWRArchipelago.UI;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using UnityEngine;
-using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
@@ -14,13 +13,7 @@ public class UIManager : BaseComponent
 {
     [CanBeNull] public static UIManager Instance;
 
-    [ModInject]
-    public ILogService LogService
-    {
-        set => Log = value.CreateLog("TFWRAP.UIMgr");
-    }
-
-    private ILogger Log;
+    [Log] private readonly ILogger<UIManager> _log = null!;
 
     public ProgressGUI progressGUI;
     public ArchipelagoSettingsGUI settingsGUI;

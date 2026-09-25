@@ -2,26 +2,20 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
 using HarmonyLib;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using UnityEngine;
 using UnityEngine.UIElements;
-using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
 
 public class ProgressGUI : BaseGUI
 {
-    [ModInject]
-    public ILogService LogService
-    {
-        set => Log = value.CreateLog("TFWRAP.ProgGUI");
-    }
-    private ILogger Log;
+    [Log] private readonly ILogger<ProgressGUI> _log = null!;
     private const float RefreshRate = 2.0f; // Every 2 seconds
 
     private UIDocument _uiDocument;
@@ -50,6 +44,7 @@ public class ProgressGUI : BaseGUI
 
     /// <summary>Used to signal the UI should be rebuilt</summary>
     private bool _reload = false;
+
     private UpdateInformation _updateInformation;
 
     private class UpdateInformation
@@ -91,7 +86,7 @@ public class ProgressGUI : BaseGUI
     public override void Awake()
     {
         base.Awake();
-        Log.LogInfo("Initializing Statistics GUI");
+        _log.LogInfo("Initializing Statistics GUI");
 
         // Create the GUI and setup styles
         Initialize();
@@ -128,7 +123,7 @@ public class ProgressGUI : BaseGUI
             return;
         }
 
-        Log.LogWarning("There are no statistics matching: " + key);
+        _log.LogWarning("There are no statistics matching: " + key);
     }
 
     public void MarkCompleted(string key)
@@ -139,7 +134,7 @@ public class ProgressGUI : BaseGUI
             return;
         }
 
-        Log.LogError("There are no achievements matching: " + key);
+        _log.LogError("There are no achievements matching: " + key);
     }
 
     public override bool IsMouseOverWindow() =>
@@ -157,9 +152,9 @@ public class ProgressGUI : BaseGUI
         Dictionary<string, double> stats,
         IEnumerable<APLocation> allLocations)
     {
-        if (groupedMilestones is null) Log.LogWarning("GroupedMilestones is null");
-        if (stats is null) Log.LogWarning("Stats is null");
-        if (allLocations is null) Log.LogWarning("AllLocations is null");
+        if (groupedMilestones is null) _log.LogWarning("GroupedMilestones is null");
+        if (stats is null) _log.LogWarning("Stats is null");
+        if (allLocations is null) _log.LogWarning("AllLocations is null");
 
         // Save the information needed for a reload
         _updateInformation = new UpdateInformation
@@ -243,16 +238,16 @@ public class ProgressGUI : BaseGUI
         _uiDocument = root.AddComponent<UIDocument>();
 
         PanelSettings settings = Resources.PanelSettings;
-        if (settings is null) Log.LogException("Failed to actually load PanelSettings!");
+        if (settings is null) _log.LogError("Failed to actually load PanelSettings!");
 
         ThemeStyleSheet themeStyleSheet = Resources.ThemeStyleSheet;
-        if (themeStyleSheet is null) Log.LogException("Failed to load ThemeStyleSheet!");
+        if (themeStyleSheet is null) _log.LogError("Failed to load ThemeStyleSheet!");
 
         settings?.themeStyleSheet = themeStyleSheet;
         _uiDocument.panelSettings = settings;
 
         StyleSheet styleSheet = Resources.AchievementStyleSheet;
-        if (styleSheet is null) Log.LogException("Failed to load StyleSheet!");
+        if (styleSheet is null) _log.LogError("Failed to load StyleSheet!");
 
         _uiDocument.rootVisualElement.styleSheets.Add(styleSheet);
         RootElement = _uiDocument.rootVisualElement;
@@ -517,7 +512,7 @@ public class ProgressGUI : BaseGUI
         {
             foreach (KeyValuePair<double, double> modifiedValue in modifiedValues)
             {
-                foreach (Row row in _rows.Where(m => 
+                foreach (Row row in _rows.Where(m =>
                              m.Milestone != null && Math.Abs(m.Milestone.BaseNumber - modifiedValue.Key) < 1))
                 {
                     row.UpdateProgress(null, modifiedValue.Value);
@@ -526,7 +521,7 @@ public class ProgressGUI : BaseGUI
         }
         catch (Exception ex)
         {
-            Log.LogException("Failed to update values", ex);
+            _log.LogException("Failed to update values", ex);
         }
     }
 

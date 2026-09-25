@@ -3,27 +3,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
-public class APManager : BaseComponent
+public class APManager : BaseComponent, IInjectable
 {
     [CanBeNull] public static APManager Instance { get; private set; }
-    [ModInject]
-    public ILogService LogService
-    {
-        set => Log = value.CreateLog("TFWRAP.APMgr");
-    }
-    private ILogger Log;
-
-    public IAPService APService;
-    public ILocationQueue LocationQueue;
-    private IItemQueue _itemQueue;
+    
+    [Log] private readonly ILogger<APManager> _log = null!; 
+    [ModInject] public readonly IAPService APService = null!;
+    [ModInject] public readonly ILocationQueue LocationQueue = null!;
+    [ModInject] public readonly IItemQueue ItemQueue = null!;
 
     private IEnumerable<APLocation> _apLocations;
 
@@ -31,13 +26,6 @@ public class APManager : BaseComponent
     {
         base.OnEnable();
         Instance = this;
-        _apLocations = InitializeLocations();
-        List<APLocation> locations = _apLocations.ToList();
-        APService = InjectionService.Inject(new APService(locations));
-        LocationQueue = InjectionService.Inject(new LocationQueue(locations));
-        _itemQueue = new ItemQueue((itemName, itemsReceived) =>
-            GameManager.Instance?.GiveItem(itemName, itemsReceived) ?? false);
-        InjectionService.Inject(_itemQueue);
     }
 
     private void Start()
@@ -53,15 +41,23 @@ public class APManager : BaseComponent
 
         UIManager.Instance?.settingsGUI.ConnectionAttemptEvent += OnConnectionAttemptEvent;
         OnDisabled += () => UIManager.Instance?.settingsGUI.ConnectionAttemptEvent -= OnConnectionAttemptEvent;
-        
+
         UIManager.Instance?.settingsGUI.DisconnectRequestEvent += APService.Disconnect;
         OnDisabled += () => UIManager.Instance?.settingsGUI.DisconnectRequestEvent -= APService.Disconnect;
-        
+
         APService.APDisconnected += OnAPDisconnected;
         OnDisabled += () => APService.APDisconnected -= OnAPDisconnected;
     }
 
-    private void OnAPDisconnected(object sender, string e) => _itemQueue.Reset();
+    public void OnInject()
+    {
+        _apLocations = InitializeLocations();
+        List<APLocation> locations = _apLocations.ToList();
+        LocationQueue.SetLocations(locations);
+        APService.SetLocations(locations);
+    }
+    
+    private void OnAPDisconnected(object sender, string e) => ItemQueue.Reset();
 
     private void Update()
     {
@@ -79,7 +75,7 @@ public class APManager : BaseComponent
     private void OnGrassSanity(object sender, string grassCoords) => APService.SubmitGrass(grassCoords);
 
     private void OnConnectionAttemptEvent(object sender, ConnectionInfo e) =>
-        APService.TryEnableAsync(e, LocationQueue, _itemQueue);
+        APService.TryEnableAsync(e, LocationQueue, ItemQueue);
 
     public IEnumerable<APLocation> GetLocations() => _apLocations;
 
@@ -93,12 +89,12 @@ public class APManager : BaseComponent
             string folderPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
             string locationText = File.ReadAllText(Path.Combine(folderPath, "locations.json"));
             List<APLocation> locationData = JsonConvert.DeserializeObject<List<APLocation>>(locationText);
-            Log.LogInfo($"Loaded {locationData.Count} locations");
+            _log.LogInformation($"Loaded {locationData.Count} locations");
             return locationData;
         }
         catch (Exception e)
         {
-            Log.LogException("Failed to load APLocation data", e);
+            _log.LogException("Failed to load APLocation data", e);
             return [];
         }
     }

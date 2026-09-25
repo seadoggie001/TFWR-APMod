@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
@@ -12,20 +12,14 @@ namespace com.seadoggie.TFWRArchipelago.Components;
 public class GoalManager : BaseComponent
 {
     [CanBeNull] public static GoalManager Instance;
-    [ModInject]
-    public ILogService LogService
-    {
-        set => Log = value.CreateLog("TFWRAP.GoalMgr");
-    }
-    private ILogger Log;
-    
-    public IStatsService StatsService;
+
+    [Log] private readonly ILogger<GoalManager> _log = null!;
+    [ModInject] public readonly IStatsService StatsService = null!;
 
     protected override void OnEnable()
     {
         base.OnEnable();
         Instance = this;
-        StatsService = InjectionService.Inject(new StatsService());
     }
 
     private void Start()
@@ -34,10 +28,10 @@ public class GoalManager : BaseComponent
 
         StatEvent += OnStatEvent;
         OnDisabled += () => StatEvent -= OnStatEvent;
-        
+
         APManager.Instance?.APService.OptionsLoaded += OnConnectionResult;
         OnDisabled += () => APManager.Instance?.APService.OptionsLoaded -= OnConnectionResult;
-        
+
         APManager.Instance?.APService.APDisconnected += OnAPDisconnected;
         OnDisabled += () => APManager.Instance?.APService.APDisconnected -= OnAPDisconnected;
 
@@ -64,7 +58,7 @@ public class GoalManager : BaseComponent
             }
             catch (Exception ex)
             {
-                Log.LogException(nameof(RaiseStatEvent), ex);
+                _log.LogException(nameof(RaiseStatEvent), ex);
             }
         });
     }

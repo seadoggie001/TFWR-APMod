@@ -1,24 +1,17 @@
 using System;
 using com.seadoggie.TFWRArchipelago.Components;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Service;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using UnityEngine;
 using UnityEngine.UIElements;
-using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
 
 public class FloatingActionButton : BaseGUI
 {
-    [ModInject]
-    public ILogService LogService
-    {
-        set => Log = value.CreateLog("TFWRAP.UI-FAB");
-    }
-
-    private ILogger Log;
+    [Log] private readonly ILogger<FloatingActionButton> _log = null!;
     private UIDocument _uiDocument;
     private VisualElement _rootElement;
     private VisualElement _fab;
@@ -27,7 +20,7 @@ public class FloatingActionButton : BaseGUI
 
     private void Start()
     {
-        Log.LogInfo("Awaking FAB");
+        _log.LogInfo("Awaking FAB");
 
         // Create the GUI and setup styles
         Initialize();
@@ -49,7 +42,7 @@ public class FloatingActionButton : BaseGUI
 
     private void Initialize()
     {
-        Log.LogInfo("Initializing FAB");
+        _log.LogInfo("Initializing FAB");
         GameObject root = new("TFWRAP-FAB");
         DontDestroyOnLoad(root);
 
@@ -58,19 +51,19 @@ public class FloatingActionButton : BaseGUI
         PanelSettings settings = Resources.PanelSettings;
         if (settings is null)
         {
-            Log.LogException("Failed to actually load PanelSettings!");
+            _log.LogError("Failed to actually load PanelSettings!");
             return;
         }
 
         ThemeStyleSheet themeStyleSheet = Resources.ThemeStyleSheet;
-        if (themeStyleSheet is null) Log.LogException("Failed to load ThemeStyleSheet!");
+        if (themeStyleSheet is null) _log.LogError("Failed to load ThemeStyleSheet!");
 
         settings.themeStyleSheet = themeStyleSheet;
         _uiDocument.panelSettings = settings;
         _rootElement = _uiDocument.rootVisualElement;
 
         StyleSheet styleSheet = Resources.AchievementStyleSheet;
-        if (styleSheet is null) Log.LogException("Failed to load StyleSheet!");
+        if (styleSheet is null) _log.LogError("Failed to load StyleSheet!");
 
         _rootElement.styleSheets.Add(styleSheet);
 
@@ -99,12 +92,12 @@ public class FloatingActionButton : BaseGUI
         _overlayIcon.AddToClassList("icon-modifier");
         icon.Add(_overlayIcon);
 
-        Log.LogInfo("Completed initializing FAB");
+        _log.LogInfo("Completed initializing FAB");
     }
 
     private void Clicked(PointerDownEvent _)
     {
-        Log.LogInfo("Clicked FAB");
+        _log.LogInfo("Clicked FAB");
         UIManager.Instance?.OpenConnectionSettings();
     }
 

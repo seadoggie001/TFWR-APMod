@@ -5,8 +5,8 @@ using com.seadoggie.TFWRArchipelago.Functions;
 using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Service;
 using HarmonyLib;
+using Microsoft.Extensions.Logging;
 using UnityEngine;
-using ILogger = com.seadoggie.TFWRArchipelago.Logging.ILogger;
 
 namespace com.seadoggie.TFWRArchipelago;
 
@@ -17,8 +17,8 @@ public class Plugin : BaseUnityPlugin
     public static Plugin Instance { get; private set; } = null!;
     public GameObject MainGameObject { get; private set; }
 
-    private static readonly ILogService LogService = new LogService();
-    public static readonly ILogger Log = LogService.CreateLog("TFWRAP.Main");
+    public static ILoggerFactory LogFactory;
+    public static ILogger<Plugin> Log;
 
     private readonly Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
 
@@ -30,18 +30,28 @@ public class Plugin : BaseUnityPlugin
     private void Awake()
     {
         Instance = this;
-
-        // Use field dependency injection (for testing and my sanity)
-        InjectionService.Register(typeof(ILogService), LogService);
-        InjectionService.Register(typeof(ILogger), Log);
-        InjectionService.Register(typeof(IEnabledService), new EnabledService());
-
+        
+        try
+        {
+            LogFactory = new LoggerFactory([new PluginLoggerProvider()]);
+            Log = LogFactory.CreateLogger<Plugin>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("[TFWRAP] Failed to create Log");
+            Console.WriteLine($"Exception Message {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
+            return;
+        }
+        
+        InjectionService.AutomaticRegistration();
+        
         // Create Managers
         MainGameObject = new GameObject("Archipelago");
-        MainGameObject.AddComponent<UIManager>();
-        MainGameObject.AddComponent<APManager>();
-        MainGameObject.AddComponent<GoalManager>();
-        MainGameObject.AddComponent<GameManager>();
+        InjectionService.CreateAndInjectComponent<UIManager>();
+        InjectionService.CreateAndInjectComponent<APManager>();
+        InjectionService.CreateAndInjectComponent<GoalManager>();
+        InjectionService.CreateAndInjectComponent<GameManager>();
 
         // Apply game patches
         try
@@ -51,11 +61,11 @@ public class Plugin : BaseUnityPlugin
         }
         catch (Exception e)
         {
-            Log.LogException($"Plugin {MyPluginInfo.PLUGIN_GUID} failed to load properly! Harmony patch issues.", e);
+            Log.LogError($"Plugin {MyPluginInfo.PLUGIN_GUID} failed to load properly! Harmony patch issues.", e);
             return;
         }
 
-        Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running version {MyPluginInfo.PLUGIN_VERSION}");
+        Log.LogInformation($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running version {MyPluginInfo.PLUGIN_VERSION}");
     }
 
     private void Start()

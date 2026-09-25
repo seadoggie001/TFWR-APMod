@@ -24,6 +24,7 @@
         <PackageReference Include="BepInEx.Core" Version="5.*" PrivateAssets="all" />
         <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" PrivateAssets="all" />
         <PackageReference Include="DroneLib" Version="0.0.0-20260918-0314" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.12" />
         <PackageReference Include="UnityEngine.Modules" Version="2021.3.5" PrivateAssets="all"  />
     </ItemGroup>
 

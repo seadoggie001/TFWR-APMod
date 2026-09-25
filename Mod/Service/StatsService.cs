@@ -1,27 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
 /// <summary>
 /// A Stat tracking implementation to enable custom statistics
 /// </summary>
+[Injectable(typeof(IStatsService))]
 public class StatsService : IStatsService
 {
-    [ModInject]
-    // ReSharper disable once UnusedMember.Local
-    private ILogService LogService
-    {
-        set => Log = value.CreateLog("TFWRAP.StatsService");
-    }
-
+    [Log] private readonly ILogger<StatsService> _log = null!;
     [ModInject] private IEnabledService EnabledService { get; set; }
-
-    private ILogger Log { get; set; }
 
     /// <summary>
     /// The statistics being tracked
@@ -58,7 +51,7 @@ public class StatsService : IStatsService
     /// </summary>
     public void Initialize(IEnumerable<APLocation> locations)
     {
-        Log.LogInfo("Initializing statistics...");
+        _log.LogInfo("Initializing statistics...");
         // For each location with a statistic
         foreach (APLocation location in locations?.Where(m => m.statistic != null) ?? [])
         {
@@ -90,7 +83,7 @@ public class StatsService : IStatsService
             // Log.LogInfo($"Stat: {location.statistic.key} Value: {value}");
         }
 
-        Log.LogInfo("Tracking stats for: " + string.Join(", ", _milestones.Keys));
+        _log.LogInfo("Tracking stats for: " + string.Join(", ", _milestones.Keys));
     }
 
     public void Stop() => _canRaiseStatisticEvents = false;
@@ -111,7 +104,7 @@ public class StatsService : IStatsService
         }
         catch (Exception e)
         {
-            Log.LogException("UserStats.Add Error", e);
+            _log.LogException("UserStats.Add Error", e);
             return;
         }
 
@@ -175,7 +168,7 @@ public class StatsService : IStatsService
     {
         if (!EnabledService.PluginIsEnabled())
         {
-            Log.LogWarning("Not tracking stats, currently disabled");
+            _log.LogWarning("Not tracking stats, currently disabled");
             return;
         }
 
@@ -184,14 +177,14 @@ public class StatsService : IStatsService
         // Find the milestone
         if (!_milestones.TryGetValue(stat, out List<Milestone> milestones))
         {
-            Log.LogWarning($"Tracking Stats, but found nothing for {stat}!");
+            _log.LogWarning($"Tracking Stats, but found nothing for {stat}!");
             return;
         }
 
         // ignore if it's empty
         if (milestones is null || !milestones.Any())
         {
-            Log.LogException($"Found a really weird milestone! Stat for {stat} but the value is null or empty list?");
+            _log.LogError($"Found a really weird milestone! Stat for {stat} but the value is null or empty list?");
             return;
         }
 
@@ -202,7 +195,7 @@ public class StatsService : IStatsService
         {
             // If it's too much, stop checking
             if (milestone.Target > count) break;
-            Log.LogInfo(
+            _log.LogInfo(
                 $"Found achievement! Stat: {stat} Location: {milestone.Location} Achievement: {milestone.Achievement}");
             // Grant the achievement or location
             GoalEvent?.Invoke(this, !string.IsNullOrWhiteSpace(milestone.Achievement)

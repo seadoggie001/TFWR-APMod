@@ -2,21 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Model;
+using Microsoft.Extensions.Logging;
+using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
 /// <inheritdoc/>
+[Injectable(typeof(ILocationQueue))]
 public class LocationQueue(IEnumerable<APLocation> allLocations) : ILocationQueue
 {
-    [ModInject]
-    private ILogService LogSource
-    {
-        set => Log = value.CreateLog("TFWRAP.LocQ");
-    }
-
-    private ILogger Log;
+    [Log] private readonly ILogger<LocationQueue> _log = null!;
     private readonly HashSet<long> _locationQueue = [];
 
     public event EventHandler<APLocation> APLocationGiven;
@@ -45,7 +41,7 @@ public class LocationQueue(IEnumerable<APLocation> allLocations) : ILocationQueu
 
             if (apLocation is null)
             {
-                Log.LogException($"Failed to find AP Location with ID: {location}");
+                _log.LogException($"Failed to find AP Location with ID: {location}");
                 return false;
             }
 
@@ -55,13 +51,13 @@ public class LocationQueue(IEnumerable<APLocation> allLocations) : ILocationQueu
         }
         catch (Exception e)
         {
-            Log.LogError(e.Message);
+            _log.LogError(e.Message);
             if (e.InnerException != null)
             {
-                Log.LogError(e.InnerException.Message);
+                _log.LogError(e.InnerException.Message);
             }
 
-            Log.LogInfo(e.StackTrace);
+            _log.LogInfo(e.StackTrace);
             return false;
         }
     }
