@@ -29,8 +29,8 @@ public class GoalManager : BaseComponent
         StatEvent += OnStatEvent;
         OnDisabled += () => StatEvent -= OnStatEvent;
 
-        APManager.Instance?.APService.OptionsLoaded += OnConnectionResult;
-        OnDisabled += () => APManager.Instance?.APService.OptionsLoaded -= OnConnectionResult;
+        APManager.Instance?.APService.OptionsLoaded += OnOptionsLoaded;
+        OnDisabled += () => APManager.Instance?.APService.OptionsLoaded -= OnOptionsLoaded;
 
         APManager.Instance?.APService.APDisconnected += OnAPDisconnected;
         OnDisabled += () => APManager.Instance?.APService.APDisconnected -= OnAPDisconnected;
@@ -41,7 +41,7 @@ public class GoalManager : BaseComponent
 
     private void OnAPDisconnected(object sender, string e) => StatsService.Stop();
 
-    private void OnConnectionResult(object _, APOptions apOptions) => StatsService.LoadOptions(apOptions);
+    private void OnOptionsLoaded(object _, APOptions apOptions) => StatsService.LoadOptions(apOptions);
 
     /// <summary>
     /// Raised to add a value to a stat
@@ -65,10 +65,10 @@ public class GoalManager : BaseComponent
 
     public List<KeyValuePair<string, double>> UserStatsSave() => StatsService.Save();
 
-    private void OnGameLoaded(object _, ModSaveGame e)
+    private void OnGameLoaded(object _, ModSaveGame modSaveGame)
     {
         StatsService.Stop();
-        StatsService.Load(e?.Statistics);
+        StatsService.Load(modSaveGame?.Statistics);
     }
 
     private void OnStatEvent(object _, Stat e) => StatsService.Add(e.Name, e.Value);

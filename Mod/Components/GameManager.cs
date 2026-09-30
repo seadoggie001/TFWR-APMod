@@ -46,7 +46,14 @@ public class GameManager : BaseComponent
         OnDisabled += () => UIManager.Instance?.settingsGUI.ConnectionAttemptEvent -= OnConnectionAttempt;
 
         APManager.Instance?.ItemQueue.ItemReady += OnItemReceived;
+        OnDisabled += () => APManager.Instance?.ItemQueue.ItemReady -= OnItemReceived;
+
+        APManager.Instance?.APService.OptionsLoaded += OnOptionsLoaded;
+        OnDisabled += () => APManager.Instance?.APService.OptionsLoaded -= OnOptionsLoaded;
     }
+
+    private static void OnOptionsLoaded(object sender, APOptions options) =>
+        ResourceManagerPatch.ManipulateCropCosts(options.CropCosts);
 
     /// <summary>Add the connection details to the config</summary>
     private void OnConnectionAttempt(object _, ConnectionInfo info) => TfwrConfig.ConnectionInfo = info;
@@ -60,7 +67,12 @@ public class GameManager : BaseComponent
     private void OnAchievementUnlocked(object sender, string achievement) => UnlockHat(achievement);
 
     // Disable the interprocess communication if the mod is loaded. Sorry, no tapping here.
-    private static void OnGameLoaded(object sender, ModSaveGame saveGame) => IpcPatch.SetRunning(saveGame is not null);
+    private static void OnGameLoaded(object sender, ModSaveGame saveGame)
+    {
+        IpcPatch.SetRunning(saveGame is not null);
+        if (saveGame?.Options?.CropCosts is not null)
+            ResourceManagerPatch.ManipulateCropCosts(saveGame.Options.CropCosts);
+    }
 
     private static void OnGoalEvent(object sender, GoalEvent goalEvent)
     {
@@ -115,6 +127,7 @@ public class GameManager : BaseComponent
                     ? new ItemProcessed(true, true)
                     : new ItemProcessed(false, false);
             }
+
             _log.LogError($"Unable to process {itemName}. Not registered?");
         }
         catch (Exception e)
@@ -157,6 +170,9 @@ public class GameManager : BaseComponent
 
     public void SaveProgress() => Task.Run(() =>
     {
-        GameService.SaveProgress(GoalManager.Instance?.UserStatsSave(), DefaultSaveName());
+        GameService.SaveProgress(
+            GoalManager.Instance?.UserStatsSave(),
+            APManager.Instance?.APService.GetOptions(),
+            DefaultSaveName());
     });
 }

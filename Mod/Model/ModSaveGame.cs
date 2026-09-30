@@ -23,4 +23,9 @@ public class ModSaveGame
     /// Grass sanity items completed
     /// </summary>
     public HashSet<Position> Grass { get; set; } = [];
+
+    /// <summary>
+    /// Include Options to support offline play
+    /// </summary>
+    public APOptions Options { get; set; }
 }

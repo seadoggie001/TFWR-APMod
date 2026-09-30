@@ -27,12 +27,15 @@ public class GameService : IGameService
     /// Saves the current stats of the game
     /// </summary>
     /// <param name="statistics"></param>
+    /// <param name="options"></param>
     /// <param name="fileName"></param>
-    public void SaveProgress(List<KeyValuePair<string, double>> statistics, string fileName)
+    public void SaveProgress(List<KeyValuePair<string, double>> statistics, APOptions options, string fileName)
     {
         try
         {
-            _modSaveGame?.Statistics = statistics;
+            if (_modSaveGame is null) throw new Exception("Cannot save the game, modded save file is null");
+            if (statistics is not null) _modSaveGame.Statistics = statistics;
+            if (options is not null) _modSaveGame.Options = options;
             string json = JsonSerializer.Serialize(_modSaveGame);
             string filePath = GetFilePath(fileName);
             File.WriteAllText(filePath, json);
@@ -152,8 +155,8 @@ public interface IGameService
 
     event EventHandler<string> GrassSanity;
 
-    /// <inheritdoc cref="GameService.SaveProgress(List{KeyValuePair{string, double}}, string)" />
-    void SaveProgress(List<KeyValuePair<string, double>> statistics, string fileName);
+    /// <inheritdoc cref="GameService.SaveProgress(List{KeyValuePair{string, double}}, APOptions, string)" />
+    void SaveProgress(List<KeyValuePair<string, double>> statistics, APOptions options, string fileName);
 
     /// <inheritdoc cref="GameService.Load(string)" />
     void Load(string fileName);

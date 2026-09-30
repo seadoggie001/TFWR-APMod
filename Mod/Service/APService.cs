@@ -21,11 +21,17 @@ public class APService : IAPService
     private APLocation _goal;
     private Dictionary<string, object> _slotData;
     private APOptions _options;
+    private APOptions _offlineOptions;
     private IEnumerable<APLocation> _allLocations;
 
     public APService() => APDisconnected += OnAPDisconnected;
 
-    private void OnAPDisconnected(object sender, string _) => Session?.Socket.DisconnectAsync();
+    private void OnAPDisconnected(object sender, string _)
+    {
+        Session?.Socket.DisconnectAsync();
+        _offlineOptions = _options;
+        _options = null;
+    }
 
     /// <summary>
     /// Fired whenever there is an error and the AP connection is lost
@@ -47,7 +53,16 @@ public class APService : IAPService
     /// </summary>
     public event EventHandler<APOptions> OptionsLoaded;
 
-    public void ResetAchievementCache(object sender, ModSaveGame modSaveGame) => _achievementCache.Clear();
+    public void OnGameLoaded(object sender, ModSaveGame modSaveGame)
+    {
+        // Reset achievements
+        _achievementCache.Clear();
+        if (modSaveGame?.Options is null) return;
+        // Load an offline copy of the APOptions
+        _offlineOptions = modSaveGame.Options;
+        // Let other things use the offline options
+        if (_options is null) OptionsLoaded?.Invoke(this, _offlineOptions);
+    }
 
     /// <summary>
     /// Submits a location based on an achievementName
@@ -145,7 +160,7 @@ public class APService : IAPService
                 InjectionService.Inject(_options);
                 _options.LoadSlotData(_slotData);
 
-                _log.LogInfo(_options);
+                _log.LogInfo(_options.ToString());
 
                 // Determine goal location
                 _goal = _allLocations.First(m => m.name == _options.GoalName());
@@ -240,7 +255,7 @@ public class APService : IAPService
         return loginResult;
     }
 
-    public APOptions GetOptions() => _options;
+    public APOptions GetOptions() => _options ?? _offlineOptions;
 
     public void SubmitGrass(string grassName)
     {
@@ -275,7 +290,7 @@ public interface IAPService
     /// <inheritdoc cref="APService.OptionsLoaded" />
     event EventHandler<APOptions> OptionsLoaded;
 
-    void ResetAchievementCache(object sender, ModSaveGame modSaveGame);
+    void OnGameLoaded(object sender, ModSaveGame modSaveGame);
     void UnlockAchievement(string achievementName);
     void SubmitLocationById(long id);
 

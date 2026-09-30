@@ -33,8 +33,8 @@ public class APManager : BaseComponent, IInjectable
         GameManager.Instance?.GameService.PreLoadGame += APService.Disconnect;
         OnDisabled += () => GameManager.Instance?.GameService.PreLoadGame -= APService.Disconnect;
 
-        GameManager.Instance?.GameService.GameLoaded += APService.ResetAchievementCache;
-        OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= APService.ResetAchievementCache;
+        GameManager.Instance?.GameService.GameLoaded += OnGameLoaded;
+        OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
 
         GameManager.Instance?.GameService.GrassSanity += OnGrassSanity;
         OnDisabled += () => GameManager.Instance?.GameService.GrassSanity -= OnGrassSanity;
@@ -71,6 +71,12 @@ public class APManager : BaseComponent, IInjectable
         {
             _log.LogException("Failed to load update locations/items", e);
         }
+    }
+
+    private void OnGameLoaded(object sender, ModSaveGame saveGame)
+    {
+        ItemQueue.Reset();
+        APService.OnGameLoaded(sender, saveGame);
     }
 
     private void OnGrassSanity(object sender, string grassCoords) => APService.SubmitGrass(grassCoords);

@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using com.seadoggie.TFWRArchipelago.Components;
 using HarmonyLib;
+using Microsoft.Extensions.Logging;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
@@ -120,25 +122,33 @@ public class ResourceManagerPatch
             Plugin.Log.LogException($"{nameof(GetUnlock)}", e);
         }
     }
-
-    [HarmonyPostfix]
-    [HarmonyPatch(nameof(ResourceManager.GetFarmObject))]
-    public static void GetFarmObject(string name, ref FarmObjectSO __result)
+    
+    public static void ManipulateCropCosts(Dictionary<string, List<string>> CropCosts)
     {
+        if (CropCosts is null) return;
         try
         {
-            if (!Plugin.Instance.Enabled || __result is null || !__result) return;
-            if (APManager.Instance is null) return;
-            if (!(APManager.Instance?.APService?.GetOptions()?.CropCosts?.TryGetValue(name, out List<string> items) ??
-                  false)) return;
-            ItemBlock cost = ItemBlock.CreateEmpty();
-            foreach (string item in items) cost.AddItem(StringIds.GetItemId(item), 1);
+            DroneLib.Helpers.Reflection.GetStaticField(
+                typeof(ResourceManager),
+                "farmObjects",
+                BindingFlags.Static | BindingFlags.NonPublic,
+                (Dictionary<string, FarmObjectSO> farmObjects) =>
+                {
+                    foreach (KeyValuePair<string, List<string>> cropCost in CropCosts)
+                    {
+                        if (!farmObjects.TryGetValue(cropCost.Key, out FarmObjectSO so)) continue;
+                        ItemBlock cost = ItemBlock.CreateEmpty();
+                        cropCost.Value.ForEach(m => cost.AddItem(StringIds.GetItemId(m), 1));
+                        so.cost = cost;
+                    }
 
-            __result.cost = cost;
+                    return farmObjects;
+                }
+            );
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Plugin.Log.LogException($"{nameof(GetFarmObject)}", e);
+            Plugin.Log.LogError(ex, "Failed to manipulate crop costs");
         }
     }
 }

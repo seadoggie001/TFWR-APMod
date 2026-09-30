@@ -133,7 +133,8 @@ public class APOptions
     {
         return $"[APOptions] GoalName: {GoalName()}, " +
                $"RandomizedCosts: {CropCostsRandomized()}, " +
-               $"GrassSanity: {GrassSanityEnabled()}";
+               $"GrassSanity: {GrassSanityEnabled()} " +
+               $"Costs: {{{string.Join(", ", CropCosts.Select(m => $"{m.Key}=[{string.Join(",", m.Value)}]"))}}} ";
     }
 }
 
