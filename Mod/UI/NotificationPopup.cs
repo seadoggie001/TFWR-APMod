@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using com.seadoggie.TFWRArchipelago.Service;
@@ -12,6 +13,8 @@ public class NotificationPopup : BaseGUI
 {
     [Log] private readonly ILogger<NotificationPopup> _log = null!;
     private const string TransitionClassName = "expanded";
+    private const float TransitionLength = 1f;
+    
     private UIDocument _uiDocument;
     private VisualElement _rootElement;
     private VisualElement _container;
@@ -72,20 +75,28 @@ public class NotificationPopup : BaseGUI
         _isDisplayed = true;
         string left = text.Split('|')[0];
         string right = text.Split('|')[1];
+        float display = 5f;
+        while (_messageQueue.TryPeek(out string next))
+        {
+            if (next.Split('|')[0] != left) break;
+            _messageQueue.TryDequeue(out string _);
+            right += ", " + next.Split('|')[1];
+            display += 1;
+        }
         _title.text = left;
         _text.text = right;
 
-        StartCoroutine(Transition());
+        StartCoroutine(Transition(Math.Min(display, 20f)));
     }
 
-    private IEnumerator Transition()
+    private IEnumerator Transition(float display)
     {
         _container.AddToClassList(TransitionClassName);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(TransitionLength);
         _notification.AddToClassList(TransitionClassName);
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(display);
         _notification.RemoveFromClassList(TransitionClassName);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(TransitionLength);
         _container.RemoveFromClassList(TransitionClassName);
         yield return new WaitForSeconds(1);
         _isDisplayed = false;
