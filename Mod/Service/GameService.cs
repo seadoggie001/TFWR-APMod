@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using com.seadoggie.TFWRArchipelago.Model;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
-//ToDo: Replace UnityEngine.JsonUtility and UnityEngine.Vector2Int to allow testing of the GameService
 [Injectable(typeof(IGameService))]
 public class GameService : IGameService
 {
@@ -34,7 +33,7 @@ public class GameService : IGameService
         try
         {
             _modSaveGame?.Statistics = statistics;
-            string json = JsonUtility.ToJson(_modSaveGame);
+            string json = JsonSerializer.Serialize(_modSaveGame);
             string filePath = GetFilePath(fileName);
             File.WriteAllText(filePath, json);
         }
@@ -62,7 +61,7 @@ public class GameService : IGameService
             string json = File.ReadAllText(filePath);
             if (!string.IsNullOrWhiteSpace(json))
             {
-                modSaveGame = JsonUtility.FromJson<ModSaveGame>(json);
+                modSaveGame = JsonSerializer.Deserialize<ModSaveGame>(json);
             }
 
             Plugin.Log.LogInfo("Save game was loaded");
@@ -109,7 +108,7 @@ public class GameService : IGameService
         });
     }
 
-    public void RaiseGrassSanity(Vector2Int position)
+    public void RaiseGrassSanity(int x, int y)
     {
         Task.Run(() =>
         {
@@ -117,9 +116,9 @@ public class GameService : IGameService
             {
                 if (_modSaveGame is null) return;
                 // Check if it needs to be submitted
-                if (!_modSaveGame.Grass.Add(position)) return;
+                if (!_modSaveGame.Grass.Add(new Position(x, y))) return;
 
-                string locName = $"Grass ({position.x}, {position.y})";
+                string locName = $"Grass ({x}, {y})";
                 GrassSanity?.Invoke(this, locName);
             }
             catch (Exception ex)
@@ -162,5 +161,5 @@ public interface IGameService
     GameService.Result CanGivePlayerItem(string itemName, int itemsReceived);
     void IncrementItemCount();
     void RaiseMenuOpen(bool open);
-    void RaiseGrassSanity(Vector2Int position);
+    void RaiseGrassSanity(int x, int y);
 }

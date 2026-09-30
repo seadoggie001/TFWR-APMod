@@ -39,7 +39,7 @@ public static class DronePatch
         {
             FarmObject obj = __instance.EntityUnderDrone();
             if (obj?.objectSO?.dropItem != "hay") return;
-            GameManager.Instance?.GameService.RaiseGrassSanity(__instance.pos);
+            GameManager.Instance?.GameService.RaiseGrassSanity(__instance.pos.x, __instance.pos.y);
         }
         catch (Exception e)
         {

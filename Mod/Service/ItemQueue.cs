@@ -4,7 +4,6 @@ using System.Linq;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
 using Microsoft.Extensions.Logging;
-using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
