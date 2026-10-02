@@ -1,14 +1,15 @@
 using System;
 using System.Reflection;
+using com.seadoggie.TFWRArchipelago.Components;
 using DroneLib.Function;
 using DroneLib.Helpers;
 
 namespace com.seadoggie.TFWRArchipelago.Functions;
 
-public class FastFlip : BaseFunction
+public class DoubleFlip : BaseFunction
 {
-    public override string Name => "fast_flip";
-    private const double Reduction = 3;
+    public override string Name => "double_flip";
+    private const double Reduction = 1;
 
     public override void ValidateCall(FunctionValidation validationState)
         => NoParams(validationState.Parameters);
@@ -17,14 +18,17 @@ public class FastFlip : BaseFunction
     {
         // Convert 1 second into OPs
         double ops = Math.Floor(1.0 / execution.sim.OpDuration.Seconds);
-        // Reduce to 1/3 of the time
+        // Reduce the time
         ops /= Reduction;
         
         // Actually do the flip
         Drone drone = execution.sim.farm.drones[droneId];
         drone.DoAFlip();
+        
+        GoalManager.Instance?.StatsService.Add("flips", 1);
+        
         FieldInfo fieldInfo = typeof(Drone).GetField("animDuration", BindingFlags.Instance | BindingFlags.NonPublic);
-        if (fieldInfo is null) throw new Exception("Failed to perform a fast flip");
+        if (fieldInfo is null) throw new Exception("Failed to perform a double flip");
         fieldInfo.SetValue(drone, Duration.FromSeconds(1 / Reduction));
 
         // Set the function's return value

@@ -73,7 +73,7 @@ public class Plugin : BaseUnityPlugin
 
     private void Start()
     {
-        DroneLib.Function.Registration.RegisterFunction(new FastFlip());
+        DroneLib.Function.Registration.RegisterFunction(new DoubleFlip());
         DroneLib.Function.Registration.RegisterFunction(new Teleport());
         DroneLib.Item.Registration.RegisterItem(new FakeAPItem());
     }
