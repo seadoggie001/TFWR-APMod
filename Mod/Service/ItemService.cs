@@ -23,7 +23,7 @@ public class ItemService : IItemService
         public bool IsTrap { get; } = IsTrap;
     }
 
-    public ItemService()
+    public void Initialize()
     {
         _log.LogInformation("Registering Items from {assembly}", Assembly.GetExecutingAssembly().FullName);
         // Using reflection, find any type with an Item attribute
@@ -89,6 +89,7 @@ public class ItemService : IItemService
 
 public interface IItemService
 {
+    void Initialize();
     bool CanProcess(string name);
     bool Process(string name);
 }

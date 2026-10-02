@@ -75,7 +75,7 @@ public class APManager : BaseComponent, IInjectable
 
     private void OnGameLoaded(object sender, ModSaveGame saveGame)
     {
-        ItemQueue.Reset();
+        ItemQueue.Reset(saveGame.ItemsReceived);
         APService.OnGameLoaded(sender, saveGame);
     }
 

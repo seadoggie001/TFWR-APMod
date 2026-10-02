@@ -13,25 +13,35 @@ namespace com.seadoggie.TFWRArchipelago.Service;
 [Injectable(typeof(IItemQueue))]
 public class ItemQueue : IItemQueue
 {
-    private const float RefreshRate = 0.1f;
-
     [Log] private readonly ILogger<ItemQueue> _log = null!;
 
+    /// <summary># of items received from AP</summary>
     private int _itemsReceived;
+
+    /// <summary># of items already processed</summary>
+    private int _itemsProcessed;
+
+    private string _stash = "";
     private readonly List<string> _itemQueue = [];
 
     public event EventHandler<ItemReceivedData> ItemReady;
 
     public void Process()
     {
+        // Wait for an item in the queue
         if (_itemQueue.Count == 0) return;
-        string item = _itemQueue.First();
+        // Wait for all received items to have been processed
+        bool useStash = _itemsProcessed < _itemsReceived;
+
+        string item = useStash ? _stash : _itemQueue.First();
         ItemReady?.Invoke(this, new ItemReceivedData()
         {
             ItemName = item,
             ItemCount = _itemsReceived,
         });
+        if (useStash) return;
         _itemQueue.Remove(item);
+        _stash = item;
         _itemsReceived++;
     }
 
@@ -39,15 +49,25 @@ public class ItemQueue : IItemQueue
     {
         ItemInfo itemInfo = helper.PeekItem();
         string itemReceivedName = itemInfo.ItemDisplayName;
-        _itemQueue.Add(itemReceivedName);
+        if (_itemsProcessed <= _itemsReceived)
+        {
+            _itemQueue.Add(itemReceivedName);
+        }
+        else
+        {
+            _itemsReceived++;
+        }
         helper.DequeueItem();
     }
 
-    public void Reset()
+    public void Reset(int count = 0)
     {
         _itemsReceived = 0;
+        _itemsProcessed = count;
         _itemQueue.Clear();
     }
+
+    public void IncrementItemProcessed() => _itemsProcessed++;
 }
 
 public interface IItemQueue
@@ -55,7 +75,8 @@ public interface IItemQueue
     event EventHandler<ItemReceivedData> ItemReady;
     void Process();
     void OnItemReceived(IReceivedItemsHelper helper);
-    void Reset();
+    void Reset(int count = 0);
+    void IncrementItemProcessed();
 }
 
 public record ItemReceivedData

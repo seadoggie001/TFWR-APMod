@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
-public class GameManager : BaseComponent
+public class GameManager : BaseComponent, IInjectable
 {
     [CanBeNull] public static GameManager Instance;
     [Log] private readonly ILogger<GameManager> _log = null!;
@@ -54,6 +54,11 @@ public class GameManager : BaseComponent
 
     private static void OnOptionsLoaded(object sender, APOptions options) =>
         ResourceManagerPatch.ManipulateCropCosts(options.CropCosts);
+
+    public void OnInject()
+    {
+        ItemService.Initialize();
+    }
 
     /// <summary>Add the connection details to the config</summary>
     private void OnConnectionAttempt(object _, ConnectionInfo info) => TfwrConfig.ConnectionInfo = info;
@@ -104,7 +109,9 @@ public class GameManager : BaseComponent
                 ItemProcessed item = GivePlayerItem(itemName);
                 if (item.NotificationNeeded)
                     RaiseNewItemReceived(new Notification { Title = "You received an item!", Message = itemName });
-                if (item.Processed) GameService.IncrementItemCount();
+                if (!item.Processed) return;
+                GameService.IncrementItemCount();
+                APManager.Instance?.ItemQueue.IncrementItemProcessed();
                 return;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -132,14 +139,14 @@ public class GameManager : BaseComponent
         }
         catch (Exception e)
         {
-            _log.LogInfo("GivePlayerItem");
+            _log.LogInformation("GivePlayerItem");
             _log.LogError(e.Message);
             if (e.InnerException != null)
             {
                 _log.LogError(e.InnerException.Message);
             }
 
-            _log.LogInfo(e.StackTrace);
+            _log.LogInformation(e.StackTrace);
         }
 
         return new ItemProcessed(false, false);
