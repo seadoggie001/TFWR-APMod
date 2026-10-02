@@ -18,20 +18,31 @@ public static class InjectionService
             .Where(m => m.GetCustomAttribute<InjectableAttribute>() != null);
         foreach (Type type in types)
         {
+            InjectableAttribute attr = type.GetCustomAttribute<InjectableAttribute>();
+            if (attr is null) continue;
+
             // Find an empty constructor
             ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
             if (constructor is null)
             {
-                Log.LogWarning($"Failed to auto-register {type.Name}: Missing empty constructor");
+                Log.LogWarning("Failed to auto-register {TypeName}: Missing empty constructor", type.Name);
                 continue;
             }
 
             // Create the object with that constructor
             object injectableObject = constructor.Invoke([]);
-            InjectableAttribute attr = type.GetCustomAttribute<InjectableAttribute>();
-            if (attr is null) continue;
 
-            Log.LogInformation($"Injectable: [{type.Name} = {attr.Interface.Name}]");
+            // Locate the Inject method. It can't be called directly because of type-issues.
+            MethodInfo info = typeof(InjectionService).GetMethod(nameof(Inject));
+            if (info is null)
+            {
+                Log.LogError("Failed to locate InjectionService.Inject method info");
+                continue;
+            }
+
+            // Call the Invoke method with the type of the object created
+            info.MakeGenericMethod(injectableObject.GetType()).Invoke(null, [injectableObject]);
+
             // Save it as an injectable service
             InjectableServices.Add(attr.Interface, injectableObject);
         }
@@ -84,7 +95,6 @@ public static class InjectionService
 
             // Set the value of the property (ie: inject the value)
             propertyInfo.SetValue(target, value);
-            Log.LogInformation($"{typeof(T).Name}.{propertyInfo.Name} = {value.GetType().Name}");
         }
 
         return target;
@@ -104,7 +114,6 @@ public static class InjectionService
             }
 
             fieldInfo.SetValue(target, value);
-            Log.LogInformation($"{typeof(T).Name}.{fieldInfo.Name} = {value.GetType().Name}");
         }
 
         return target;
@@ -117,18 +126,20 @@ public static class InjectionService
         foreach (FieldInfo info in fieldInfo)
         {
             LogAttribute attribute = info.GetCustomAttribute<LogAttribute>();
-            if(attribute is null) continue;
-    
+            if (attribute is null) continue;
+
             if (info.FieldType == typeof(ILogger<T>))
             {
                 info.SetValue(target, LoggerFactory.CreateLogger<T>());
             }
             else
             {
-                Log.LogWarning($"Cannot inject a log into a non-standard log field. {typeof(T)}.{info.Name} is of type {info.FieldType.Name}");
+                Log.LogWarning(
+                    "Cannot inject a log into a non-standard log field. {Type}.{FieldName} is of type {FieldType}",
+                    typeof(T), info.Name, info.FieldType.Name);
             }
         }
-    
+
         return target;
     }
 }

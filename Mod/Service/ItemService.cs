@@ -25,7 +25,7 @@ public class ItemService : IItemService
 
     public ItemService()
     {
-        // Log.LogInfo("Registering Items from " + Assembly.GetExecutingAssembly().FullName);
+        _log.LogInformation("Registering Items from {assembly}", Assembly.GetExecutingAssembly().FullName);
         // Using reflection, find any type with an Item attribute
         IEnumerable<Type> types = Assembly.GetExecutingAssembly().GetTypes();
 
@@ -33,10 +33,8 @@ public class ItemService : IItemService
         Register<TrapAttribute>(types, true);
 
         // Manually register each unlock with the UnlockItem
-        foreach (string unlock in APItem.Unlocks)
-        {
-            RegisteredItems[unlock] = new ItemInfo(typeof(UnlockItem), false);
-        }
+        foreach (string unlock in APItem.Unlocks) RegisteredItems[unlock] = new ItemInfo(typeof(UnlockItem), false);
+        _log.LogInformation("Registered UnlockItems: {items}", string.Join(",", RegisteredItems.Keys));
     }
 
     private static void Register<T>(IEnumerable<Type> types, bool traps) where T : ItemAttribute
@@ -72,11 +70,11 @@ public class ItemService : IItemService
                 // (traps sent while the trap is active will be ignored)
                 if (Plugin.Instance.MainGameObject.TryGetComponent(item.Type, out Component _))
                 {
-                    _log.LogWarning($"Failed to process item: {name}");
+                    _log.LogWarning("Failed to process item: {Name}", name);
                     return item.IsTrap;
                 }
 
-                _log.LogInfo($"Creating and processing item: {name}");
+                _log.LogInformation("Creating and processing item: {Name}", name);
                 // Create the component and inject any references it needs
                 Component component = BepInExHelper.CreateAndInjectComponent(item.Type);
                 if (component is UnlockItem unlock) unlock.SetUnlock(name);
@@ -84,7 +82,7 @@ public class ItemService : IItemService
             }
         }
 
-        Plugin.Log.LogError("Failed to locate item: " + name);
+        Plugin.Log.LogError("Failed to locate item: {Name}", name);
         return false;
     }
 }

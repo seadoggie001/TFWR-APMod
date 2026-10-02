@@ -48,7 +48,7 @@ public class Teleport : BaseFunction
         Coords coords = (Coords) customArgument!;
         Drone drone = execution.sim.farm.drones[droneId];
         
-        Plugin.Log.LogInfo($"[Teleport] Attempting to teleport to ({coords.X},{coords.Y})");
+        Plugin.Log.LogInformation("[Teleport] Attempting to teleport to ({X},{Y})", coords.X, coords.Y);
 
         // If the coords are outside the farm
         if (coords.X > execution.sim.farm.grid.WorldSize.x

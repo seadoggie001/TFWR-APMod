@@ -27,7 +27,7 @@ public class UnlockItem : BaseItem
             string unlockName = Unlocks.ItemToUnlock(ItemNameToUnlock);
             if (string.IsNullOrWhiteSpace(unlockName))
             {
-                Log.LogError($"Failed to find unlock item: {ItemNameToUnlock}");
+                Log.LogError("Failed to find unlock item: {ItemName}", ItemNameToUnlock);
                 return true;
             }
 
@@ -39,7 +39,7 @@ public class UnlockItem : BaseItem
             }
 
             int count = farm.NumUnlocked(unlockName);
-            Log.LogInfo($"Found {count} unlocked {unlockName}");
+            Log.LogInformation("Found {Count} unlocked {UnlockName}", count, unlockName);
 
             // Hopefully we do not allow for "too many" items... but I think the game handles that internally
             farm.Unlock(unlockName, count + 1);

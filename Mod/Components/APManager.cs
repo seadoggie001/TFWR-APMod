@@ -96,7 +96,7 @@ public class APManager : BaseComponent, IInjectable
             string folderPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
             string locationText = File.ReadAllText(Path.Combine(folderPath, "locations.json"));
             List<APLocation> locationData = JsonConvert.DeserializeObject<List<APLocation>>(locationText);
-            _log.LogInformation($"Loaded {locationData.Count} locations");
+            _log.LogInformation("Loaded {count} locations", locationData.Count);
             return locationData;
         }
         catch (Exception e)

@@ -1,5 +1,6 @@
 using System;
 using com.seadoggie.TFWRArchipelago.Service;
+using Microsoft.Extensions.Logging;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Utils;
@@ -18,7 +19,7 @@ public static class BepInExHelper
         }
 
         created = InjectionService.Inject(created);
-        Plugin.Log.LogInfo($"Created and Injected component: {target.Name}");
+        Plugin.Log.LogInformation("Created and Injected component: {component}", target.Name);
         return created;
     }
 
@@ -32,7 +33,7 @@ public static class BepInExHelper
         }
 
         created = InjectionService.Inject(created);
-        Plugin.Log.LogInfo($"Created and Injected component: {typeof(T).Name}");
+        Plugin.Log.LogInformation("Created and Injected component: {component}", typeof(T).Name);
         created.enabled = true;
         return created;
     }

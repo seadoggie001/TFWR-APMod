@@ -4,6 +4,7 @@ using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Functions;
 using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Service;
+using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 using Microsoft.Extensions.Logging;
 using UnityEngine;
@@ -43,7 +44,9 @@ public class Plugin : BaseUnityPlugin
             Console.WriteLine(ex.StackTrace);
             return;
         }
-        
+
+        InjectionService.LoggerFactory = LogFactory;
+        InjectionService.Log = LogFactory.CreateLogger(nameof(InjectionService));
         InjectionService.AutomaticRegistration();
         
         // Create Managers

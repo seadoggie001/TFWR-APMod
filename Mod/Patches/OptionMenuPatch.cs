@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using com.seadoggie.TFWRArchipelago.Components;
 using HarmonyLib;
+using Microsoft.Extensions.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
@@ -24,7 +25,7 @@ public class OptionMenuPatch
                 !ResourceManagerPatch.CustomOptions.ToList().Contains(optionName))
                 return;
 
-            Plugin.Log.LogInfo("CustomOption Changed. Name: " + optionName);
+            Plugin.Log.LogInformation("CustomOption Changed. Name: {option}", optionName);
             // Don't cause an infinite loop because we're setting the value in the "listener"
             // Note: a locking object fails here... perhaps it's related to BepinEx or Harmony?
             if (_settingValue) return;
@@ -38,7 +39,7 @@ public class OptionMenuPatch
                     }
                     catch (Exception e)
                     {
-                        Plugin.Log.LogException("Failed to create the connection settings modifier GUI", e);
+                        Plugin.Log.LogError(e, "Failed to create the connection settings modifier GUI");
                     }
 
                     OptionHolder.SetOption(ResourceManagerPatch.ArchipelagoOptionToggle,
@@ -50,7 +51,7 @@ public class OptionMenuPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(OnOptionChanged)}", e);
+            Plugin.Log.LogError(e, $"{nameof(OnOptionChanged)}");
         }
     }
 }

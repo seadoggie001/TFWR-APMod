@@ -20,7 +20,7 @@ public class FloatingActionButton : BaseGUI
 
     private void Start()
     {
-        _log.LogInfo("Awaking FAB");
+        _log.LogInformation("Awaking FAB");
 
         // Create the GUI and setup styles
         Initialize();
@@ -42,7 +42,7 @@ public class FloatingActionButton : BaseGUI
 
     private void Initialize()
     {
-        _log.LogInfo("Initializing FAB");
+        _log.LogInformation("Initializing FAB");
         GameObject root = new("TFWRAP-FAB");
         DontDestroyOnLoad(root);
 
@@ -92,12 +92,12 @@ public class FloatingActionButton : BaseGUI
         _overlayIcon.AddToClassList("icon-modifier");
         icon.Add(_overlayIcon);
 
-        _log.LogInfo("Completed initializing FAB");
+        _log.LogInformation("Completed initializing FAB");
     }
 
     private void Clicked(PointerDownEvent _)
     {
-        _log.LogInfo("Clicked FAB");
+        _log.LogInformation("Clicked FAB");
         UIManager.Instance?.OpenConnectionSettings();
     }
 

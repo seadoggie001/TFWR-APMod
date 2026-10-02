@@ -84,7 +84,7 @@ public class APService : IAPService
                 APLocation location = _allLocations.FirstOrDefault(m => m.achievement == achievementName);
                 if (location is null)
                 {
-                    _log.LogWarning("Unable to locate location for achievement " + achievementName);
+                    _log.LogWarning("Unable to locate location for achievement {name}", achievementName);
                     return;
                 }
 
@@ -113,7 +113,7 @@ public class APService : IAPService
     {
         try
         {
-            _log.LogInfo("Attempting to sign in to Archipelago");
+            _log.LogInformation("Attempting to sign in to Archipelago");
 
             // Only attempt to connect if not connected already
             if (Session?.Socket?.Connected ?? false)
@@ -121,34 +121,35 @@ public class APService : IAPService
                 _log.LogWarning("Already signed in");
             }
 
-            _log.LogInfo($"Creating a session. URL: {connectionSettings.Url}:{connectionSettings.Port}");
+            _log.LogInformation("Creating a session. URL: {url}:{port}", connectionSettings.Url,
+                connectionSettings.Port);
             // Create the session
             Session = ArchipelagoSessionFactory.CreateSession(connectionSettings.Url, connectionSettings.Port);
 
-            _log.LogInfo("Setting up item queue");
+            _log.LogInformation("Setting up item queue");
             Session.Items.ItemReceived += itemQueue.OnItemReceived;
 
-            _log.LogInfo("Connecting");
+            _log.LogInformation("Connecting");
             RoomInfoPacket roomInfoPacket = await ConnectAsync();
             if (roomInfoPacket == null)
             {
-                _log.LogError(
-                    $"Failed to connect to room. Connection Details: {{URL: {connectionSettings.Url}:{connectionSettings.Port}}}");
+                _log.LogError("Failed to connect to room. Connection Details: {{URL: {url}:{port}}}",
+                    connectionSettings.Url, connectionSettings.Port);
                 ConnectionResult?.Invoke(this,
                     new LoginFailure("Failed to connect. Please review the connection settings."));
                 await Session.Socket.DisconnectAsync();
                 return false;
             }
 
-            _log.LogInfo("Setting up location queue");
+            _log.LogInformation("Setting up location queue");
             Session.Locations.CheckedLocationsUpdated += locationQueue.OnLocationsReceived;
 
-            _log.LogInfo("Logging in");
+            _log.LogInformation("Logging in");
             LoginResult loginResult = await LoginAsync(connectionSettings);
             ConnectionResult?.Invoke(this, loginResult);
             if (loginResult.Successful)
             {
-                _log.LogInfo("Successfully logged in.");
+                _log.LogInformation("Successfully logged in.");
                 Session.Socket.SocketClosed += reason => APDisconnected?.Invoke(this, reason);
                 Session.Socket.ErrorReceived += (_, message) => APDisconnected?.Invoke(this, message);
 
@@ -160,12 +161,12 @@ public class APService : IAPService
                 InjectionService.Inject(_options);
                 _options.LoadSlotData(_slotData);
 
-                _log.LogInfo(_options.ToString());
+                _log.LogInformation("{options}", _options.ToString());
 
                 // Determine goal location
                 _goal = _allLocations.First(m => m.name == _options.GoalName());
 
-                _log.LogInfo("Goal name was set to " + _options.GoalName());
+                _log.LogInformation("Goal name was set to {goal}", _options.GoalName());
                 if (_goal is null) _log.LogError("_goal is null!");
 
                 OptionsLoaded?.Invoke(this, _options);
@@ -174,9 +175,9 @@ public class APService : IAPService
             }
 
             _log.LogError(
-                $"Failed to connect. Connection Details: {{URL: {connectionSettings.Url}:{connectionSettings.Port}, " +
-                $"Username: {connectionSettings.Username}, " +
-                $"Password? {!string.IsNullOrWhiteSpace(connectionSettings.Password)}}}");
+                "Failed to connect. Connection Details: {{URL: {url}:{port}, Username: {user}, Password? {password}}}",
+                connectionSettings.Url, connectionSettings.Port, connectionSettings.Username,
+                !string.IsNullOrWhiteSpace(connectionSettings.Password));
             return false;
         }
         catch (Exception ex)
@@ -214,11 +215,9 @@ public class APService : IAPService
             return null;
         }
 
-        _log.LogInfo($"[RoomInfo] " +
-                     $"{{ Seed: {roomInfoPacket.SeedName}; " +
-                     $"Games: {string.Join(", ", roomInfoPacket.Games)}; " +
-                     $"Tags: {string.Join(",", roomInfoPacket.Tags)}; " +
-                     $"Version: {roomInfoPacket.GeneratorVersion.ToVersion()} }}");
+        _log.LogInformation("[RoomInfo] {{ Seed: {seed}; Games: {games}; Tags: {tags}; Version: {version} }}",
+            roomInfoPacket.SeedName, string.Join(", ", roomInfoPacket.Games), string.Join(",", roomInfoPacket.Tags),
+            roomInfoPacket.GeneratorVersion.ToVersion());
 
         return roomInfoPacket;
     }
@@ -241,15 +240,15 @@ public class APService : IAPService
         catch (Exception e)
         {
             loginResult = new LoginFailure(e.GetBaseException().Message);
-            _log.LogError($"Exception Message: {e.Message}");
-            _log.LogError($"Base Exception Message: {e.GetBaseException().Message}");
+            _log.LogError("Exception Message: {message}", e.Message);
+            _log.LogError("Base Exception Message: {baseMessage}", e.GetBaseException().Message);
         }
 
         if (loginResult.Successful) return loginResult;
         _log.LogError($"Failed to connect to the server. All errors (if any?) to follow");
         foreach (string error in ((LoginFailure)loginResult).Errors)
         {
-            _log.LogInfo(error);
+            _log.LogInformation(error);
         }
 
         return loginResult;
@@ -263,7 +262,7 @@ public class APService : IAPService
         APLocation location = _allLocations.FirstOrDefault(m => m.name == grassName);
         if (location == null)
         {
-            _log.LogError($"Grass sanity is not found in the APLocations. Expected: {grassName}");
+            _log.LogError("Grass sanity is not found in the APLocations. Expected: {position}", grassName);
             return;
         }
 

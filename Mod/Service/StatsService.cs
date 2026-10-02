@@ -51,7 +51,7 @@ public class StatsService : IStatsService
     /// </summary>
     public void Initialize(IEnumerable<APLocation> locations)
     {
-        _log.LogInfo("Initializing statistics...");
+        _log.LogInformation("Initializing statistics...");
         // For each location with a statistic
         foreach (APLocation location in locations?.Where(m => m.statistic != null) ?? [])
         {
@@ -80,10 +80,10 @@ public class StatsService : IStatsService
 
             _stats[location.statistic.key] = 0;
             // Uncomment to see all requested stats
-            // Log.LogInfo($"Stat: {location.statistic.key} Value: {value}");
+            // Log.LogInformation($"Stat: {location.statistic.key} Value: {value}");
         }
 
-        _log.LogInfo("Tracking stats for: " + string.Join(", ", _milestones.Keys));
+        _log.LogInformation("Tracking stats for: {milestones}", string.Join(", ", _milestones.Keys));
     }
 
     public void Stop() => _canRaiseStatisticEvents = false;
@@ -175,14 +175,14 @@ public class StatsService : IStatsService
         // Find the milestone
         if (!_milestones.TryGetValue(stat, out List<Milestone> milestones))
         {
-            _log.LogWarning($"Tracking Stats, but found nothing for {stat}!");
+            _log.LogWarning("Tracking Stats, but found nothing for {Stat}!", stat);
             return;
         }
 
         // ignore if it's empty
         if (milestones is null || !milestones.Any())
         {
-            _log.LogError($"Found a really weird milestone! Stat for {stat} but the value is null or empty list?");
+            _log.LogError("Found a really weird milestone! Stat for {Stat} but the value is null or empty list?", stat);
             return;
         }
 
@@ -193,8 +193,9 @@ public class StatsService : IStatsService
         {
             // If it's too much, stop checking
             if (milestone.Target > count) break;
-            _log.LogInfo(
-                $"Found achievement! Stat: {stat} Location: {milestone.Location} Achievement: {milestone.Achievement}");
+            _log.LogInformation(
+                "Found achievement! Stat: {Stat} Location: {location} Achievement: {achievement}", stat,
+                milestone.Location, milestone.Achievement);
             // Grant the achievement or location
             GoalEvent?.Invoke(this, !string.IsNullOrWhiteSpace(milestone.Achievement)
                 ? new GoalEvent(milestone.APLocation.id, milestone.Achievement, GoalType.Achievement)

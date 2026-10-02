@@ -46,7 +46,7 @@ public class LocationQueue : ILocationQueue
 
             if (apLocation is null)
             {
-                _log.LogError($"Failed to find AP Location with ID: {location}");
+                _log.LogError("Failed to find AP Location with ID: {Location}", location);
                 return false;
             }
 
@@ -62,7 +62,7 @@ public class LocationQueue : ILocationQueue
                 _log.LogError(e.InnerException.Message);
             }
 
-            _log.LogInfo(e.StackTrace);
+            _log.LogInformation(e.StackTrace);
             return false;
         }
     }

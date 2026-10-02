@@ -3,6 +3,7 @@ using System.IO;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
 using HarmonyLib;
+using Microsoft.Extensions.Logging;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -62,7 +63,7 @@ public class SaveChooserPatch
             button.onClick = new Button.ButtonClickedEvent();
             button.onClick.AddListener(() =>
             {
-                Plugin.Log.LogInfo("SaveChooserPatch NewAPButton OnClick");
+                Plugin.Log.LogInformation("SaveChooserPatch NewAPButton OnClick");
                 string saveName = SaveChooser.GenerateUnusedSaveName();
                 string filePath = GameService.GetFilePath(saveName);
                 FileInfo fileInfo = new(filePath);

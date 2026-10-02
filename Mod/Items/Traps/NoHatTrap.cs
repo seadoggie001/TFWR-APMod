@@ -1,6 +1,7 @@
 using System.Collections;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Patches;
+using Microsoft.Extensions.Logging;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Items.Traps;
@@ -51,7 +52,7 @@ public class NoHatTrap : BaseItem
         {
             drone.hat = Hat.CreateHat(straw, simulation, drone);
         }
-        Log.LogInfo("Done with no hat");
+        Log.LogInformation("Done with no hat");
         
         Completed();
     }

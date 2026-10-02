@@ -67,7 +67,7 @@ public class GameService : IGameService
                 modSaveGame = JsonSerializer.Deserialize<ModSaveGame>(json);
             }
 
-            Plugin.Log.LogInfo("Save game was loaded");
+            Plugin.Log.LogInformation("Save game was loaded");
 
             Plugin.Instance.Enabled = true;
             _modSaveGame = modSaveGame;
@@ -87,7 +87,7 @@ public class GameService : IGameService
                 ? Result.ItemAlreadyReceived
                 : Result.ProcessItem;
 
-        _log.LogError($"Failed to give {itemName} because the ModSaveGame isn't loaded yet");
+        _log.LogError("Failed to give {ItemName} because the ModSaveGame isn't loaded yet", itemName);
         return Result.ModNotInitialized;
     }
 

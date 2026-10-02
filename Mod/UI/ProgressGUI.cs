@@ -86,7 +86,7 @@ public class ProgressGUI : BaseGUI
     public override void Awake()
     {
         base.Awake();
-        _log.LogInfo("Initializing Statistics GUI");
+        _log.LogInformation("Initializing Statistics GUI");
 
         // Create the GUI and setup styles
         Initialize();
@@ -123,7 +123,7 @@ public class ProgressGUI : BaseGUI
             return;
         }
 
-        _log.LogWarning("There are no statistics matching: " + key);
+        _log.LogWarning("There are no statistics matching: {key}", key);
     }
 
     public void MarkCompleted(string key)
@@ -134,7 +134,7 @@ public class ProgressGUI : BaseGUI
             return;
         }
 
-        _log.LogError("There are no achievements matching: " + key);
+        _log.LogError("There are no achievements matching: {key}", key);
     }
 
     public override bool IsMouseOverWindow() =>
@@ -184,7 +184,7 @@ public class ProgressGUI : BaseGUI
             }
             else
             {
-                Plugin.Log.LogInfo("Ooops, GUI visibility went weird");
+                Plugin.Log.LogInformation("Ooops, GUI visibility went weird");
             }
         }
 

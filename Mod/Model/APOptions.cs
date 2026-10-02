@@ -9,7 +9,7 @@ namespace com.seadoggie.TFWRArchipelago.Model;
 
 public class APOptions
 {
-    [ModInject] private ILogger<APOptions> Logger { get; set; }
+    [Log] private ILogger<APOptions> _logger;
 
     public readonly Dictionary<double, double> ModifiedValues = [];
 
@@ -35,7 +35,7 @@ public class APOptions
         {
             if (!slotData.TryGetValue(cropOption, out object cost))
             {
-                Logger.LogWarning($"Crop Cost was randomized, but {cropOption} was not included");
+                _logger.LogWarning("Crop Cost was randomized, but {CropOption} was not included", cropOption);
                 continue;
             }
 
