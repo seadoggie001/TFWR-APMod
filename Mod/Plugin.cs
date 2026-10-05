@@ -18,7 +18,7 @@ public class Plugin : BaseUnityPlugin
     public static Plugin Instance { get; private set; } = null!;
     public GameObject MainGameObject { get; private set; }
 
-    public static ILoggerFactory LogFactory;
+    private static ILoggerFactory _logFactory;
     public static ILogger<Plugin> Log;
 
     private readonly Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
@@ -34,8 +34,8 @@ public class Plugin : BaseUnityPlugin
         
         try
         {
-            LogFactory = new LoggerFactory([new PluginLoggerProvider()]);
-            Log = LogFactory.CreateLogger<Plugin>();
+            _logFactory = new LoggerFactory([new PluginLoggerProvider()]);
+            Log = new Logger<Plugin>(_logFactory);
         }
         catch (Exception ex)
         {
@@ -45,8 +45,8 @@ public class Plugin : BaseUnityPlugin
             return;
         }
 
-        InjectionService.LoggerFactory = LogFactory;
-        InjectionService.Log = LogFactory.CreateLogger(nameof(InjectionService));
+        InjectionService.LoggerFactory = _logFactory;
+        InjectionService.Log = _logFactory.CreateLogger<InjectionService>();
         InjectionService.AutomaticRegistration();
         
         // Create Managers
@@ -64,7 +64,7 @@ public class Plugin : BaseUnityPlugin
         }
         catch (Exception e)
         {
-            Log.LogError($"Plugin {MyPluginInfo.PLUGIN_GUID} failed to load properly! Harmony patch issues.", e);
+            Log.LogError(e,$"Plugin {MyPluginInfo.PLUGIN_GUID} failed to load properly! Harmony patch issues.");
             return;
         }
 

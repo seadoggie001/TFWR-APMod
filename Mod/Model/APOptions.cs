@@ -9,7 +9,7 @@ namespace com.seadoggie.TFWRArchipelago.Model;
 
 public class APOptions
 {
-    [Log] private ILogger<APOptions> _logger;
+    [Log] private readonly ILogger<APOptions> _logger = null!;
 
     public readonly Dictionary<double, double> ModifiedValues = [];
 

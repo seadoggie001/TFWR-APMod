@@ -12,6 +12,8 @@ public class FreeHayFiller : BaseItem
 {
     protected override string ItemName => nameof(FreeHayFiller);
 
+    [Log] private readonly ILogger<FreeHayFiller> _log = null!;
+
     public void Start()
     {
         try
@@ -19,14 +21,14 @@ public class FreeHayFiller : BaseItem
             int? hayId = ResourceManager.GetAllItems().FirstOrDefault(m => m.itemName == "hay")?.itemId;
             if (hayId is null)
             {
-                Log.LogError($"Failed to locate hay itemId. Cannot add items.");
+                _log.LogError($"Failed to locate hay itemId. Cannot add items.");
                 return;
             }
 
             Simulation sim = MainSimPatch.GetMainSim();
             if (sim is null)
             {
-                Log.LogError("Failed to locate main simulation. Cannot add items.");
+                _log.LogError("Failed to locate main simulation. Cannot add items.");
                 return;
             }
             
@@ -42,7 +44,7 @@ public class FreeHayFiller : BaseItem
         }
         catch (Exception ex)
         {
-            Log.LogException($"{nameof(FreeHayFiller)}", ex);
+            _log.LogException($"{nameof(FreeHayFiller)}", ex);
         }
     }
 }

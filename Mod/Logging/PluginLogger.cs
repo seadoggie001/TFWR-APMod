@@ -7,14 +7,9 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 namespace com.seadoggie.TFWRArchipelago.Logging;
 
 /// <inheritdoc />
-public class PluginLogger : ILogger
+public class PluginLogger(string name) : ILogger
 {
-    private readonly ManualLogSource _source;
-
-    public PluginLogger(string name)
-    {
-        _source = BepInEx.Logging.Logger.CreateLogSource(name);
-    }
+    private readonly ManualLogSource _source = BepInEx.Logging.Logger.CreateLogSource(name);
 
     public IDisposable BeginScope<TState>(TState state)
         where TState : notnull => null!;
@@ -30,9 +25,9 @@ public class PluginLogger : ILogger
     {
         if (!IsEnabled(logLevel)) return;
 
-        string message = formatter.Invoke(state, exception);
+        string message = formatter(state, exception);
         if (exception is not null)
-            message = $"{message} - Exception: {exception.Message}\n\t{exception.StackTrace.Replace("\n", "\n\t")}";
+            message = $"{exception.GetType().Name}: {message}\n\tException: {exception.Message}\n\t{exception.StackTrace?.Replace("\n", "\n\t")}";
 
         switch (logLevel)
         {

@@ -10,6 +10,7 @@ public class UnlockItem : BaseItem
 {
     protected override string ItemName => "UnlockItem";
     public string ItemNameToUnlock { get; set; }
+    [Log] private readonly ILogger<UnlockItem> _log = null!;
 
     public void SetUnlock(string item) => ItemNameToUnlock = item;
 
@@ -23,23 +24,23 @@ public class UnlockItem : BaseItem
     {
         try
         {
-
+            _log.LogInformation("Attempting to unlock {itemName}", ItemNameToUnlock);
             string unlockName = Unlocks.ItemToUnlock(ItemNameToUnlock);
             if (string.IsNullOrWhiteSpace(unlockName))
             {
-                Log.LogError("Failed to find unlock item: {ItemName}", ItemNameToUnlock);
+                _log.LogError("Failed to find unlock item: {ItemName}", ItemNameToUnlock);
                 return true;
             }
 
             Farm farm = MainSimPatch.GetMainSim()?.farm;
             if (farm is null)
             {
-                Log.LogError("Failed to find Farm.");
+                _log.LogError("Failed to find Farm.");
                 return false;
             }
 
             int count = farm.NumUnlocked(unlockName);
-            Log.LogInformation("Found {Count} unlocked {UnlockName}", count, unlockName);
+            _log.LogInformation("Found {Count} unlocked {UnlockName}", count, unlockName);
 
             // Hopefully we do not allow for "too many" items... but I think the game handles that internally
             farm.Unlock(unlockName, count + 1);
@@ -51,7 +52,7 @@ public class UnlockItem : BaseItem
         }
         catch (Exception ex)
         {
-            Log.LogException("Failed to unlock item", ex);
+            _log.LogError(ex, "Failed to unlock item");
             return false;
         }
     }

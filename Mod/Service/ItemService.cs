@@ -25,7 +25,6 @@ public class ItemService : IItemService
 
     public void Initialize()
     {
-        _log.LogInformation("Registering Items from {assembly}", Assembly.GetExecutingAssembly().FullName);
         // Using reflection, find any type with an Item attribute
         IEnumerable<Type> types = Assembly.GetExecutingAssembly().GetTypes();
 
@@ -45,44 +44,31 @@ public class ItemService : IItemService
             // Register the primary name
             T item = type.GetCustomAttribute<T>();
             RegisteredItems[item.Name] = new ItemInfo(type, traps);
-            // Log.LogInfo($"Item: {item.Name} Type: {type.FullName}");
 
             // Register each alternative name 
             foreach (string acceptedName in item.AcceptedNames ?? [])
-            {
                 RegisteredItems[acceptedName] = new ItemInfo(type, traps);
-                // Log.LogInfo($"\t Alternate: {acceptedName}");
-            }
         }
     }
 
     public bool CanProcess(string name) => RegisteredItems.ContainsKey(name);
 
-    private readonly object _componentLock = new();
-
     public bool Process(string name)
     {
         if (RegisteredItems.TryGetValue(name, out ItemInfo item))
         {
-            lock (_componentLock)
-            {
-                // If the component already exists, return that this was processed only if it is a trap
-                // (traps sent while the trap is active will be ignored)
-                if (Plugin.Instance.MainGameObject.TryGetComponent(item.Type, out Component _))
-                {
-                    _log.LogWarning("Failed to process item: {Name}", name);
-                    return item.IsTrap;
-                }
+            // If the component already exists, return that this was processed only if it is a trap
+            // (traps sent while the trap is active will be ignored)
+            if (Plugin.Instance.MainGameObject.TryGetComponent(item.Type, out Component _)) return item.IsTrap;
 
-                _log.LogInformation("Creating and processing item: {Name}", name);
-                // Create the component and inject any references it needs
-                Component component = BepInExHelper.CreateAndInjectComponent(item.Type);
-                if (component is UnlockItem unlock) unlock.SetUnlock(name);
-                return true;
-            }
+            _log.LogDebug("Creating and processing item: {Name}", name);
+            // Create the component and inject any references it needs
+            Component component = BepInExHelper.CreateAndInjectComponent(item.Type);
+            if (component is UnlockItem unlock) unlock.SetUnlock(name);
+            return true;
         }
 
-        Plugin.Log.LogError("Failed to locate item: {Name}", name);
+        _log.LogError("Failed to locate item: {Name}", name);
         return false;
     }
 }

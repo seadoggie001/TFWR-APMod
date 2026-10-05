@@ -1,5 +1,4 @@
 using System;
-using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
 // StructuredMessageTemplate isn't available in 4.6.2?
@@ -11,11 +10,9 @@ public static class LoggingExtensions
 {
     extension(ILogger log)
     {
-        //ToDo: Figure out how to format exceptions so I "like" them
-        public void LogException(string message, Exception exception) =>
-            log?.LogError(exception, message);
-        
-        public void LogException(Exception exception, [CanBeNull] string message, [ItemCanBeNull] params object[] args) =>
-            log?.LogError(exception, message, args);
+        public void LogException(string message, Exception exception, params object[] args)
+        {
+            log?.Log(LogLevel.Error, exception, message, args);
+        }
     }
 }

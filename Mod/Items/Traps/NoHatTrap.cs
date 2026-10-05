@@ -10,7 +10,8 @@ namespace com.seadoggie.TFWRArchipelago.Items.Traps;
 public class NoHatTrap : BaseItem
 {
     protected override string ItemName => nameof(NoHatTrap);
-    
+
+    [Log] private readonly ILogger<NoHatTrap> _log = null!;
     private static Hat _emprerorsHat = null;
     private static readonly HatSO Hatless = HatlessHat();
     public void Start()
