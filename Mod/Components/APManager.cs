@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
@@ -35,7 +35,6 @@ public class APManager : BaseComponent
             _apLocations = InitializeLocations();
             List<APLocation> locations = _apLocations.ToList();
             LocationQueue.SetLocations(locations);
-            APService.SetLocations(locations);
         }
         catch (Exception ex)
         {
@@ -82,7 +81,7 @@ public class APManager : BaseComponent
 
     private void OnGameLoaded(object sender, ModSaveGame saveGame)
     {
-        ItemQueue.Reset(saveGame.ItemsReceived);
+        ItemQueue.Reset(saveGame?.ItemsReceived ?? 0);
         APService.OnGameLoaded(sender, saveGame);
     }
 
@@ -102,8 +101,7 @@ public class APManager : BaseComponent
         {
             string folderPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
             string locationText = File.ReadAllText(Path.Combine(folderPath, "locations.json"));
-            List<APLocation> locationData = JsonConvert.DeserializeObject<List<APLocation>>(locationText);
-            _log.LogInformation("Loaded {count} locations", locationData.Count);
+            List<APLocation> locationData = APService.LoadLocations(locationText).ToList();
             return locationData;
         }
         catch (Exception e)

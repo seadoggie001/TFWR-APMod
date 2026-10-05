@@ -8,29 +8,29 @@ namespace com.seadoggie.TFWRArchipelago.Model;
 
 public class APLocation
 {
-	public long id;
-	public string name;
-	public string description;
-	public string region;
-	[CanBeNull] public string achievement;
-	[CanBeNull] public Requirement[] requirements;
-	[CanBeNull] public Statistic statistic;
-	[CanBeNull] public TimedStatistic timed;
+	public long id { get; set; }
+	public string name { get; set; }
+	public string description { get; set; }
+	public string region { get; set; }
+	[CanBeNull] public string achievement { get; set; }
+	[CanBeNull] public Requirement[] requirements { get; set; }
+	[CanBeNull] public Statistic statistic { get; set; }
+	[CanBeNull] public TimedStatistic timed { get; set; }
 	
 	public class TimedStatistic : Statistic
 	{
-		public string time;
+		public string time{ get; set; }
 	}
 
 	public class Statistic
 	{
-		public string key;
-		public string value;
+		public string key{ get; set; }
+		public string value{ get; set; }
 	}
 
 	public class Requirement
 	{
-		public string name;
-		public int count;
+		public string name{ get; set; }
+		public int count{ get; set; }
 	}
 }

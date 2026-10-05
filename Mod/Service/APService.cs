@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
@@ -269,9 +270,20 @@ public class APService : IAPService
         SubmitLocationById(location.id);
     }
 
-    public void SetLocations(List<APLocation> locations)
+    public IEnumerable<APLocation> LoadLocations(string text)
     {
-        _allLocations = locations;
+        try
+        {
+            IEnumerable<APLocation> locationData = JsonSerializer.Deserialize<APLocation[]>(text);
+            _log.LogInformation("Loaded {count} locations", locationData.Count());
+            _allLocations = locationData;
+            return locationData;
+        }
+        catch (Exception e)
+        {
+            _log.LogException("Failed to load APLocation data", e);
+            return [];
+        }
     }
 }
 
@@ -299,5 +311,5 @@ public interface IAPService
     void Disconnect(object sender, EventArgs e);
     APOptions GetOptions();
     void SubmitGrass(string grassName);
-    void SetLocations(List<APLocation> locations);
+    IEnumerable<APLocation> LoadLocations(string text);
 }
