@@ -13,7 +13,7 @@ using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
 
-public class ProgressGUI : BaseGUI
+public class ProgressGUI : BaseGUI, IInjectable
 {
     [Log] private readonly ILogger<ProgressGUI> _log = null!;
     private const float RefreshRate = 2.0f; // Every 2 seconds
@@ -83,13 +83,19 @@ public class ProgressGUI : BaseGUI
 
     public VisualElement RootElement;
 
-    public override void Awake()
+    public void OnInject()
     {
-        base.Awake();
-        _log.LogInformation("Initializing Statistics GUI");
+        try
+        {
+            _log.LogInformation("Initializing Statistics GUI");
 
-        // Create the GUI and setup styles
-        Initialize();
+            // Create the GUI and setup styles
+            Initialize();
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Failed to start up {name}", nameof(ProgressGUI));
+        }
     }
 
     // Repeatedly invoke RefreshUI. After RefreshRate seconds, repeat every RefreshRate seconds
@@ -184,7 +190,7 @@ public class ProgressGUI : BaseGUI
             }
             else
             {
-                Plugin.Log.LogInformation("Ooops, GUI visibility went weird");
+                _log.LogInformation("Ooops, GUI visibility went weird");
             }
         }
 

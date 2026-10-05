@@ -22,21 +22,31 @@ public class GoalManager : BaseComponent
         Instance = this;
     }
 
-    private void Start()
+    public override void OnInject()
+    {}
+
+    public override void Initialize()
     {
-        StatsService.Initialize(APManager.Instance?.GetLocations());
+        try
+        {
+            StatsService.Initialize(APManager.Instance?.GetLocations());
+        
+            StatEvent += OnStatEvent;
+            OnDisabled += () => StatEvent -= OnStatEvent;
 
-        StatEvent += OnStatEvent;
-        OnDisabled += () => StatEvent -= OnStatEvent;
+            APManager.Instance?.APService.OptionsLoaded += OnOptionsLoaded;
+            OnDisabled += () => APManager.Instance?.APService.OptionsLoaded -= OnOptionsLoaded;
 
-        APManager.Instance?.APService.OptionsLoaded += OnOptionsLoaded;
-        OnDisabled += () => APManager.Instance?.APService.OptionsLoaded -= OnOptionsLoaded;
+            APManager.Instance?.APService.APDisconnected += OnAPDisconnected;
+            OnDisabled += () => APManager.Instance?.APService.APDisconnected -= OnAPDisconnected;
 
-        APManager.Instance?.APService.APDisconnected += OnAPDisconnected;
-        OnDisabled += () => APManager.Instance?.APService.APDisconnected -= OnAPDisconnected;
-
-        GameManager.Instance?.GameService.GameLoaded += OnGameLoaded;
-        OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
+            GameManager.Instance?.GameService.GameLoaded += OnGameLoaded;
+            OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Failed to startup {name}", nameof(GoalManager));
+        }
     }
 
     private void OnAPDisconnected(object sender, string e) => StatsService.Stop();

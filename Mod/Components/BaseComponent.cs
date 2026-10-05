@@ -1,9 +1,10 @@
 using System;
+using com.seadoggie.TFWRArchipelago.Service;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
-public class BaseComponent : MonoBehaviour
+public abstract class BaseComponent : MonoBehaviour, IInjectable
 {
     protected Action OnDisabled;
     protected virtual void OnEnable()
@@ -14,4 +15,8 @@ public class BaseComponent : MonoBehaviour
     {
         OnDisabled?.Invoke();
     }
+
+    public abstract void OnInject();
+
+    public abstract void Initialize();
 }

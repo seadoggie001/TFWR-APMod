@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
-public class APManager : BaseComponent, IInjectable
+public class APManager : BaseComponent
 {
     [CanBeNull] public static APManager Instance { get; private set; }
 
@@ -28,7 +28,22 @@ public class APManager : BaseComponent, IInjectable
         Instance = this;
     }
 
-    private void Start()
+    public override void OnInject()
+    {
+        try
+        {
+            _apLocations = InitializeLocations();
+            List<APLocation> locations = _apLocations.ToList();
+            LocationQueue.SetLocations(locations);
+            APService.SetLocations(locations);
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Failed to start up {name}", nameof(APManager));
+        }
+    }
+
+    public override void Initialize()
     {
         GameManager.Instance?.GameService.PreLoadGame += APService.Disconnect;
         OnDisabled += () => GameManager.Instance?.GameService.PreLoadGame -= APService.Disconnect;
@@ -47,14 +62,6 @@ public class APManager : BaseComponent, IInjectable
 
         APService.APDisconnected += OnAPDisconnected;
         OnDisabled += () => APService.APDisconnected -= OnAPDisconnected;
-    }
-
-    public void OnInject()
-    {
-        _apLocations = InitializeLocations();
-        List<APLocation> locations = _apLocations.ToList();
-        LocationQueue.SetLocations(locations);
-        APService.SetLocations(locations);
     }
 
     private void OnAPDisconnected(object sender, string e) => ItemQueue.Reset();

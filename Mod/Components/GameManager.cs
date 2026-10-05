@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
-public class GameManager : BaseComponent, IInjectable
+public class GameManager : BaseComponent
 {
     [CanBeNull] public static GameManager Instance;
     [Log] private readonly ILogger<GameManager> _log = null!;
@@ -28,7 +28,9 @@ public class GameManager : BaseComponent, IInjectable
         TfwrConfig.SetupConfig(Plugin.Instance.Config);
     }
 
-    private void Start()
+    public override void OnInject() => ItemService.Initialize();
+
+    public override void Initialize()
     {
         GoalManager.Instance?.StatsService.GoalEvent += OnGoalEvent;
         OnDisabled += () => GoalManager.Instance?.StatsService.GoalEvent -= OnGoalEvent;
@@ -54,12 +56,7 @@ public class GameManager : BaseComponent, IInjectable
 
     private static void OnOptionsLoaded(object sender, APOptions options) =>
         ResourceManagerPatch.ManipulateCropCosts(options.CropCosts);
-
-    public void OnInject()
-    {
-        ItemService.Initialize();
-    }
-
+    
     /// <summary>Add the connection details to the config</summary>
     private void OnConnectionAttempt(object _, ConnectionInfo info) => TfwrConfig.ConnectionInfo = info;
 

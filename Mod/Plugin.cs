@@ -51,10 +51,15 @@ public class Plugin : BaseUnityPlugin
         
         // Create Managers
         MainGameObject = new GameObject("Archipelago");
-        BepInExHelper.CreateAndInjectComponent<UIManager>();
-        BepInExHelper.CreateAndInjectComponent<APManager>();
-        BepInExHelper.CreateAndInjectComponent<GoalManager>();
-        BepInExHelper.CreateAndInjectComponent<GameManager>();
+        BaseComponent[] components =
+        [
+            BepInExHelper.CreateAndInjectComponent<UIManager>(),
+            BepInExHelper.CreateAndInjectComponent<APManager>(),
+            BepInExHelper.CreateAndInjectComponent<GoalManager>(),
+            BepInExHelper.CreateAndInjectComponent<GameManager>()
+        ];
+
+        foreach (BaseComponent component in components) component.Initialize();
 
         // Apply game patches
         try

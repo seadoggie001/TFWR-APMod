@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
 using com.seadoggie.TFWRArchipelago.Model;
@@ -26,33 +27,42 @@ public class UIManager : BaseComponent
         Instance = this;
     }
 
-    private void Start()
+    public override void Initialize()
     {
-        GoalManager.Instance?.StatsService.GoalEvent += OnGoalEvent;
-        OnDisabled += () => GoalManager.Instance?.StatsService.GoalEvent -= OnGoalEvent;
-        GoalManager.Instance?.StatsService.StatTotalEvent += OnStatTotalEvent;
-        OnDisabled += () => GoalManager.Instance?.StatsService.StatTotalEvent -= OnStatTotalEvent;
+        try
+        {
+            GoalManager.Instance?.StatsService.GoalEvent += OnGoalEvent;
+            OnDisabled += () => GoalManager.Instance?.StatsService.GoalEvent -= OnGoalEvent;
+            GoalManager.Instance?.StatsService.StatTotalEvent += OnStatTotalEvent;
+            OnDisabled += () => GoalManager.Instance?.StatsService.StatTotalEvent -= OnStatTotalEvent;
 
-        APManager.Instance?.APService.APDisconnected += OnAPDisconnected;
-        OnDisabled += () => APManager.Instance?.APService.APDisconnected -= OnAPDisconnected;
-        APManager.Instance?.LocationQueue.APLocationGiven += OnAPLocationGiven;
-        OnDisabled += () => APManager.Instance?.LocationQueue.APLocationGiven -= OnAPLocationGiven;
-        APManager.Instance?.APService.ConnectionResult += OnConnectionResult;
-        OnDisabled += () => APManager.Instance?.APService.ConnectionResult -= OnConnectionResult;
-        APManager.Instance?.APService.OptionsLoaded += OnOptionsLoaded;
-        OnDisabled += () => APManager.Instance?.APService.OptionsLoaded -= OnOptionsLoaded;
+            APManager.Instance?.APService.APDisconnected += OnAPDisconnected;
+            OnDisabled += () => APManager.Instance?.APService.APDisconnected -= OnAPDisconnected;
+            APManager.Instance?.LocationQueue.APLocationGiven += OnAPLocationGiven;
+            OnDisabled += () => APManager.Instance?.LocationQueue.APLocationGiven -= OnAPLocationGiven;
+            APManager.Instance?.APService.ConnectionResult += OnConnectionResult;
+            OnDisabled += () => APManager.Instance?.APService.ConnectionResult -= OnConnectionResult;
+            APManager.Instance?.APService.OptionsLoaded += OnOptionsLoaded;
+            OnDisabled += () => APManager.Instance?.APService.OptionsLoaded -= OnOptionsLoaded;
 
-        GameManager.Instance?.GameService.GameLoaded += OnGameLoaded;
-        OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
-        GameManager.Instance?.GameService.MenuOpen += OnMenuOpen;
-        OnDisabled += () => GameManager.Instance?.GameService.MenuOpen -= OnMenuOpen;
-        GameManager.Instance?.NewItemReceived += NotifyItemReceived;
-        OnDisabled += () => GameManager.Instance?.NewItemReceived -= NotifyItemReceived;
-
+            GameManager.Instance?.GameService.GameLoaded += OnGameLoaded;
+            OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
+            GameManager.Instance?.GameService.MenuOpen += OnMenuOpen;
+            OnDisabled += () => GameManager.Instance?.GameService.MenuOpen -= OnMenuOpen;
+            GameManager.Instance?.NewItemReceived += NotifyItemReceived;
+            OnDisabled += () => GameManager.Instance?.NewItemReceived -= NotifyItemReceived;
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Failed to initialize {name}", nameof(UIManager));
+        }
+    }
+    
+    public override void OnInject()
+    {
         progressGUI = new GameObject("StatGUI").AddComponent<ProgressGUI>();
         InjectionService.Inject(progressGUI);
         progressGUI.transform.SetParent(Plugin.Instance.MainGameObject.transform);
-        progressGUI.Disable();
 
         floatingActionButton = new GameObject("FabGUI").AddComponent<FloatingActionButton>();
         InjectionService.Inject(floatingActionButton);

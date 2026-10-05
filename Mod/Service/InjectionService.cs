@@ -6,10 +6,10 @@ using Microsoft.Extensions.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
-public static class InjectionService
+public class InjectionService
 {
     public static ILoggerFactory LoggerFactory { private get; set; }
-    public static ILogger Log { private get; set; }
+    public static ILogger<InjectionService> Log { private get; set; }
     private static readonly Dictionary<Type, object> InjectableServices = new();
 
     public static void AutomaticRegistration()
@@ -62,6 +62,11 @@ public static class InjectionService
     /// <inheritdoc cref="Register" />
     public static void Register<T>(object service) => Register(typeof(T), service);
 
+    public static object InjectType(object target, Type type)
+    {
+        return typeof(InjectionService).GetMethod("Inject")?.MakeGenericMethod([type]).Invoke(null, [target]);
+    }
+
     /// <summary>
     /// Inject registered services into any properties or fields
     /// </summary>
@@ -69,11 +74,28 @@ public static class InjectionService
     /// <exception cref="Exception"></exception>
     public static T Inject<T>(T target)
     {
-        target = InjectProperties(target);
-        target = InjectFields(target);
-        target = InjectLog(target);
-        if (target is IInjectable injectable) injectable.OnInject();
-        return target;
+        try
+        {
+            target = InjectProperties(target);
+            target = InjectFields(target);
+            target = InjectLog(target);
+            try
+            {
+                if (target is IInjectable injectable) injectable.OnInject();
+            }
+            catch (Exception innerEx)
+            {
+                Log.LogError(innerEx, "Stop throwing exceptions on inject!");
+            }
+
+            return target;
+        }
+        catch (Exception ex)
+        {
+            Log.LogError(ex, "Failed to inject all items");
+        }
+
+        return default(T);
     }
 
     private static T InjectProperties<T>(T target)
