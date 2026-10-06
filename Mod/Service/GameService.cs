@@ -62,10 +62,8 @@ public class GameService : IGameService
             }
 
             string json = File.ReadAllText(filePath);
-            if (!string.IsNullOrWhiteSpace(json))
-            {
-                modSaveGame = JsonSerializer.Deserialize<ModSaveGame>(json);
-            }
+            if (!string.IsNullOrWhiteSpace(json)) modSaveGame = JsonSerializer.Deserialize<ModSaveGame>(json);
+
 
             Plugin.Log.LogInformation("Save game was loaded");
 
@@ -118,6 +116,7 @@ public class GameService : IGameService
             try
             {
                 if (_modSaveGame is null) return;
+                _modSaveGame.Grass ??= [];
                 // Check if it needs to be submitted
                 if (!_modSaveGame.Grass.Add(new Position(x, y))) return;
 

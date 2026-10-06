@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
 using HarmonyLib;
@@ -70,6 +71,7 @@ public class SaveChooserPatch
                 if (!fileInfo.Exists && fileInfo.Directory is not null)
                     Directory.CreateDirectory(fileInfo.Directory.FullName);
                 File.WriteAllText(filePath, JsonUtility.ToJson(new ModSaveGame()));
+                GameManager.Instance?.GameService.Load(saveName);
                 __instance.CreateNewSave();
             });
 
