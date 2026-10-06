@@ -17,7 +17,7 @@ public class FrozenTrap : BaseItem
     private IEnumerator Frozen()
     {
         DronePatch.IsFrozen = true;
-        yield return new WaitForSecondsRealtime(15);
+        yield return new WaitForSecondsRealtime(TrapLength);
         DronePatch.IsFrozen = false;
         
         Completed();

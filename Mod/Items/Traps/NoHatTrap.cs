@@ -1,20 +1,22 @@
 using System.Collections;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Patches;
+using com.seadoggie.TFWRArchipelago.Service;
 using Microsoft.Extensions.Logging;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Items.Traps;
 
 [Trap(APItem.NoHatTrap)]
-public class NoHatTrap : BaseItem
+public class NoHatTrap : BaseItem, IInjectable
 {
     protected override string ItemName => nameof(NoHatTrap);
 
     [Log] private readonly ILogger<NoHatTrap> _log = null!;
     private static Hat _emprerorsHat = null;
     private static readonly HatSO Hatless = HatlessHat();
-    public void Start()
+    
+    public void OnInject()
     {
         StartCoroutine(NoHat());
     }
@@ -45,7 +47,7 @@ public class NoHatTrap : BaseItem
             _emprerorsHat ??= Hat.CreateHat(Hatless, simulation, drone);
             drone.hat = _emprerorsHat;
         }
-        yield return new WaitForSecondsRealtime(15);
+        yield return new WaitForSecondsRealtime(TrapLength);
         DronePatch.Hatless = false;
         HatSO straw = ResourceManager.GetHat("straw_hat");
         simulation = MainSimPatch.GetMainSim();
@@ -53,7 +55,7 @@ public class NoHatTrap : BaseItem
         {
             drone.hat = Hat.CreateHat(straw, simulation, drone);
         }
-        Log.LogInformation("Done with no hat");
+        _log.LogInformation("Done with no hat");
         
         Completed();
     }

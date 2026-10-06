@@ -16,9 +16,9 @@ public class FlipTrap : BaseItem
 
     private IEnumerator Flip()
     {
-        Farm.LeanScale(new Vector3(-1, -1, 1), 5);
-        yield return new WaitForSecondsRealtime(20);
-        Farm.LeanScale(new Vector3(1, 1, 1), 5);
+        Farm.LeanScale(new Vector3(-1, -1, 1), 2);
+        yield return new WaitForSecondsRealtime(TrapLength - 4);
+        Farm.LeanScale(new Vector3(1, 1, 1), 2);
         
         Completed();
     }

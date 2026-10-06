@@ -1,23 +1,31 @@
 using System;
 using com.seadoggie.TFWRArchipelago.Patches;
+using com.seadoggie.TFWRArchipelago.Service;
 using com.seadoggie.TFWRArchipelago.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Items;
 
 // Do NOT add an ItemAttribute to this class. Unlocks are manually registered in the ItemService 
-public class UnlockItem : BaseItem
+public class UnlockItem : BaseItem, IInjectable
 {
     protected override string ItemName => "UnlockItem";
     public string ItemNameToUnlock { get; set; }
+    private bool _ready;
     [Log] private readonly ILogger<UnlockItem> _log = null!;
 
-    public void SetUnlock(string item) => ItemNameToUnlock = item;
+    public void SetUnlock(string item)
+    {
+        ItemNameToUnlock = item;
+        if (_log != null) _ready = true;
+    }
+
+    public void OnInject() => _ready = !string.IsNullOrWhiteSpace(ItemNameToUnlock);
 
     public void Update()
     {
-        if (string.IsNullOrEmpty(ItemNameToUnlock)) return;
-        if(Unlocked()) Completed();
+        if (!_ready) return;
+        if (Unlocked()) Completed();
     }
 
     private bool Unlocked()

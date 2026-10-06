@@ -20,7 +20,7 @@ public class TinyTrap : BaseItem
     private IEnumerator Tiny()
     {
         DronePatch.ModifiedSize = new Vector3(Size,Size,Size);
-        yield return new WaitForSecondsRealtime(15);
+        yield return new WaitForSecondsRealtime(TrapLength);
         DronePatch.ModifiedSize = null;
         
         Completed();
