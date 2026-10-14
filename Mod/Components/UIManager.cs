@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
+using Archipelago.MultiClient.Net.Models;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
 using com.seadoggie.TFWRArchipelago.UI;
@@ -44,6 +45,8 @@ public class UIManager : BaseComponent
             OnDisabled += () => APManager.Instance?.APService.ConnectionResult -= OnConnectionResult;
             APManager.Instance?.APService.OptionsLoaded += OnOptionsLoaded;
             OnDisabled += () => APManager.Instance?.APService.OptionsLoaded -= OnOptionsLoaded;
+            APManager.Instance?.ItemQueue.ItemDequeued += OnItemDequeued;
+            OnDisabled += () => APManager.Instance?.ItemQueue.ItemDequeued -= OnItemDequeued;
 
             GameManager.Instance?.GameService.GameLoaded += OnGameLoaded;
             OnDisabled += () => GameManager.Instance?.GameService.GameLoaded -= OnGameLoaded;
@@ -57,7 +60,9 @@ public class UIManager : BaseComponent
             _log.LogError(ex, "Failed to initialize {name}", nameof(UIManager));
         }
     }
-    
+
+    private void OnItemDequeued(object sender, ItemInfo itemData) => progressGUI.ItemReceived(itemData.ItemName);
+
     public override void OnInject()
     {
         progressGUI = new GameObject("StatGUI").AddComponent<ProgressGUI>();

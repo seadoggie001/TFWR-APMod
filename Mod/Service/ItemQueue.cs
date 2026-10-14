@@ -24,6 +24,10 @@ public class ItemQueue : IItemQueue
     private string _stash = "";
     private readonly List<string> _itemQueue = [];
 
+    /// <summary>Event when an item is dequeued from AP. These may have been processed before.</summary>
+    public event EventHandler<ItemInfo> ItemDequeued;
+    
+    /// <summary>Event when a new event is processed</summary>
     public event EventHandler<ItemReceivedData> ItemReady;
 
     public void Process()
@@ -57,7 +61,7 @@ public class ItemQueue : IItemQueue
         {
             _itemsReceived++;
         }
-        helper.DequeueItem();
+        ItemDequeued?.Invoke(this, helper.DequeueItem());
     }
 
     public void Reset(int count = 0)
@@ -72,6 +76,7 @@ public class ItemQueue : IItemQueue
 
 public interface IItemQueue
 {
+    event EventHandler<ItemInfo> ItemDequeued;
     event EventHandler<ItemReceivedData> ItemReady;
     void Process();
     void OnItemReceived(IReceivedItemsHelper helper);
