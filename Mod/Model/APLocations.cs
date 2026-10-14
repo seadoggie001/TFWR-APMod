@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+using com.seadoggie.TFWRArchipelago.APLogic;
 using JetBrains.Annotations;
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable InconsistentNaming
@@ -27,6 +29,8 @@ public class APLocation
 		public string key{ get; set; }
 		public string value{ get; set; }
 	}
+    
+    [JsonIgnore] public Rule Rule { get; set; }
 }
 
 public class Requirement

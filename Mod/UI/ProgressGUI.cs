@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using com.seadoggie.TFWRArchipelago.APLogic;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
 using HarmonyLib;
@@ -21,6 +22,7 @@ public class ProgressGUI : BaseGUI, IInjectable
     private UIDocument _uiDocument;
     private IEnumerable<Row> _rows;
     private Visibility _visible;
+    private APWorld _world;
 
     private enum Visibility
     {
@@ -56,12 +58,21 @@ public class ProgressGUI : BaseGUI, IInjectable
 
     private class Row
     {
+        /// <summary>
+        /// Unity UI Element holding everything
+        /// </summary>
         public GroupBox GroupBox;
+        /// <summary>
+        /// [Optional] ProgressBar displaying progress (ie: 5/10 Flips)
+        /// </summary>
         [CanBeNull] public ProgressBar ProgressBar;
+        /// <summary>
+        /// Toggle displaying if the Location is completed or not
+        /// </summary>
         public Toggle Toggle;
-
+        
         [CanBeNull] public Milestone Milestone;
-        [CanBeNull] public APLocation APLocation;
+        public APLocation APLocation;
 
         public void Completed(bool completed)
         {
@@ -154,6 +165,7 @@ public class ProgressGUI : BaseGUI, IInjectable
     /// <param name="groupedMilestones"></param>
     /// <param name="stats"></param>
     /// <param name="allLocations"></param>
+    /// <param name="regions"></param>
     public void LoadStats(IEnumerable<KeyValuePair<string, List<Milestone>>> groupedMilestones,
         Dictionary<string, double> stats,
         APExport exportData)
@@ -169,6 +181,11 @@ public class ProgressGUI : BaseGUI, IInjectable
             Stats = stats,
             AllLocations = exportData.locations,
         };
+
+        Builder builder = new(exportData);
+        _world = builder.Build();
+        _world.ReEvaluate();
+        
         // Clear the statistic queue
         _statQueue = new ConcurrentQueue<Stat>();
         _reload = true;
@@ -282,41 +299,52 @@ public class ProgressGUI : BaseGUI, IInjectable
 
         // Button group
         VisualElement buttonGroup = CreateWithClass(["btn-group"]);
+        titleRow.Add(buttonGroup);
 
         Button statBtn = new()
         {
-            text = "Statistic",
+            text = "Stat",
+            tooltip = "Toggle statistics",
         };
         statBtn.AddToClassList("btn");
         statBtn.AddToClassList("btn-toggle");
+        buttonGroup.Add(statBtn);
 
         Button achievementBtn = new()
         {
-            text = "Achievement",
+            text = "Achv",
+            tooltip = "Toggle achievements",
         };
         achievementBtn.AddToClassList("btn");
         achievementBtn.AddToClassList("btn-toggle");
+        buttonGroup.Add(achievementBtn);
 
         Button completedBtn = new()
         {
-            text = "Completed",
+            text = "Done",
             tooltip = "Toggle completed",
         };
         completedBtn.AddToClassList("btn");
         completedBtn.AddToClassList("btn-toggle");
+        buttonGroup.Add(completedBtn);
+
+        Button logicBtn = new()
+        {
+            text = "Logic",
+            tooltip = "Toggle items in logic",
+        };
+        logicBtn.AddToClassList("btn");
+        logicBtn.AddToClassList("btn-toggle");
+        buttonGroup.Add(logicBtn);
 
         Button close = new()
         {
             text = "X",
+            tooltip = "Collapse"
         };
         close.AddToClassList("btn");
         close.AddToClassList("btn-close");
-
-        buttonGroup.Add(statBtn);
-        buttonGroup.Add(achievementBtn);
-        buttonGroup.Add(completedBtn);
         buttonGroup.Add(close);
-        titleRow.Add(buttonGroup);
 
         Button expandBtn = new()
         {
@@ -378,7 +406,16 @@ public class ProgressGUI : BaseGUI, IInjectable
 
         close.RegisterCallback<MouseUpEvent>(Closed);
         _unregisterCallback += () => close.UnregisterCallback<MouseUpEvent>(Closed);
+        
+        logicBtn.RegisterCallback<MouseUpEvent>(ToggleLogic);
+        _unregisterCallback += () => logicBtn.UnregisterCallback<MouseUpEvent>(ToggleLogic);
 
+        // Note: tooltip should be at the bottom of the UI
+        Tooltip tooltip = new();
+
+        root.Add(tooltip);
+        root.Query<Button>().ToList().ForEach(m => m.AddManipulator(new Tooltip.TooltipManipulator(tooltip)));
+        
         return;
 
         void ToggleCompleted(MouseUpEvent evt)
@@ -398,6 +435,27 @@ public class ProgressGUI : BaseGUI, IInjectable
             statBtn.ToggleInClassList("toggled");
             container.ToggleInClassList("hide-progress");
         }
+
+        void ToggleLogic(MouseUpEvent evt)
+        {
+            logicBtn.ToggleInClassList("toggled");
+            bool isToggled = logicBtn.ClassListContains("toggled");
+            container.ToggleInClassList("hide-ool");
+            if (!isToggled) return;
+            _log.LogInformation("Updating logic items");
+            
+            UpdateRowLogic();
+        }
+    }
+
+    private void UpdateRowLogic()
+    {
+        // For each row
+        foreach (Row row in _rows)
+        {
+            if (!row.GroupBox.ClassListContains("ool") || !(row.APLocation?.Rule?.Value ?? false)) continue;
+            row.GroupBox.ToggleInClassList("ool");
+        }
     }
 
     private static VisualElement CreateWithClass(IEnumerable<string> classes)
@@ -413,6 +471,7 @@ public class ProgressGUI : BaseGUI, IInjectable
         groupBox.AddToClassList("statistic");
         groupBox.AddToClassList("progress");
         groupBox.AddToClassList("border");
+        groupBox.AddToClassList("ool");
         if (milestone.Triggered) groupBox.AddToClassList("complete");
         if (first) groupBox.AddToClassList("border-first");
 
@@ -474,6 +533,7 @@ public class ProgressGUI : BaseGUI, IInjectable
         row.AddToClassList("statistic");
         row.AddToClassList("achievement");
         row.AddToClassList("border");
+        row.AddToClassList("ool");
 
         // Title row
         VisualElement titleRow = new();
@@ -562,5 +622,19 @@ public class ProgressGUI : BaseGUI, IInjectable
                 row.UpdateProgress(stat.Value);
             }
         }
+    }
+
+    public void ItemReceived(string itemName)
+    {
+        if (_world.ReceivedItems.TryGetValue(itemName, out int value))
+        {
+            _world.ReceivedItems[itemName] = value + 1;
+        }
+        else
+        {
+            _world.ReceivedItems.Add(itemName, 1);
+        }
+        _world.ReEvaluate();
+        UpdateRowLogic();
     }
 }
