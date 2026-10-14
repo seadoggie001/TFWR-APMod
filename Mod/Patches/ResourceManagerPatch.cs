@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using com.seadoggie.TFWRArchipelago.Components;
 using HarmonyLib;
 using Microsoft.Extensions.Logging;
 using UnityEngine;
@@ -14,11 +13,13 @@ namespace com.seadoggie.TFWRArchipelago.Patches;
 [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony forces the use of some variable names")]
 public class ResourceManagerPatch
 {
-    public const string ArchipelagoOptionToggle = "Archipelago";
-    public const string ArchipelagoOptionToggleValue = "Click to Open";
+    public static class OptionNames
+    {
+        public const string OpenConnectionWindow = "Launch AP Connection";
+        public const string RickRollTrap = "Rick Roll Trap";
+    }
     public static string[] CustomOptions = [];
-
-    private static CycleOptionSO _openArchipelagoOption;
+    public const string ArchipelagoCategory = "Archipelago";
 
     [HarmonyPostfix]
     [HarmonyPatch(nameof(ResourceManager.LoadAll))]
@@ -48,16 +49,25 @@ public class ResourceManagerPatch
     {
         try
         {
-            if (!(GameManager.Instance?.TfwrConfig?.Debug ?? false))
-                return;
+            List<OptionSO> newOptions =
+            [
+                AddOption(OptionNames.OpenConnectionWindow,
+                    "Open Archipelago connection settings",
+                    ArchipelagoCategory,
+                    0f,
+                    ["Click to Open", " Click to Open "],
+                    "Click to Open"),
+                AddOption(OptionNames.RickRollTrap,
+                    "Disables the Rick Roll trap completely",
+                    ArchipelagoCategory,
+                    0f,
+                    ["enabled", "disabled"],
+                    "enabled"),
+            ];
+            CustomOptions = newOptions.Select(m => m.name).ToArray();
             List<OptionSO> options = __result.ToList();
-            _openArchipelagoOption ??= AddOption(ArchipelagoOptionToggle, "Open Archipelago settings", "general", 0f,
-                [ArchipelagoOptionToggleValue, "Closed"], ArchipelagoOptionToggleValue);
-            options.Add(_openArchipelagoOption);
-            options.Add(AddOption("DEBUG", "Cause debugging is hard", "general", 0f, ["Send location", "done"],
-                "Send location"));
-            CustomOptions = [ArchipelagoOptionToggle, "DEBUG"];
-            __result = options;
+            options.AddRange(newOptions);
+            __result = options.ToList();
         }
         catch (Exception e)
         {
@@ -122,7 +132,7 @@ public class ResourceManagerPatch
             Plugin.Log.LogException($"{nameof(GetUnlock)}", e);
         }
     }
-    
+
     public static void ManipulateCropCosts(Dictionary<string, List<string>> CropCosts)
     {
         if (CropCosts is null) return;

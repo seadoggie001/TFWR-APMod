@@ -9,8 +9,6 @@ namespace com.seadoggie.TFWRArchipelago.Patches;
 [HarmonyPatch(typeof(OptionMenu))]
 public class OptionMenuPatch
 {
-    private static bool _settingValue;
-
     /// <summary>
     /// Launch the GUI for Arch settings when a custom option is clicked
     /// </summary>
@@ -21,18 +19,13 @@ public class OptionMenuPatch
     {
         try
         {
-            if (!(GameManager.Instance?.TfwrConfig?.Debug ?? false) ||
-                !ResourceManagerPatch.CustomOptions.ToList().Contains(optionName))
-                return;
+            if (!ResourceManagerPatch.CustomOptions.ToList().Contains(optionName)) return;
 
-            Plugin.Log.LogInformation("CustomOption Changed. Name: {option}", optionName);
-            // Don't cause an infinite loop because we're setting the value in the "listener"
-            // Note: a locking object fails here... perhaps it's related to BepinEx or Harmony?
-            if (_settingValue) return;
-            _settingValue = true;
+            Plugin.Log.LogInformation("CustomOption Changed. Name: {option} Value: {value}", optionName,
+                OptionHolder.GetString(optionName));
             switch (optionName)
             {
-                case ResourceManagerPatch.ArchipelagoOptionToggle:
+                case ResourceManagerPatch.OptionNames.OpenConnectionWindow:
                     try
                     {
                         UIManager.Instance?.OpenConnectionSettings();
@@ -42,12 +35,8 @@ public class OptionMenuPatch
                         Plugin.Log.LogError(e, "Failed to create the connection settings modifier GUI");
                     }
 
-                    OptionHolder.SetOption(ResourceManagerPatch.ArchipelagoOptionToggle,
-                        ResourceManagerPatch.ArchipelagoOptionToggleValue);
                     break;
             }
-
-            _settingValue = false;
         }
         catch (Exception e)
         {
