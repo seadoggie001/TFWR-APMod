@@ -64,11 +64,8 @@ public class Tooltip : VisualElement
 
         StyleLength padding = new(10);
         // label
-        _label = new Label
-        {
-            pickingMode = PickingMode.Ignore,
-            classList = { USSLabel }
-        };
+        _label = new Label { pickingMode = PickingMode.Ignore, };
+        _label.AddToClassList(USSLabel);
         Add(_label);
 
         style.position = Position.Absolute;
@@ -141,7 +138,7 @@ public class Tooltip : VisualElement
                 styleTop = target.worldBound.yMax + 5;
                 break;
         }
-        
+
         // Note: this is weird because of the 75px offset used to skip over the item list
         styleTop -= 75;
         if (styleLeft < parent.worldBound.xMin) styleLeft = parent.worldBound.xMin;
