@@ -32,7 +32,7 @@ public class ItemService : IItemService
         Register<TrapAttribute>(types, true);
 
         // Manually register each unlock with the UnlockItem
-        foreach (string unlock in APItem.Unlocks) RegisteredItems[unlock] = new ItemInfo(typeof(UnlockItem), false);
+        foreach (string unlock in APItem.Names.Unlocks) RegisteredItems[unlock] = new ItemInfo(typeof(UnlockItem), false);
         _log.LogInformation("Registered UnlockItems: {items}", string.Join(",", RegisteredItems.Keys));
     }
 

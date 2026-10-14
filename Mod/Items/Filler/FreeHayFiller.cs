@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Items.Filler;
 
-[Item(APItem.FreeHay)]
+[Item(APItem.Names.FreeHay)]
 public class FreeHayFiller : BaseItem, IInjectable
 {
     protected override string ItemName => nameof(FreeHayFiller);

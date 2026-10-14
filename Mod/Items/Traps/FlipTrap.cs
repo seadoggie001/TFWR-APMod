@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Items.Traps;
 
-[Trap(APItem.FlipTrap)]
+[Trap(APItem.Names.FlipTrap)]
 public class FlipTrap : BaseItem
 {
     protected override string ItemName => nameof(FlipTrap);

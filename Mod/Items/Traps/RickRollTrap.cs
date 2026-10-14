@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Items.Traps;
 
-[Trap(APItem.RickRollTrap)]
+[Trap(APItem.Names.RickRollTrap)]
 public class RickRollTrap : BaseItem
 {
     protected override string ItemName => nameof(RickRollTrap);

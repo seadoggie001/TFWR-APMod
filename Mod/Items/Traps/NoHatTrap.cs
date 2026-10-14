@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Items.Traps;
 
-[Trap(APItem.NoHatTrap)]
+[Trap(APItem.Names.NoHatTrap)]
 public class NoHatTrap : BaseItem, IInjectable
 {
     protected override string ItemName => nameof(NoHatTrap);

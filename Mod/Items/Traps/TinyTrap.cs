@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Items.Traps;
 
-[Trap(APItem.TinyTrap)]
+[Trap(APItem.Names.TinyTrap)]
 public class TinyTrap : BaseItem
 {
     protected override string ItemName => nameof(TinyTrap);
