@@ -29,7 +29,7 @@ public class GoalManager : BaseComponent
     {
         try
         {
-            StatsService.Initialize(APManager.Instance?.GetLocations());
+            StatsService.Initialize(APManager.Instance?.GetAPData().locations);
         
             StatEvent += OnStatEvent;
             OnDisabled += () => StatEvent -= OnStatEvent;

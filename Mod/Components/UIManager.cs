@@ -127,7 +127,7 @@ public class UIManager : BaseComponent
             progressGUI.LoadStats(
                 GoalManager.Instance?.StatsService.MilestoneCopy(),
                 GoalManager.Instance?.StatsService.StatCopy(),
-                APManager.Instance?.GetLocations()
+                APManager.Instance?.GetAPData()
             );
         }
     }

@@ -156,18 +156,18 @@ public class ProgressGUI : BaseGUI, IInjectable
     /// <param name="allLocations"></param>
     public void LoadStats(IEnumerable<KeyValuePair<string, List<Milestone>>> groupedMilestones,
         Dictionary<string, double> stats,
-        IEnumerable<APLocation> allLocations)
+        APExport exportData)
     {
         if (groupedMilestones is null) _log.LogWarning("GroupedMilestones is null");
         if (stats is null) _log.LogWarning("Stats is null");
-        if (allLocations is null) _log.LogWarning("AllLocations is null");
+        if (exportData is null) _log.LogWarning("exportData is null");
 
         // Save the information needed for a reload
         _updateInformation = new UpdateInformation
         {
             GroupedMilestones = groupedMilestones,
             Stats = stats,
-            AllLocations = allLocations,
+            AllLocations = exportData.locations,
         };
         // Clear the statistic queue
         _statQueue = new ConcurrentQueue<Stat>();

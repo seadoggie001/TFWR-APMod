@@ -27,10 +27,10 @@ public class APLocation
 		public string key{ get; set; }
 		public string value{ get; set; }
 	}
+}
 
-	public class Requirement
-	{
-		public string name{ get; set; }
-		public int count{ get; set; }
-	}
+public class Requirement
+{
+	public string name{ get; set; }
+	public int count{ get; set; }
 }

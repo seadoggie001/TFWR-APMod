@@ -1,6 +1,6 @@
 namespace com.seadoggie.TFWRArchipelago.Model;
 
-public static class APItem
+public class APItem
 {
     public static class Names
     {
@@ -57,4 +57,11 @@ public static class APItem
             PowerFlip
         ];
     }
+
+    public long id { get; set; }
+    public string name { get; set; }
+    public int count { get; set; }
+    public int classification { get; set; }
+    public int secondary_count { get; set; }
+    public int secondary_classification { get; set; }
 }

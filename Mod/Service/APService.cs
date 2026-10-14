@@ -23,7 +23,7 @@ public class APService : IAPService
     private Dictionary<string, object> _slotData;
     private APOptions _options;
     private APOptions _offlineOptions;
-    private IEnumerable<APLocation> _allLocations;
+    private APExport _export;
 
     public APService() => APDisconnected += OnAPDisconnected;
 
@@ -82,7 +82,7 @@ public class APService : IAPService
                 // Let everything know that an achievement was unlocked
                 AchievementUnlocked?.Invoke(this, achievementName);
                 // Find the relevant location for this achievement
-                APLocation location = _allLocations.FirstOrDefault(m => m.achievement == achievementName);
+                APLocation location = _export.locations.FirstOrDefault(m => m.achievement == achievementName);
                 if (location is null)
                 {
                     _log.LogWarning("Unable to locate location for achievement {name}", achievementName);
@@ -165,7 +165,7 @@ public class APService : IAPService
                 _log.LogInformation("{options}", _options.ToString());
 
                 // Determine goal location
-                _goal = _allLocations.First(m => m.name == _options.GoalName());
+                _goal = _export.locations.First(m => m.name == _options.GoalName());
 
                 _log.LogInformation("Goal name was set to {goal}", _options.GoalName());
                 if (_goal is null) _log.LogError("_goal is null!");
@@ -260,7 +260,7 @@ public class APService : IAPService
     public void SubmitGrass(string grassName)
     {
         if (!Plugin.Instance.Enabled || _options is null || !_options.GrassSanityEnabled()) return;
-        APLocation location = _allLocations.FirstOrDefault(m => m.name == grassName);
+        APLocation location = _export.locations.FirstOrDefault(m => m.name == grassName);
         if (location == null)
         {
             _log.LogError("Grass sanity is not found in the APLocations. Expected: {position}", grassName);
@@ -270,19 +270,20 @@ public class APService : IAPService
         SubmitLocationById(location.id);
     }
 
-    public IEnumerable<APLocation> LoadLocations(string text)
+    public APExport LoadData(string text)
     {
         try
         {
-            IEnumerable<APLocation> locationData = JsonSerializer.Deserialize<APLocation[]>(text);
-            _log.LogInformation("Loaded {count} locations", locationData.Count());
-            _allLocations = locationData;
-            return locationData;
+            APExport exportData = JsonSerializer.Deserialize<APExport>(text);
+            _log.LogInformation("Loaded: {locs} locations, {regs} regions, {crops} crops", exportData.locations.Count(),
+                exportData.regions.Count(), exportData.crops.Count());
+            _export = exportData;
+            return exportData;
         }
         catch (Exception e)
         {
             _log.LogException("Failed to load APLocation data", e);
-            return [];
+            return null;
         }
     }
 }
@@ -311,5 +312,5 @@ public interface IAPService
     void Disconnect(object sender, EventArgs e);
     APOptions GetOptions();
     void SubmitGrass(string grassName);
-    IEnumerable<APLocation> LoadLocations(string text);
+    APExport LoadData(string text);
 }

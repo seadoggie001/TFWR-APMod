@@ -20,7 +20,7 @@ public class APManager : BaseComponent
     [ModInject] public readonly ILocationQueue LocationQueue = null!;
     [ModInject] public readonly IItemQueue ItemQueue = null!;
 
-    private IEnumerable<APLocation> _apLocations;
+    private APExport _export;
 
     protected override void OnEnable()
     {
@@ -32,9 +32,8 @@ public class APManager : BaseComponent
     {
         try
         {
-            _apLocations = InitializeLocations();
-            List<APLocation> locations = _apLocations.ToList();
-            LocationQueue.SetLocations(locations);
+            _export = InitializeLocations();
+            LocationQueue.SetLocations(_export.locations);
         }
         catch (Exception ex)
         {
@@ -90,24 +89,24 @@ public class APManager : BaseComponent
     private void OnConnectionAttemptEvent(object sender, ConnectionInfo e) =>
         APService.TryEnableAsync(e, LocationQueue, ItemQueue);
 
-    public IEnumerable<APLocation> GetLocations() => _apLocations;
+    public APExport GetAPData() => _export;
 
     /// <summary>
     /// Loads all Locations from data.yaml
     /// </summary>
-    private IEnumerable<APLocation> InitializeLocations()
+    private APExport InitializeLocations()
     {
         try
         {
             string folderPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
-            string locationText = File.ReadAllText(Path.Combine(folderPath, "locations.json"));
-            List<APLocation> locationData = APService.LoadLocations(locationText).ToList();
-            return locationData;
+            string locationText = File.ReadAllText(Path.Combine(folderPath, "data.json"));
+            APExport exportData = APService.LoadData(locationText);
+            return exportData;
         }
         catch (Exception e)
         {
-            _log.LogException("Failed to load APLocation data", e);
-            return [];
+            _log.LogException("Failed to load export data", e);
+            return null;
         }
     }
 }
