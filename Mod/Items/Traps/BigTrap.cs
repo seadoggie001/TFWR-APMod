@@ -6,16 +6,11 @@ using UnityEngine;
 namespace com.seadoggie.TFWRArchipelago.Items.Traps;
 
 [Trap(APItem.Names.BigTrap)]
-public class BigTrap : BaseItem
+public class BigTrap : BaseTrap
 {
-    protected override string ItemName => nameof(BigTrap);
     private const float Size = 2.5f;
-    public void Start()
-    {
-        StartCoroutine(Bigger());
-    }
     
-    private IEnumerator Bigger()
+    protected override IEnumerator Trap()
     {
         DronePatch.ModifiedSize = new Vector3(Size,Size,Size);
         yield return new WaitForSecondsRealtime(TrapLength);

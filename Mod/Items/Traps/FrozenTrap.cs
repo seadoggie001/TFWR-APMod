@@ -6,15 +6,9 @@ using UnityEngine;
 namespace com.seadoggie.TFWRArchipelago.Items.Traps;
 
 [Trap(APItem.Names.FrozenTrap)]
-public class FrozenTrap : BaseItem
+public class FrozenTrap : BaseTrap
 {
-    protected override string ItemName => nameof(FrozenTrap);
-    public void Start()
-    {
-        StartCoroutine(Frozen());
-    }
-
-    private IEnumerator Frozen()
+    protected override IEnumerator Trap()
     {
         DronePatch.IsFrozen = true;
         yield return new WaitForSecondsRealtime(TrapLength);

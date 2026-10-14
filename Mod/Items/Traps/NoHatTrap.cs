@@ -8,16 +8,15 @@ using UnityEngine;
 namespace com.seadoggie.TFWRArchipelago.Items.Traps;
 
 [Trap(APItem.Names.NoHatTrap)]
-public class NoHatTrap : BaseItem, IInjectable
+public class NoHatTrap : BaseTrap, IInjectable
 {
-    protected override string ItemName => nameof(NoHatTrap);
-
     [Log] private readonly ILogger<NoHatTrap> _log = null!;
-    private static Hat _emprerorsHat = null;
+    private static Hat _emperorHat = null;
     private static readonly HatSO Hatless = HatlessHat();
-    
+
     public void OnInject()
     {
+        if (IsDisabled()) return;
         StartCoroutine(NoHat());
     }
 
@@ -44,9 +43,10 @@ public class NoHatTrap : BaseItem, IInjectable
         Simulation simulation = MainSimPatch.GetMainSim();
         foreach (Drone drone in simulation.farm.drones)
         {
-            _emprerorsHat ??= Hat.CreateHat(Hatless, simulation, drone);
-            drone.hat = _emprerorsHat;
+            _emperorHat ??= Hat.CreateHat(Hatless, simulation, drone);
+            drone.hat = _emperorHat;
         }
+
         yield return new WaitForSecondsRealtime(TrapLength);
         DronePatch.Hatless = false;
         HatSO straw = ResourceManager.GetHat("straw_hat");
@@ -55,8 +55,16 @@ public class NoHatTrap : BaseItem, IInjectable
         {
             drone.hat = Hat.CreateHat(straw, simulation, drone);
         }
+
         _log.LogInformation("Done with no hat");
-        
+
         Completed();
+    }
+
+
+    protected override IEnumerator Trap()
+    {
+        // This trap uses injection
+        yield return null;
     }
 }

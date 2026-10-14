@@ -56,6 +56,14 @@ public class APItem
             Simulation, Operators, Senses, Variables, Functions, Import, Utilities, Lists, Dictionaries, Costs, Unlock,
             PowerFlip
         ];
+
+        /// <summary>
+        /// All trap items in the game
+        /// </summary>
+        public static readonly string[] Traps =
+        [
+            RickRollTrap, BigTrap, FlipTrap, FrozenTrap, NoHatTrap, TinyTrap,
+        ];
     }
 
     public long id { get; set; }

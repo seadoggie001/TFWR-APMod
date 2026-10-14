@@ -5,16 +5,11 @@ using UnityEngine;
 namespace com.seadoggie.TFWRArchipelago.Items.Traps;
 
 [Trap(APItem.Names.FlipTrap)]
-public class FlipTrap : BaseItem
+public class FlipTrap : BaseTrap
 {
-    protected override string ItemName => nameof(FlipTrap);
     private static GameObject Farm => GameObject.Find("Farm");
-    public void Start()
-    {
-        StartCoroutine(Flip());
-    }
 
-    private IEnumerator Flip()
+    protected override IEnumerator Trap()
     {
         Farm.LeanScale(new Vector3(-1, -1, 1), 2);
         yield return new WaitForSecondsRealtime(TrapLength - 4);

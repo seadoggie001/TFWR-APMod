@@ -11,8 +11,6 @@ namespace com.seadoggie.TFWRArchipelago.Items.Filler;
 [Item(APItem.Names.FreeHay)]
 public class FreeHayFiller : BaseItem, IInjectable
 {
-    protected override string ItemName => nameof(FreeHayFiller);
-
     [Log] private readonly ILogger<FreeHayFiller> _log = null!;
     
     public void OnInject()

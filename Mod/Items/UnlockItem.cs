@@ -9,7 +9,6 @@ namespace com.seadoggie.TFWRArchipelago.Items;
 // Do NOT add an ItemAttribute to this class. Unlocks are manually registered in the ItemService 
 public class UnlockItem : BaseItem, IInjectable
 {
-    protected override string ItemName => "UnlockItem";
     public string ItemNameToUnlock { get; set; }
     private bool _ready;
     [Log] private readonly ILogger<UnlockItem> _log = null!;

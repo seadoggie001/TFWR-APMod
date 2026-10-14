@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using com.seadoggie.TFWRArchipelago.Model;
 using HarmonyLib;
 using Microsoft.Extensions.Logging;
 using UnityEngine;
@@ -51,19 +52,24 @@ public class ResourceManagerPatch
         {
             List<OptionSO> newOptions =
             [
+                // Add all traps as an option
+                ..APItem.Names.Traps.Select(trap => 
+                    AddOption(trap,
+                        "Disables the trap completely", 
+                        ArchipelagoCategory, 
+                        0f, 
+                        ["enabled", "disabled"], 
+                        "enabled")
+                    ).ToList(),
+
                 AddOption(OptionNames.OpenConnectionWindow,
                     "Open Archipelago connection settings",
                     ArchipelagoCategory,
-                    0f,
+                    1f,
                     ["Click to Open", " Click to Open "],
                     "Click to Open"),
-                AddOption(OptionNames.RickRollTrap,
-                    "Disables the Rick Roll trap completely",
-                    ArchipelagoCategory,
-                    0f,
-                    ["enabled", "disabled"],
-                    "enabled"),
             ];
+
             CustomOptions = newOptions.Select(m => m.name).ToArray();
             List<OptionSO> options = __result.ToList();
             options.AddRange(newOptions);
