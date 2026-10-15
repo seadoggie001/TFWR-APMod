@@ -29,12 +29,12 @@ public class Teleport : BaseFunction
 
             // Set up the program state to pass off moving the drone later
             ProgramState programState = validationState.Execution.States[validationState.DroneId];
-            // StoreArgument(programState, );
-            programState.currentSideEffectArgument2 = new Coords()
+            
+            StoreArgument(programState, new Coords()
             {
                 X = (int)(PyNumber)validationState.Parameters[0],
                 Y = (int)(PyNumber)validationState.Parameters[1],
-            };
+            });
         }
         catch (Exception ex)
         {

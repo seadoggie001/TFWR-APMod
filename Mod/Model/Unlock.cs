@@ -37,4 +37,5 @@ public static class Unlock
     public const string Utilities = "utilities";
     public const string Variables = "variables";
     public const string Watering = "watering";
+    public const string PowerFlip = "power_flip";
 }

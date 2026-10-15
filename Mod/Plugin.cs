@@ -5,6 +5,7 @@ using com.seadoggie.TFWRArchipelago.Functions;
 using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Service;
 using com.seadoggie.TFWRArchipelago.Utils;
+using DroneLib.Model;
 using HarmonyLib;
 using Microsoft.Extensions.Logging;
 using UnityEngine;
@@ -31,7 +32,7 @@ public class Plugin : BaseUnityPlugin
     private void Awake()
     {
         Instance = this;
-        
+
         try
         {
             _logFactory = new LoggerFactory([new PluginLoggerProvider()]);
@@ -48,7 +49,7 @@ public class Plugin : BaseUnityPlugin
         InjectionService.LoggerFactory = _logFactory;
         InjectionService.Log = _logFactory.CreateLogger<InjectionService>();
         InjectionService.AutomaticRegistration();
-        
+
         // Create Managers
         MainGameObject = new GameObject("Archipelago");
         BaseComponent[] components =
@@ -69,17 +70,48 @@ public class Plugin : BaseUnityPlugin
         }
         catch (Exception e)
         {
-            Log.LogError(e,$"Plugin {MyPluginInfo.PLUGIN_GUID} failed to load properly! Harmony patch issues.");
+            Log.LogError(e, $"Plugin {MyPluginInfo.PLUGIN_GUID} failed to load properly! Harmony patch issues.");
             return;
         }
 
-        Log.LogInformation($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running version {MyPluginInfo.PLUGIN_VERSION}");
+        Log.LogInformation(
+            $"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running version {MyPluginInfo.PLUGIN_VERSION}");
     }
 
     private void Start()
     {
-        DroneLib.Function.Registration.RegisterFunction(new DoubleFlip());
+        DroneLib.Function.Registration.RegisterFunction(new PowerFlip());
         DroneLib.Function.Registration.RegisterFunction(new Teleport());
         DroneLib.Item.Registration.RegisterItem(new FakeAPItem());
+        DroneLib.Model.UnlockRegistration.RegisterUnlock(new UnlockDescription()
+        {
+            AdditivePercentFactor = 1,
+            AdditivePercentStart = 3000,
+            Description = "Perform a flip so powerful that you get credit for 30 flips per power spent.\n\n`power_flip(5)`",
+            DisplayCode = "power_flip(5)",
+            DisplayName = "Power Flip",
+            Enabled = true,
+            MaxUnlockLevel = 1,
+            ParentUnlock = "sunflowers",
+            UnlockCost = new ItemBlock(StringIds.PowerItemId, 3000),
+            Order = 99,
+            UnlockName = "power_flip",
+            Unlocks = [],
+        });
+        DroneLib.Model.UnlockRegistration.RegisterUnlock(new UnlockDescription()
+        {
+            AdditivePercentFactor = 1,
+            AdditivePercentStart = 3000,
+            Description = "Concentrate on your movement so hard that you teleport.\n\n`teleport(6,8)`",
+            DisplayCode = "teleport(6,8)",
+            DisplayName = "Teleport",
+            Enabled = true,
+            MaxUnlockLevel = 1,
+            ParentUnlock = "expand",
+            UnlockCost = new ItemBlock(StringIds.WeirdSubstanceItemId, 3000),
+            Order = 0,
+            UnlockName = "teleport",
+            Unlocks = [],
+        });
     }
 }

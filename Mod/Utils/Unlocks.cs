@@ -44,6 +44,7 @@ public static class Unlocks
             APItem.Names.Utilities => Unlock.Utilities,
             APItem.Names.Variables => Unlock.Variables,
             APItem.Names.Watering => Unlock.Watering,
+            APItem.Names.PowerFlip => Unlock.PowerFlip,
             // Leaderboard is intentionally disabled because mods.
             // APItem.Names.Leaderboard => Unlock.Leaderboard,
             _ => null
