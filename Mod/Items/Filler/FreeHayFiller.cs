@@ -33,7 +33,7 @@ public class FreeHayFiller : BaseItem, IInjectable
             
             // Determine number of hay to gift
             double gifted = sim.farm.Items.GetNumber((int)hayId) * 0.2;
-            gifted = Math.Floor(Math.Min(gifted, 10));
+            gifted = Math.Floor(Math.Max(gifted, 10));
             // Add the hay
             sim.farm.Items.AddItem((int)hayId, gifted);
             // Update statistics too
