@@ -17,7 +17,6 @@ public class ResourceManagerPatch
     public static class OptionNames
     {
         public const string OpenConnectionWindow = "Launch AP Connection";
-        public const string RickRollTrap = "Rick Roll Trap";
     }
     public static string[] CustomOptions = [];
     public const string ArchipelagoCategory = "Archipelago";
