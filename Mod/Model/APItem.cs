@@ -38,6 +38,7 @@ public class APItem
         public const string Costs = "Costs";
         public const string Unlock = "Unlock";
         public const string PowerFlip = "PowerFlip";
+        public const string Teleport = "Teleport";
         public const string FreeHay = "Free Hay";
         public const string RickRollTrap = "Rick Roll Trap";
         public const string BigTrap = "Big Drone Trap";
@@ -54,7 +55,7 @@ public class APItem
             Loop, DroneSpeed, Hats, Grass, Expand, Plant, Carrot, Watering, Fertilizer, Sunflowers, Mazes, TopHat,
             Trees, Pumpkins, Polyculture, Cactus, Dinosaurs, TheFarmersRemains, Megafarm, Debug, MoreDebug, Timing,
             Simulation, Operators, Senses, Variables, Functions, Import, Utilities, Lists, Dictionaries, Costs, Unlock,
-            PowerFlip
+            PowerFlip, Teleport
         ];
 
         /// <summary>
