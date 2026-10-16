@@ -151,7 +151,7 @@ public class ProgressGUI : BaseGUI, IInjectable
             return;
         }
 
-        _log.LogError("There are no achievements matching: {key}", key);
+        _log.LogWarning("There are no achievements matching: {key}", key);
     }
 
     public override bool IsMouseOverWindow() =>
@@ -164,8 +164,7 @@ public class ProgressGUI : BaseGUI, IInjectable
     /// </summary>
     /// <param name="groupedMilestones"></param>
     /// <param name="stats"></param>
-    /// <param name="allLocations"></param>
-    /// <param name="regions"></param>
+    /// <param name="exportData"></param>
     public void LoadStats(IEnumerable<KeyValuePair<string, List<Milestone>>> groupedMilestones,
         Dictionary<string, double> stats,
         APExport exportData)
@@ -179,7 +178,7 @@ public class ProgressGUI : BaseGUI, IInjectable
         {
             GroupedMilestones = groupedMilestones,
             Stats = stats,
-            AllLocations = exportData.locations,
+            AllLocations = exportData?.locations,
         };
 
         Builder builder = new(exportData);

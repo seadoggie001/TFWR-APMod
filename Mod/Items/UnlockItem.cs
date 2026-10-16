@@ -31,7 +31,6 @@ public class UnlockItem : BaseItem, IInjectable
     {
         try
         {
-            _log.LogInformation("Attempting to unlock {itemName}", ItemNameToUnlock);
             string unlockName = Unlocks.ItemToUnlock(ItemNameToUnlock);
             if (string.IsNullOrWhiteSpace(unlockName))
             {
@@ -47,7 +46,6 @@ public class UnlockItem : BaseItem, IInjectable
             }
 
             int count = farm.NumUnlocked(unlockName);
-            _log.LogInformation("Found {Count} unlocked {UnlockName}", count, unlockName);
 
             // Hopefully we do not allow for "too many" items... but I think the game handles that internally
             farm.Unlock(unlockName, count + 1);

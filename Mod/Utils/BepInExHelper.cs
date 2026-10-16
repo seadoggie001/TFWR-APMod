@@ -15,13 +15,9 @@ public static class BepInExHelper
         try
         {
             Component created = Plugin.Instance.MainGameObject.AddComponent(target);
-            if (!created)
-            {
-                throw new Exception($"Failed to create component of type: {target.FullName}");
-            }
-
+            if (!created) throw new Exception($"Failed to create component of type: {target.FullName}");
+            
             InjectionService.InjectType(created, target);
-            Plugin.Log.LogDebug("Created and Injected component: {component}", target.Name);
             return created;
         }
         catch (Exception ex)
@@ -37,13 +33,9 @@ public static class BepInExHelper
         {
             T created = Plugin.Instance.MainGameObject.AddComponent<T>();
             created?.enabled = false;
-            if (created is null)
-            {
-                throw new Exception($"Failed to create component of type: {typeof(T).FullName}");
-            }
+            if (created is null) throw new Exception($"Failed to create component of type: {typeof(T).FullName}");
 
             created = InjectionService.Inject(created);
-            Plugin.Log.LogDebug("Created and Injected component: {component}", typeof(T).Name);
             created.enabled = true;
             return created;
         }

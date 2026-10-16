@@ -60,8 +60,7 @@ public class ItemService : IItemService
             // If the component already exists, return that this was processed only if it is a trap
             // (traps sent while the trap is active will be ignored)
             if (Plugin.Instance.MainGameObject.TryGetComponent(item.Type, out Component _)) return item.IsTrap;
-
-            _log.LogDebug("Creating and processing item: {Name}", name);
+            
             // Create the component and inject any references it needs
             Component component = BepInExHelper.CreateAndInjectComponent(item.Type);
             if (component is UnlockItem unlock) unlock.SetUnlock(name);
