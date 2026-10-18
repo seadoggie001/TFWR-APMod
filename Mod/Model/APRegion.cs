@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 using com.seadoggie.TFWRArchipelago.APLogic;
+using Newtonsoft.Json;
 
 namespace com.seadoggie.TFWRArchipelago.Model;
 

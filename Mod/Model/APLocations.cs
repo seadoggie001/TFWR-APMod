@@ -1,6 +1,7 @@
-using System.Text.Json.Serialization;
 using com.seadoggie.TFWRArchipelago.APLogic;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
+
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnassignedField.Global

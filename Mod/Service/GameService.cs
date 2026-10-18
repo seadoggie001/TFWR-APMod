@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
 using System.Threading.Tasks;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 
 namespace com.seadoggie.TFWRArchipelago.Service;
@@ -37,7 +37,7 @@ public class GameService : IGameService
             if (_modSaveGame is null) throw new Exception("Cannot save the game, modded save file is null");
             if (statistics is not null) _modSaveGame.Statistics = statistics;
             if (options is not null) _modSaveGame.Options = options;
-            string json = JsonSerializer.Serialize(_modSaveGame);
+            string json = JsonConvert.SerializeObject(_modSaveGame);
             string filePath = GetFilePath(fileName);
             File.WriteAllText(filePath, json);
         }
@@ -63,7 +63,7 @@ public class GameService : IGameService
             }
 
             string json = File.ReadAllText(filePath);
-            if (!string.IsNullOrWhiteSpace(json)) modSaveGame = JsonSerializer.Deserialize<ModSaveGame>(json);
+            if (!string.IsNullOrWhiteSpace(json)) modSaveGame = JsonConvert.DeserializeObject<ModSaveGame>(json);
 
 
             Plugin.Log.LogInformation("Save game was loaded");

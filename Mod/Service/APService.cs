@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
+using Newtonsoft.Json;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
@@ -274,7 +274,7 @@ public class APService : IAPService
     {
         try
         {
-            APExport exportData = JsonSerializer.Deserialize<APExport>(text);
+            APExport exportData = JsonConvert.DeserializeObject<APExport>(text);
             _log.LogInformation("Loaded: {locs} locations, {regs} regions, {crops} crops", exportData.locations.Count(),
                 exportData.regions.Count(), exportData.crops.Count());
             _export = exportData;
