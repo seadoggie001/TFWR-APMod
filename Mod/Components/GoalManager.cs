@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
+using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
+
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
@@ -13,7 +14,7 @@ public class GoalManager : BaseComponent
 {
     [CanBeNull] public static GoalManager Instance;
 
-    [Log] private readonly ILogger<GoalManager> _log = null!;
+    [Log] private readonly IModLog _log = null!;
     [ModInject] public readonly IStatsService StatsService = null!;
 
     protected override void OnEnable()
@@ -68,7 +69,7 @@ public class GoalManager : BaseComponent
             }
             catch (Exception ex)
             {
-                _log.LogException(nameof(RaiseStatEvent), ex);
+                _log.LogError(ex, nameof(RaiseStatEvent));
             }
         });
     }

@@ -4,7 +4,7 @@ using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Patches;
 using DroneLib.Function;
 using DroneLib.Helpers;
-using Microsoft.Extensions.Logging;
+
 
 namespace com.seadoggie.TFWRArchipelago.Functions;
 
@@ -28,7 +28,7 @@ public class PowerFlip : BaseFunction
         }
         catch (Exception ex)
         {
-            Plugin.Log.LogException("Teleport Exception", ex);
+            Plugin.Log.LogError(ex, "Teleport Exception");
         }
     }
 

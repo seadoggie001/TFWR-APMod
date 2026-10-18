@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
-using Microsoft.Extensions.Logging;
+using com.seadoggie.TFWRArchipelago.Utils;
+
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
@@ -13,7 +14,7 @@ namespace com.seadoggie.TFWRArchipelago.Service;
 [Injectable(typeof(IItemQueue))]
 public class ItemQueue : IItemQueue
 {
-    [Log] private readonly ILogger<ItemQueue> _log = null!;
+    [Log] private readonly IModLog _log = null!;
 
     /// <summary># of items received from AP</summary>
     private int _itemsReceived;

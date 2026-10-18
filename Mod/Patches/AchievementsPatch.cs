@@ -20,7 +20,7 @@ public class AchievementsPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(UnlockAchievement)}", e);
+            Plugin.Log.LogError(e, $"{nameof(UnlockAchievement)}");
         }
     }
 
@@ -40,7 +40,7 @@ public class AchievementsPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(IncrementStat)}", e);
+            Plugin.Log.LogError(e, $"{nameof(IncrementStat)}");
         }
     }
 
@@ -63,7 +63,7 @@ public class AchievementsPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(CollectItem)}", e);
+            Plugin.Log.LogError(e, $"{nameof(CollectItem)}");
         }
     }
 }

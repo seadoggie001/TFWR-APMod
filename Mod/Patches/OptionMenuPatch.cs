@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using com.seadoggie.TFWRArchipelago.Components;
 using HarmonyLib;
-using Microsoft.Extensions.Logging;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 

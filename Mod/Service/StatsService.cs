@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
-using Microsoft.Extensions.Logging;
+
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
@@ -13,7 +13,7 @@ namespace com.seadoggie.TFWRArchipelago.Service;
 [Injectable(typeof(IStatsService))]
 public class StatsService : IStatsService
 {
-    [Log] private readonly ILogger<StatsService> _log = null!;
+    [Log] private readonly IModLog _log = null!;
     [ModInject] private IEnabledService EnabledService { get; set; }
 
     /// <summary>
@@ -104,7 +104,7 @@ public class StatsService : IStatsService
         }
         catch (Exception e)
         {
-            _log.LogException("UserStats.Add Error", e);
+            _log.LogError(e, "UserStats.Add Error");
             return;
         }
 

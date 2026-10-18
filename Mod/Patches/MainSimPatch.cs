@@ -16,7 +16,7 @@ public static class MainSimPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException("Failed to get MainSim.sim", e);
+            Plugin.Log.LogError(e, "Failed to get MainSim.sim");
             return null;
         }
     }

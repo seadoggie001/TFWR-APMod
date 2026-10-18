@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 using DroneLib.Function;
-using Microsoft.Extensions.Logging;
+
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Functions;
@@ -38,7 +38,7 @@ public class Teleport : BaseFunction
         }
         catch (Exception ex)
         {
-            Plugin.Log.LogException("Teleport Exception", ex);
+            Plugin.Log.LogError(ex, "Teleport Exception");
         }
     }
 

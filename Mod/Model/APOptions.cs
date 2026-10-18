@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using com.seadoggie.TFWRArchipelago.Service;
-using Microsoft.Extensions.Logging;
+using com.seadoggie.TFWRArchipelago.Utils;
+
 
 namespace com.seadoggie.TFWRArchipelago.Model;
 
 public class APOptions
 {
-    [Log] private readonly ILogger<APOptions> _logger = null!;
+    [Log] private readonly IModLog _logger = null!;
 
     public readonly Dictionary<double, double> ModifiedValues = [];
 

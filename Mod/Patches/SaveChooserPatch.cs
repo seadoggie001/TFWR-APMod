@@ -4,7 +4,6 @@ using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
 using HarmonyLib;
-using Microsoft.Extensions.Logging;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -83,7 +82,7 @@ public class SaveChooserPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(Setup)}", e);
+            Plugin.Log.LogError(e, $"{nameof(Setup)}");
         }
     }
 }

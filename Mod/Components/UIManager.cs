@@ -5,8 +5,8 @@ using Archipelago.MultiClient.Net.Models;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
 using com.seadoggie.TFWRArchipelago.UI;
+using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Components;
@@ -15,7 +15,7 @@ public class UIManager : BaseComponent
 {
     [CanBeNull] public static UIManager Instance;
 
-    [Log] private readonly ILogger<UIManager> _log = null!;
+    [Log] private readonly IModLog _log = null!;
 
     public ProgressGUI progressGUI;
     public ArchipelagoSettingsGUI settingsGUI;

@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Extensions.Logging;
+using com.seadoggie.TFWRArchipelago.Utils;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
 public class InjectionService
 {
-    public static ILoggerFactory LoggerFactory { private get; set; }
-    public static ILogger<InjectionService> Log { private get; set; }
+    public static IModLog Logger { private get; set; }
+    public static IModLogFactory LogFactory { private get; set; }
     private static readonly Dictionary<Type, object> InjectableServices = new();
 
     public static void AutomaticRegistration()
@@ -25,7 +25,7 @@ public class InjectionService
             ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
             if (constructor is null)
             {
-                Log.LogWarning("Failed to auto-register {TypeName}: Missing empty constructor", type.Name);
+                Logger.LogError($"Failed to auto-register {type.Name}: Missing empty constructor");
                 continue;
             }
 
@@ -36,7 +36,7 @@ public class InjectionService
             MethodInfo info = typeof(InjectionService).GetMethod(nameof(Inject));
             if (info is null)
             {
-                Log.LogError("Failed to locate InjectionService.Inject method info");
+                Logger.LogError("Failed to locate InjectionService.Inject method info");
                 continue;
             }
 
@@ -85,14 +85,14 @@ public class InjectionService
             }
             catch (Exception innerEx)
             {
-                Log.LogError(innerEx, "Stop throwing exceptions on inject!");
+                Logger.LogError(innerEx, "Stop throwing exceptions on inject!");
             }
 
             return target;
         }
         catch (Exception ex)
         {
-            Log.LogError(ex, "Failed to inject all items");
+            Logger.LogError(ex, "Failed to inject all items");
         }
 
         return default(T);
@@ -150,15 +150,14 @@ public class InjectionService
             LogAttribute attribute = info.GetCustomAttribute<LogAttribute>();
             if (attribute is null) continue;
 
-            if (info.FieldType == typeof(ILogger<T>))
+            if (info.FieldType == typeof(IModLog))
             {
-                info.SetValue(target, LoggerFactory.CreateLogger<T>());
+                info.SetValue(target, LogFactory.Create(typeof(T)));
             }
             else
             {
-                Log.LogWarning(
-                    "Cannot inject a log into a non-standard log field. {Type}.{FieldName} is of type {FieldType}",
-                    typeof(T), info.Name, info.FieldType.Name);
+                Logger.LogWarning(
+                    $"Cannot inject a log into a non-standard log field. {typeof(T)}.{info.Name} is of type {info.FieldType.Name}");
             }
         }
 

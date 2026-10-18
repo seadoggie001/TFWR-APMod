@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using com.seadoggie.TFWRArchipelago.Service;
-using Microsoft.Extensions.Logging;
+using com.seadoggie.TFWRArchipelago.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
@@ -11,7 +11,7 @@ namespace com.seadoggie.TFWRArchipelago.UI;
 
 public class NotificationPopup : BaseGUI
 {
-    [Log] private readonly ILogger<NotificationPopup> _log = null!;
+    [Log] private readonly IModLog _log = null!;
     private const string TransitionClassName = "expanded";
     private const float TransitionLength = 1f;
     

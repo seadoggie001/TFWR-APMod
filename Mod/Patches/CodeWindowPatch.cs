@@ -23,7 +23,7 @@ public static class CodeWindowPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(PromptDelete)}", e);
+            Plugin.Log.LogError(e, $"{nameof(PromptDelete)}");
             return !BepInExHelper.HarmonySkipFunction;
         }
     }

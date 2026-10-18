@@ -49,7 +49,7 @@ public class FarmPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(Constructor_Prefix)}", e);
+            Plugin.Log.LogError(e, $"{nameof(Constructor_Prefix)}");
         }
     }
 
@@ -72,7 +72,7 @@ public class FarmPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(GetUnlockCost)}", e);
+            Plugin.Log.LogError(e, $"{nameof(GetUnlockCost)}");
             return !BepInExHelper.HarmonySkipFunction;
         }
     }

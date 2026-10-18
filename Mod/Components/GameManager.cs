@@ -5,15 +5,16 @@ using com.seadoggie.TFWRArchipelago.Configuration;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Patches;
 using com.seadoggie.TFWRArchipelago.Service;
+using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
+
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
 public class GameManager : BaseComponent
 {
     [CanBeNull] public static GameManager Instance;
-    [Log] private readonly ILogger<GameManager> _log = null!;
+    [Log] private readonly IModLog _log = null!;
     [ModInject] public readonly IGameService GameService = null!;
     [ModInject] public readonly IItemService ItemService = null!;
 

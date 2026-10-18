@@ -51,7 +51,7 @@ public class SaveOptionPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(Setup)}", e);
+            Plugin.Log.LogError(e, $"{nameof(Setup)}");
         }
     } 
 }

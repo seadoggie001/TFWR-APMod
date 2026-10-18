@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Reflection;
-using Microsoft.Extensions.Logging;
+
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
@@ -29,7 +29,7 @@ public static class HatPopupPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(ShowWithoutHat)}", e);
+            Plugin.Log.LogError(e, $"{nameof(ShowWithoutHat)}");
         }
     }
 }

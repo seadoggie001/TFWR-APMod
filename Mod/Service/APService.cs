@@ -7,14 +7,14 @@ using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
 using com.seadoggie.TFWRArchipelago.Model;
-using Microsoft.Extensions.Logging;
+using com.seadoggie.TFWRArchipelago.Utils;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
 [Injectable(typeof(IAPService))]
 public class APService : IAPService
 {
-    [Log] private readonly ILogger<APService> _log = null!;
+    [Log] private readonly IModLog _log = null!;
 
     private readonly HashSet<string> _achievementCache = [];
 
@@ -91,9 +91,9 @@ public class APService : IAPService
 
                 SubmitLocationById(location.id);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                _log.LogException(nameof(UnlockAchievement), ex);
+                _log.LogError(e, nameof(UnlockAchievement));
             }
         });
     }
@@ -181,9 +181,9 @@ public class APService : IAPService
                 !string.IsNullOrWhiteSpace(connectionSettings.Password));
             return false;
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            _log.LogException("Failed to connect to AP with exception", ex);
+            _log.LogError(e, "Failed to connect to AP with exception");
             return false;
         }
     }
@@ -206,7 +206,7 @@ public class APService : IAPService
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException("Session.ConnectAsync", e);
+            Plugin.Log.LogError(e, "Session.ConnectAsync");
             _log.LogError("Exception Type: " + e.GetType());
             _log.LogError(e.Message);
             _log.LogError(e.StackTrace);
@@ -282,7 +282,7 @@ public class APService : IAPService
         }
         catch (Exception e)
         {
-            _log.LogException("Failed to load APLocation data", e);
+            _log.LogError(e, "Failed to load APLocation data");
             return null;
         }
     }

@@ -2,12 +2,10 @@
 using BepInEx;
 using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Functions;
-using com.seadoggie.TFWRArchipelago.Logging;
 using com.seadoggie.TFWRArchipelago.Service;
 using com.seadoggie.TFWRArchipelago.Utils;
 using DroneLib.Model;
 using HarmonyLib;
-using Microsoft.Extensions.Logging;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago;
@@ -19,8 +17,8 @@ public class Plugin : BaseUnityPlugin
     public static Plugin Instance { get; private set; } = null!;
     public GameObject MainGameObject { get; private set; }
 
-    private static ILoggerFactory _logFactory;
-    public static ILogger<Plugin> Log;
+    private static IModLogFactory _logFactory;
+    public static IModLog Log;
 
     private readonly Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
 
@@ -35,8 +33,8 @@ public class Plugin : BaseUnityPlugin
 
         try
         {
-            _logFactory = new LoggerFactory([new PluginLoggerProvider()]);
-            Log = new Logger<Plugin>(_logFactory);
+            Log = new ModLogger(typeof(Plugin));
+            _logFactory = new ModLogFactory();
         }
         catch (Exception ex)
         {
@@ -45,9 +43,9 @@ public class Plugin : BaseUnityPlugin
             Console.WriteLine(ex.StackTrace);
             return;
         }
-
-        InjectionService.LoggerFactory = _logFactory;
-        InjectionService.Log = _logFactory.CreateLogger<InjectionService>();
+        
+        InjectionService.LogFactory = new ModLogFactory();
+        InjectionService.Logger = _logFactory.Create(typeof(InjectionService));
         InjectionService.AutomaticRegistration();
 
         // Create Managers
@@ -73,9 +71,8 @@ public class Plugin : BaseUnityPlugin
             Log.LogError(e, $"Plugin {MyPluginInfo.PLUGIN_GUID} failed to load properly! Harmony patch issues.");
             return;
         }
-
-        Log.LogInformation(
-            $"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running version {MyPluginInfo.PLUGIN_VERSION}");
+        
+        Log.LogInformation($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! Running version {MyPluginInfo.PLUGIN_VERSION}");
     }
 
     private void Start()

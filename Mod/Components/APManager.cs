@@ -6,8 +6,9 @@ using System.Reflection;
 using System.Text.Json;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
+using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
+
 
 namespace com.seadoggie.TFWRArchipelago.Components;
 
@@ -15,7 +16,7 @@ public class APManager : BaseComponent
 {
     [CanBeNull] public static APManager Instance { get; private set; }
 
-    [Log] private readonly ILogger<APManager> _log = null!;
+    [Log] private readonly IModLog _log = null!;
     [ModInject] public readonly IAPService APService = null!;
     [ModInject] public readonly ILocationQueue LocationQueue = null!;
     [ModInject] public readonly IItemQueue ItemQueue = null!;
@@ -74,7 +75,7 @@ public class APManager : BaseComponent
         }
         catch (Exception e)
         {
-            _log.LogException("Failed to load update locations/items", e);
+            _log.LogError(e, "Failed to load update locations/items");
         }
     }
 
@@ -105,7 +106,7 @@ public class APManager : BaseComponent
         }
         catch (Exception e)
         {
-            _log.LogException("Failed to load export data", e);
+            _log.LogError(e, "Failed to load export data");
             return null;
         }
     }

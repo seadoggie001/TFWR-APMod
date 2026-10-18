@@ -1,8 +1,9 @@
 using System;
 using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Service;
+using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
+
 using UnityEngine;
 using UnityEngine.UIElements;
 using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
@@ -11,7 +12,7 @@ namespace com.seadoggie.TFWRArchipelago.UI;
 
 public class FloatingActionButton : BaseGUI
 {
-    [Log] private readonly ILogger<FloatingActionButton> _log = null!;
+    [Log] private readonly IModLog _log = null!;
     private UIDocument _uiDocument;
     private VisualElement _rootElement;
     private VisualElement _fab;

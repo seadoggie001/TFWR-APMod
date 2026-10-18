@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using com.seadoggie.TFWRArchipelago.Model;
 using HarmonyLib;
-using Microsoft.Extensions.Logging;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
@@ -35,7 +34,7 @@ public class ResourceManagerPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(LoadAll)}", e);
+            Plugin.Log.LogError(e, $"{nameof(LoadAll)}");
         }
     }
 
@@ -76,7 +75,7 @@ public class ResourceManagerPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(GetAllOptions)}", e);
+            Plugin.Log.LogError(e, $"{nameof(GetAllOptions)}");
         }
     }
 
@@ -112,7 +111,7 @@ public class ResourceManagerPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(AddOption)}", e);
+            Plugin.Log.LogError(e, $"{nameof(AddOption)}");
             return null;
         }
     }
@@ -134,7 +133,7 @@ public class ResourceManagerPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(GetUnlock)}", e);
+            Plugin.Log.LogError(e, $"{nameof(GetUnlock)}");
         }
     }
 
@@ -161,9 +160,9 @@ public class ResourceManagerPatch
                 }
             );
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            Plugin.Log.LogError(ex, "Failed to manipulate crop costs");
+            Plugin.Log.LogError(e, "Failed to manipulate crop costs");
         }
     }
 }

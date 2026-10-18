@@ -2,7 +2,7 @@ using System.Collections;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Patches;
 using com.seadoggie.TFWRArchipelago.Service;
-using Microsoft.Extensions.Logging;
+using com.seadoggie.TFWRArchipelago.Utils;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Items.Traps;
@@ -10,7 +10,7 @@ namespace com.seadoggie.TFWRArchipelago.Items.Traps;
 [Trap(APItem.Names.NoHatTrap)]
 public class NoHatTrap : BaseTrap, IInjectable
 {
-    [Log] private readonly ILogger<NoHatTrap> _log = null!;
+    [Log] private readonly IModLog _log = null!;
     private static Hat _emperorHat = null;
     private static readonly HatSO Hatless = HatlessHat();
 

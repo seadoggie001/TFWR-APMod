@@ -4,8 +4,8 @@ using Archipelago.MultiClient.Net;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Patches;
 using com.seadoggie.TFWRArchipelago.Service;
+using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.UI;
@@ -15,7 +15,7 @@ namespace com.seadoggie.TFWRArchipelago.UI;
 /// </summary>
 public class ArchipelagoSettingsGUI : BaseGUI
 {
-    [Log] private readonly ILogger<ArchipelagoSettingsGUI> _log = null!;
+    [Log] private readonly IModLog _log = null!;
 
     public event EventHandler<ConnectionInfo> ConnectionAttemptEvent;
     public event EventHandler<EventArgs> DisconnectRequestEvent;

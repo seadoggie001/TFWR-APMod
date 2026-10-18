@@ -43,7 +43,7 @@ public class UnlockBoxPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(SetupRec)}", e);
+            Plugin.Log.LogError(e, $"{nameof(SetupRec)}");
         }
     }
 }

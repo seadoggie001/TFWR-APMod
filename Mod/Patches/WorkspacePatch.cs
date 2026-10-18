@@ -35,7 +35,7 @@ public class WorkspacePatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(Scroll)}", e);
+            Plugin.Log.LogError(e, $"{nameof(Scroll)}");
             return !BepInExHelper.HarmonySkipFunction;
         }
     }

@@ -5,9 +5,9 @@ using System.Linq;
 using com.seadoggie.TFWRArchipelago.APLogic;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Service;
+using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Resources = com.seadoggie.TFWRArchipelago.Assets.Resources;
@@ -16,7 +16,7 @@ namespace com.seadoggie.TFWRArchipelago.UI;
 
 public class ProgressGUI : BaseGUI, IInjectable
 {
-    [Log] private readonly ILogger<ProgressGUI> _log = null!;
+    [Log] private readonly IModLog _log = null!;
     private const float RefreshRate = 2.0f; // Every 2 seconds
 
     private UIDocument _uiDocument;
@@ -584,9 +584,9 @@ public class ProgressGUI : BaseGUI, IInjectable
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            _log.LogException("Failed to update values", ex);
+            _log.LogError(e, "Failed to update values");
         }
     }
 

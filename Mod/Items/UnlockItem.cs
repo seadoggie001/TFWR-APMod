@@ -2,7 +2,7 @@ using System;
 using com.seadoggie.TFWRArchipelago.Patches;
 using com.seadoggie.TFWRArchipelago.Service;
 using com.seadoggie.TFWRArchipelago.Utils;
-using Microsoft.Extensions.Logging;
+
 
 namespace com.seadoggie.TFWRArchipelago.Items;
 
@@ -11,7 +11,7 @@ public class UnlockItem : BaseItem, IInjectable
 {
     public string ItemNameToUnlock { get; set; }
     private bool _ready;
-    [Log] private readonly ILogger<UnlockItem> _log = null!;
+    [Log] private readonly IModLog _log = null!;
 
     public void SetUnlock(string item)
     {

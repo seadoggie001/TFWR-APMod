@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using com.seadoggie.TFWRArchipelago.Model;
-using Microsoft.Extensions.Logging;
+using com.seadoggie.TFWRArchipelago.Utils;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
@@ -12,7 +12,7 @@ namespace com.seadoggie.TFWRArchipelago.Service;
 [Injectable(typeof(ILocationQueue))]
 public class LocationQueue : ILocationQueue
 {
-    [Log] private readonly ILogger<LocationQueue> _log = null!;
+    [Log] private readonly IModLog _log = null!;
     private readonly HashSet<long> _locationQueue = [];
 
     private IEnumerable<APLocation> _allLocations = null;
@@ -30,7 +30,7 @@ public class LocationQueue : ILocationQueue
         }
         catch (Exception e)
         {
-            _log.LogException($"Failed to process {location}", e);
+            _log.LogError(e, $"Failed to process {location}");
         }
     }
 

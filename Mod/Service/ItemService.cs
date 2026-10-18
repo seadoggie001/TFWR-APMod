@@ -5,7 +5,7 @@ using System.Reflection;
 using com.seadoggie.TFWRArchipelago.Items;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Utils;
-using Microsoft.Extensions.Logging;
+
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Service;
@@ -13,7 +13,7 @@ namespace com.seadoggie.TFWRArchipelago.Service;
 [Injectable(typeof(IItemService))]
 public class ItemService : IItemService
 {
-    [Log] private readonly ILogger<ItemService> _log = null!;
+    [Log] private readonly IModLog _log = null!;
 
     private static readonly Dictionary<string, ItemInfo> RegisteredItems = [];
 

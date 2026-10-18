@@ -1,6 +1,5 @@
 using System;
 using com.seadoggie.TFWRArchipelago.Service;
-using Microsoft.Extensions.Logging;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Utils;

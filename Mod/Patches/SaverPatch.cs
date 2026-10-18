@@ -17,7 +17,7 @@ public static class SaverPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(Load)}", e);
+            Plugin.Log.LogError(e, $"{nameof(Load)}");
         }
     }
 
@@ -27,12 +27,12 @@ public static class SaverPatch
     {
         try
         {
-            if(!Plugin.Instance.Enabled) return;
+            if (!Plugin.Instance.Enabled) return;
             GameManager.Instance?.SaveProgress();
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(SaveProgress)}", e);
+            Plugin.Log.LogError(e, $"{nameof(SaveProgress)}");
         }
     }
 }

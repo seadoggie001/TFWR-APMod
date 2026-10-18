@@ -27,7 +27,7 @@ public static class DronePatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"Drone.{nameof(PetThePiggy)}", e);
+            Plugin.Log.LogError(e, $"Drone.{nameof(PetThePiggy)}");
         }
     }
 
@@ -43,7 +43,7 @@ public static class DronePatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"Drone.{nameof(Harvest)}", e);
+            Plugin.Log.LogError(e, $"Drone.{nameof(Harvest)}");
         }
     }
 

@@ -17,7 +17,7 @@ public class MenuPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(Play)}", e);
+            Plugin.Log.LogError(e, $"{nameof(Play)}");
         }
     }
 
@@ -31,7 +31,7 @@ public class MenuPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(Open)}", e);
+            Plugin.Log.LogError(e, $"{nameof(Open)}");
         }
     }
     
@@ -45,7 +45,7 @@ public class MenuPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(LoadSave)}", e);
+            Plugin.Log.LogError(e, $"{nameof(LoadSave)}");
         }
     }
 }

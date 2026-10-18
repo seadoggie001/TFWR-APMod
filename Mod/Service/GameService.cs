@@ -4,8 +4,9 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using com.seadoggie.TFWRArchipelago.Model;
+using com.seadoggie.TFWRArchipelago.Utils;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
+
 
 namespace com.seadoggie.TFWRArchipelago.Service;
 
@@ -14,7 +15,7 @@ public class GameService : IGameService
 {
     private const string FileName = "tfwrap.json";
     [CanBeNull] private ModSaveGame _modSaveGame;
-    [Log] private readonly ILogger<GameService> _log = null!;
+    [Log] private readonly IModLog _log = null!;
 
     public event EventHandler<ModSaveGame> GameLoaded;
     public event EventHandler<EventArgs> PreLoadGame;
@@ -40,9 +41,9 @@ public class GameService : IGameService
             string filePath = GetFilePath(fileName);
             File.WriteAllText(filePath, json);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            _log.LogException(nameof(SaveProgress), ex);
+            _log.LogError(e, nameof(SaveProgress));
         }
     }
 
@@ -73,7 +74,7 @@ public class GameService : IGameService
         }
         catch (Exception e)
         {
-            _log.LogException("Failed to load data", e);
+            _log.LogError(e, "Failed to load data");
         }
     }
 
@@ -102,9 +103,9 @@ public class GameService : IGameService
             {
                 MenuOpen?.Invoke(this, open);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                _log.LogException(nameof(RaiseMenuOpen), ex);
+                _log.LogError(e, nameof(RaiseMenuOpen));
             }
         });
     }
@@ -123,9 +124,9 @@ public class GameService : IGameService
                 string locName = $"Grass ({x}, {y})";
                 GrassSanity?.Invoke(this, locName);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                _log.LogException(nameof(RaiseGrassSanity), ex);
+                _log.LogError(e, nameof(RaiseGrassSanity));
             }
         });
     }

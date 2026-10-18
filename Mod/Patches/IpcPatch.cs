@@ -4,7 +4,7 @@ using System.Reflection;
 using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
-using Microsoft.Extensions.Logging;
+
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
@@ -41,7 +41,7 @@ public static class IpcPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException("Failed to get MainSim.sim", e);
+            Plugin.Log.LogError(e, "Failed to get MainSim.sim");
         }
     }
 }

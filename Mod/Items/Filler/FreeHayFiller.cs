@@ -4,14 +4,15 @@ using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Model;
 using com.seadoggie.TFWRArchipelago.Patches;
 using com.seadoggie.TFWRArchipelago.Service;
-using Microsoft.Extensions.Logging;
+using com.seadoggie.TFWRArchipelago.Utils;
+
 
 namespace com.seadoggie.TFWRArchipelago.Items.Filler;
 
 [Item(APItem.Names.FreeHay)]
 public class FreeHayFiller : BaseItem, IInjectable
 {
-    [Log] private readonly ILogger<FreeHayFiller> _log = null!;
+    [Log] private readonly IModLog _log = null!;
     
     public void OnInject()
     {
@@ -43,7 +44,7 @@ public class FreeHayFiller : BaseItem, IInjectable
         }
         catch (Exception ex)
         {
-            _log.LogException($"{nameof(FreeHayFiller)}", ex);
+            _log.LogError(ex, $"{nameof(FreeHayFiller)}");
         }
     }
 }

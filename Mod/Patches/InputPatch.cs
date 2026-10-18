@@ -30,7 +30,7 @@ public class InputPatch
         }
         catch (Exception e)
         {
-            Plugin.Log.LogException($"{nameof(GetMouseButtonDown)}", e);
+            Plugin.Log.LogError(e, $"{nameof(GetMouseButtonDown)}");
             return !BepInExHelper.HarmonySkipFunction;
         }
     }
