@@ -54,7 +54,7 @@ public class ModLogger : IModLog
     {
         Regex formatReplacer = new("(?<!:{){([a-zA-Z0-9_]+)}");
         int index = 0;
-        formatReplacer.Replace(message, match => $"{{{index++}}}");
+        message = formatReplacer.Replace(message, _ => $"{{{index++}}}");
         try
         {
             return string.Format(message, data);

@@ -1,9 +1,7 @@
 using System;
-using System.Reflection;
 using com.seadoggie.TFWRArchipelago.Components;
 using com.seadoggie.TFWRArchipelago.Patches;
-using DroneLib.Function;
-using DroneLib.Helpers;
+using DroneLib.Model;
 
 
 namespace com.seadoggie.TFWRArchipelago.Functions;
@@ -12,19 +10,19 @@ public class PowerFlip : BaseFunction
 {
     public override string Name => "power_flip";
 
-    public override void ValidateCall(FunctionValidation validationState)
+    public override void Binding(BindingParams bindingParams)
     {
         try
         {
             // Validate that the parameters contains two numbers
-            CorrectParams(validationState.Parameters, [
+            CorrectParams(bindingParams.Parameters, [
                 typeof(PyNumber)
             ]);
 
             // Set up the program state to pass off moving the drone later
-            ProgramState programState = validationState.Execution.States[validationState.DroneId];
+            ProgramState programState = bindingParams.Execution.States[bindingParams.DroneId];
             
-            StoreArgument(programState, (double)(PyNumber)validationState.Parameters[0]);
+            StoreArgument(programState, (double)(PyNumber)bindingParams.Parameters[0]);
         }
         catch (Exception ex)
         {
@@ -50,7 +48,7 @@ public class PowerFlip : BaseFunction
         if (!sim.farm.Items.Remove(StringIds.PowerItemId, powerToUse))
         {
             // Quit if power is missing
-            Logger.LogWarning("Not enough power to perform this action", state);
+            UISim.Inst.Logger.LogWarning("Not enough power to perform this action", state);
             return 0;
         }
         

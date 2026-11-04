@@ -1,7 +1,6 @@
 using System;
 using System.Reflection;
-using DroneLib.Function;
-
+using DroneLib.Model;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Functions;
@@ -17,23 +16,23 @@ public class Teleport : BaseFunction
     /// </summary>
     private static MethodInfo _updatePositionMethod;
 
-    public override void ValidateCall(FunctionValidation validationState)
+    public override void Binding(BindingParams bindingParams)
     {
         try
         {
             // Validate that the parameters contains two numbers
-            CorrectParams(validationState.Parameters, [
+            CorrectParams(bindingParams.Parameters, [
                 typeof(PyNumber),
                 typeof(PyNumber)
             ]);
 
             // Set up the program state to pass off moving the drone later
-            ProgramState programState = validationState.Execution.States[validationState.DroneId];
+            ProgramState programState = bindingParams.Execution.States[bindingParams.DroneId];
             
             StoreArgument(programState, new Coords()
             {
-                X = (int)(PyNumber)validationState.Parameters[0],
-                Y = (int)(PyNumber)validationState.Parameters[1],
+                X = (int)(PyNumber)bindingParams.Parameters[0],
+                Y = (int)(PyNumber)bindingParams.Parameters[1],
             });
         }
         catch (Exception ex)
@@ -56,30 +55,31 @@ public class Teleport : BaseFunction
             || coords.X < 0 
             || coords.Y < 0)
         {
-            Logger.LogWarning("You may not teleport out of the farm! You're a drone, you're not magic.", state);
+            UISim.Inst.Logger.LogWarning("You may not teleport out of the farm! You're a drone, you're not magic.", state);
             return 0;
         }
 
         // Find any objects at the current/target position
-        if (execution.sim.farm.grid.entities.TryGetValue(drone.pos, out FarmObject objAtCurrent)
-            && execution.sim.farm.grid.entities.TryGetValue(coords.Vector2Int, out FarmObject objAtDest))
+        Entity objAtCurrent = execution.sim.farm.grid.GetEntity<Entity>(drone.pos);
+        Entity objAtDest = execution.sim.farm.grid.GetEntity<Entity>(coords.X, coords.Y);
+        if (objAtCurrent != null && objAtDest != null)
         {
             if (objAtDest is HedgePlant || objAtCurrent is HedgePlant)
             {
-                Logger.LogWarning("You may not teleport into or out of a maze!", state);
+                UISim.Inst.Logger.LogWarning("You may not teleport into or out of a maze!", state);
                 return 0;
             }
 
             if (drone.hat is DinosaurHat)
             {
-                Logger.LogWarning("Dinosaurs may not teleport!", state);
+                UISim.Inst.Logger.LogWarning("Dinosaurs may not teleport!", state);
                 return 0;
             }
         }
         else
         {
             Plugin.Log.LogError("Failed to get entities at the positions for a teleport!");
-            Logger.LogError("Teleportation failure: entity request. Please report to the mod author.", state);
+            UISim.Inst.Logger.LogError("Teleportation failure: entity request. Please report to the mod author.", state);
             return 0;
         }
 
@@ -93,7 +93,7 @@ public class Teleport : BaseFunction
         if (_updatePositionMethod is null)
         {
             Plugin.Log.LogError("Failed to locate UpdatePosition method on Drone");
-            Logger.LogError("Teleportation failure: position update. Please report to the mod author.", state);
+            UISim.Inst.Logger.LogError("Teleportation failure: position update. Please report to the mod author.", state);
             return 0;
         }
 

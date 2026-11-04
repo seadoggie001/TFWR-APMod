@@ -1,5 +1,4 @@
-using com.seadoggie.TFWRArchipelago.Patches;
-using DroneLib.Item;
+using DroneLib.Model;
 using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago;
@@ -16,14 +15,14 @@ public class FakeAPItem : BaseItem
     
     public FakeAPItem()
     {
-        ItemSO = ScriptableObject.CreateInstance<ItemSO>();
-        ItemSO.itemName = "Archipelago Item";
+        ItemSo = ScriptableObject.CreateInstance<ItemSO>();
+        ItemSo.itemName = "Archipelago Item";
         // The rest of this is all nonsense?
-        ItemSO.description = "Archipelago Stuff";
-        ItemSO.docs = "I got some docs!?";
-        ItemSO.enabled = true;
-        ItemSO.name = "Some other Archipelago name?";
-        ItemSO.trackStats = true;
+        ItemSo.description = "Archipelago Stuff";
+        ItemSo.docs = "I got some docs!?";
+        ItemSo.enabled = true;
+        ItemSo.name = "Some other Archipelago name?";
+        ItemSo.trackStats = true;
         Instance = this;
     }
     

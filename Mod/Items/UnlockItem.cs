@@ -49,7 +49,7 @@ public class UnlockItem : BaseItem, IInjectable
 
             // Hopefully we do not allow for "too many" items... but I think the game handles that internally
             farm.Unlock(unlockName, count + 1);
-            UnlockSO unlock = farm.GetUnlockOf(unlockName);
+            UnlockSO unlock = ResourceManager.GetUnlockOf(unlockName);
             // foreach (string unlockItemName in unlock.unlocks) Log.LogInfo("  - and unlocks " + unlockItemName);
 
             farm.UnlockAllIn(unlock);

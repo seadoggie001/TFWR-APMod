@@ -13,7 +13,7 @@ public class OptionMenuPatch
     /// </summary>
     /// <param name="optionName"></param>
     [HarmonyPrefix]
-    [HarmonyPatch("OnOptionChanged", typeof(string))]
+    [HarmonyPatch(nameof(OptionMenu.OnOptionChanged), typeof(string))]
     public static void OnOptionChanged(string optionName)
     {
         try

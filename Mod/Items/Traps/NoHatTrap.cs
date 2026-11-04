@@ -43,7 +43,7 @@ public class NoHatTrap : BaseTrap, IInjectable
         Simulation simulation = MainSimPatch.GetMainSim();
         foreach (Drone drone in simulation.farm.drones)
         {
-            _emperorHat ??= Hat.CreateHat(Hatless, simulation, drone);
+            _emperorHat ??= Hat.CreateHat(Hatless, simulation, drone, true);
             drone.hat = _emperorHat;
         }
 
@@ -53,7 +53,7 @@ public class NoHatTrap : BaseTrap, IInjectable
         simulation = MainSimPatch.GetMainSim();
         foreach (Drone drone in simulation.farm.drones)
         {
-            drone.hat = Hat.CreateHat(straw, simulation, drone);
+            drone.hat = Hat.CreateHat(straw, simulation, drone, true);
         }
 
         _log.LogInformation("Done with no hat");

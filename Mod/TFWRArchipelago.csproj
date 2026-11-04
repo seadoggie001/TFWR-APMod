@@ -13,18 +13,25 @@
         </RestoreAdditionalProjectSources>
         <IsPackable>false</IsPackable>
         <Authors>seadoggie</Authors>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <!-- Import a settings file. See local.props.txt for more information -->
     <Import Project="local.props" Condition="Exists('local.props')" />
 
     <ItemGroup>
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
         <PackageReference Include="Archipelago.MultiClient.Net" Version="6.7.1" />
         <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
         <PackageReference Include="BepInEx.Core" Version="5.*" PrivateAssets="all" />
         <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" PrivateAssets="all" />
-        <PackageReference Include="DroneLib" Version="0.0.2" />
+        <PackageReference Include="DroneLib" Version="0.0.3" />
         <PackageReference Include="UnityEngine.Modules" Version="2021.3.5" PrivateAssets="all"  />
+
+        <Reference Include="$(ManagedPath)/Core.dll" Publicize="true"/>
+        <Reference Include="$(ManagedPath)/Utils.dll" Publicize="true"/>
+        <Reference Include="$(ManagedPath)/Assembly-CSharp.dll" Publicize="true"/>
+        <Reference Include="$(ManagedPath)/NewAssembly.dll" Publicize="true"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">

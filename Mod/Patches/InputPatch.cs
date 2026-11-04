@@ -16,7 +16,7 @@ public class InputPatch
     /// </summary>
     /// <param name="__result"></param>
     /// <returns></returns>
-    [HarmonyPatch(typeof(Input), nameof(Input.GetMouseButtonDown))]
+    [HarmonyPatch(nameof(Input.GetMouseButtonDown))]
     [HarmonyPrefix]
     public static bool GetMouseButtonDown(ref bool __result)
     {

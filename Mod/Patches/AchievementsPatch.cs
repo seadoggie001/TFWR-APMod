@@ -51,7 +51,7 @@ public class AchievementsPatch
     /// <param name="itemId"></param>
     /// <param name="number"></param>
     /// <param name="___total_stats"></param>
-    [HarmonyPatch(nameof(Achievements.CollectItem), typeof(int), typeof(double), typeof(Duration), typeof(Duration))]
+    [HarmonyPatch(nameof(Achievements.CollectItem), typeof(int), typeof(double), typeof(Duration), typeof(Duration), typeof(bool), typeof(bool))]
     [HarmonyPrefix]
     public static void CollectItem(int itemId, double number, ItemBlock ___total_stats)
     {

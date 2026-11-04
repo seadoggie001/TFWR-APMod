@@ -5,19 +5,31 @@ using System.Linq;
 using System.Reflection;
 using com.seadoggie.TFWRArchipelago.Utils;
 using HarmonyLib;
+using Platforms;
+using UnityEngine;
 
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
 [HarmonyPatch(typeof(Farm))]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public class FarmPatch
+public static class FarmPatch
 {
     /// <summary>
     /// Used to patch the starting unlocks on the farm and the unlocks on startup 
     /// </summary>
     /// <param name="unlocks">The requested unlocks</param>
-    [HarmonyPatch(MethodType.Constructor, typeof(Simulation), typeof(IEnumerable<string>), typeof(ItemBlock),
-        typeof(List<SFO>), typeof(List<SFO>), typeof(bool))]
+    [HarmonyPatch(MethodType.Constructor, 
+        typeof(Simulation),
+        typeof(EDlcMask),
+        typeof(IEnumerable<string>),
+        typeof(ItemBlock),
+        typeof(bool),
+        typeof(Vector2Int),
+        typeof(int),
+        typeof(bool),
+        typeof(List<string>),
+        typeof(List<int>),
+        typeof(List<int>))]
     [HarmonyPrefix]
     public static void Constructor_Prefix(ref IEnumerable<string> unlocks)
     {
@@ -29,22 +41,22 @@ public class FarmPatch
                 BindingFlags.Public | BindingFlags.Static);
             List<string> startUnlocks = (List<string>)startUnlocksField?.GetValue(null);
             if (startUnlocks is null) return;
-
+    
             // Combine the startUnlocks with the unlocks param
             List<string> distinctUnlocks = startUnlocks.ToList();
             distinctUnlocks.AddRange(unlocks);
             distinctUnlocks = distinctUnlocks.Distinct().ToList();
-
+    
             startUnlocks = [];
             unlocks = [];
-
+    
             // ToDo: Check if Archipelago thinks the upgrades are valid
             foreach (string unlock in distinctUnlocks)
             {
                 // Plugin.Log.LogInfo("Requested unlock: " + unlock);
                 startUnlocks.Add(unlock);
             }
-
+    
             startUnlocksField.SetValue(null, startUnlocks);
         }
         catch (Exception e)
@@ -52,7 +64,7 @@ public class FarmPatch
             Plugin.Log.LogError(e, $"{nameof(Constructor_Prefix)}");
         }
     }
-
+    
     /// <summary>
     /// Used to make everything cost an Archipelago Item
     /// </summary>
@@ -67,7 +79,7 @@ public class FarmPatch
         try
         {
             if (!Plugin.Instance.Enabled) return !BepInExHelper.HarmonySkipFunction;
-            __result = new ItemBlock(FakeAPItem.Instance.ItemSO.itemId, 1);
+            __result = new ItemBlock(FakeAPItem.Instance.ItemSo.itemId, 1);
             return BepInExHelper.HarmonySkipFunction;
         }
         catch (Exception e)

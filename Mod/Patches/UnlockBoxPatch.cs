@@ -39,7 +39,7 @@ public class UnlockBoxPatch
             ___codeText.alignment = TextAlignmentOptions.Baseline;
             ___codeText.fontSize = 24f;
             ___codeText.verticalAlignment = VerticalAlignmentOptions.Baseline;
-            ___currentCost = new ItemBlock(FakeAPItem.Instance.ItemSO.itemId, 1);
+            ___currentCost = new ItemBlock(FakeAPItem.Instance.ItemSo.itemId, 1);
         }
         catch (Exception e)
         {

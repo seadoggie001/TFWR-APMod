@@ -21,7 +21,7 @@ public static class BepInExHelper
         }
         catch (Exception ex)
         {
-            Plugin.Log.LogError("Failed to create component: {target}", target.Name);
+            Plugin.Log.LogError(ex, "Failed to create component: {target}", target.Name);
             return null;
         }
     }
@@ -40,7 +40,7 @@ public static class BepInExHelper
         }
         catch (Exception ex)
         {
-            Plugin.Log.LogError("Failed to create component: {target}", typeof(T).Name);
+            Plugin.Log.LogError(ex, "Failed to create component: {target}", typeof(T).Name);
         }
 
         return null;

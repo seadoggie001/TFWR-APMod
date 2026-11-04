@@ -5,6 +5,7 @@ using com.seadoggie.TFWRArchipelago.Functions;
 using com.seadoggie.TFWRArchipelago.Service;
 using com.seadoggie.TFWRArchipelago.Utils;
 using DroneLib.Model;
+using DroneLib.Registration;
 using HarmonyLib;
 using UnityEngine;
 
@@ -77,10 +78,15 @@ public class Plugin : BaseUnityPlugin
 
     private void Start()
     {
-        DroneLib.Function.Registration.RegisterFunction(new PowerFlip());
-        DroneLib.Function.Registration.RegisterFunction(new Teleport());
-        DroneLib.Item.Registration.RegisterItem(new FakeAPItem());
-        DroneLib.Model.UnlockRegistration.RegisterUnlock(new UnlockDescription()
+        Function functionReg = new DroneLib.Registration.Function();
+        functionReg.Add(new PowerFlip());
+        functionReg.Add(new Teleport());
+        
+        Item itemReg = new();
+        itemReg.Add(new FakeAPItem());
+        
+        Unlock unlockReg = new();
+        unlockReg.Add(new UnlockDescription()
         {
             AdditivePercentFactor = 1,
             AdditivePercentStart = 3000,
@@ -95,7 +101,7 @@ public class Plugin : BaseUnityPlugin
             UnlockName = "power_flip",
             Unlocks = [],
         });
-        DroneLib.Model.UnlockRegistration.RegisterUnlock(new UnlockDescription()
+        unlockReg.Add(new UnlockDescription()
         {
             AdditivePercentFactor = 1,
             AdditivePercentStart = 3000,

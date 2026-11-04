@@ -9,7 +9,7 @@ namespace com.seadoggie.TFWRArchipelago.Patches;
 
 [HarmonyPatch(typeof(Workspace))]
 [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony forces the use of some variable names")]
-public class WorkspacePatch
+public static class WorkspacePatch
 {
     /// <summary>
     /// Prevent the world from zooming when hovering over the StatisticsGUI

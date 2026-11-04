@@ -5,7 +5,6 @@ using HarmonyLib;
 using UnityEngine;
 
 // ReSharper disable InconsistentNaming
-
 namespace com.seadoggie.TFWRArchipelago.Patches;
 
 [HarmonyPatch(typeof(Drone))]
@@ -14,7 +13,7 @@ public static class DronePatch
     public static bool IsFrozen = false;
     public static Vector3? ModifiedSize = null;
     public static bool Hatless = false;
-
+    
     [HarmonyPatch(nameof(Drone.PetThePiggy))]
     [HarmonyPrefix]
     public static void PetThePiggy()
@@ -30,14 +29,14 @@ public static class DronePatch
             Plugin.Log.LogError(e, $"Drone.{nameof(PetThePiggy)}");
         }
     }
-
+    
     [HarmonyPatch(nameof(Drone.Harvest))]
     [HarmonyPrefix]
     public static void Harvest(Drone __instance)
     {
         try
         {
-            FarmObject obj = __instance.EntityUnderDrone();
+            Entity obj = __instance.EntityUnderDrone();
             if (obj?.objectSO?.dropItem != "hay") return;
             GameManager.Instance?.GameService.RaiseGrassSanity(__instance.pos.x, __instance.pos.y);
         }
@@ -46,15 +45,15 @@ public static class DronePatch
             Plugin.Log.LogError(e, $"Drone.{nameof(Harvest)}");
         }
     }
-
+    
     [HarmonyPatch(nameof(Drone.Move))]
     [HarmonyPrefix]
     public static bool Move()
     {
         return !IsFrozen;
     }
-
-    [HarmonyPatch(nameof(Drone.ChangeHat))]
+    
+    [HarmonyPatch(nameof(Drone.ChangeHat), typeof(Hat), typeof(ProgramState))]
     [HarmonyPrefix]
     public static bool ChangeHat()
     {

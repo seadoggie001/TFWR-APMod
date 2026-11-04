@@ -226,9 +226,11 @@ public class ArchipelagoSettingsGUI : BaseGUI
         // Update the internal status
         _state = Status.Connecting;
 
-        // Request the login attempt
-        ConnectionAttemptEvent?.Invoke(this, new ConnectionInfo(_archUrl, int.Parse(_archPort),
-            _archUsername, _archPassword));
+        if (int.TryParse(_archPort, out int port))
+        {
+            // Request the login attempt
+            ConnectionAttemptEvent?.Invoke(this, new ConnectionInfo(_archUrl, port, _archUsername, _archPassword));
+        }
     }
 
     public void ConnectionAttempt(LoginResult result)

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using com.seadoggie.TFWRArchipelago.Model;
 using HarmonyLib;
 using UnityEngine;
@@ -17,20 +16,19 @@ public class ResourceManagerPatch
     {
         public const string OpenConnectionWindow = "Launch AP Connection";
     }
+
     public static string[] CustomOptions = [];
     public const string ArchipelagoCategory = "Archipelago";
 
     [HarmonyPostfix]
-    [HarmonyPatch(nameof(ResourceManager.LoadAll))]
-    public static void LoadAll(ref ItemSO[] ___items)
+    [HarmonyPatch(typeof(DroneLib.Patches.ResourceManagerPatch),
+        nameof(DroneLib.Patches.ResourceManagerPatch.LoadItems))]
+    public static void LoadAll()
     {
         try
         {
             // Track stats for all items
-            foreach (ItemSO itemSo in ___items)
-            {
-                itemSo.trackStats = true;
-            }
+            foreach (ItemSO itemSo in ResourceManager.items) itemSo.trackStats = true;
         }
         catch (Exception e)
         {
@@ -51,14 +49,14 @@ public class ResourceManagerPatch
             List<OptionSO> newOptions =
             [
                 // Add all traps as an option
-                ..APItem.Names.Traps.Select(trap => 
+                .. APItem.Names.Traps.Select(trap =>
                     AddOption(trap,
-                        "Disables the trap completely", 
-                        ArchipelagoCategory, 
-                        0f, 
-                        ["enabled", "disabled"], 
+                        "Disables the trap completely",
+                        ArchipelagoCategory,
+                        0f,
+                        ["enabled", "disabled"],
                         "enabled")
-                    ).ToList(),
+                ).ToList(),
 
                 AddOption(OptionNames.OpenConnectionWindow,
                     "Open Archipelago connection settings",
@@ -125,7 +123,7 @@ public class ResourceManagerPatch
             if (Plugin.Instance.Enabled && __result is not null && __result)
             {
                 // Everything costs an Archipelago item
-                __result.unlockCost = new ItemBlock(FakeAPItem.Instance.ItemSO.itemId, 1);
+                __result.unlockCost = new ItemBlock(FakeAPItem.Instance.ItemSo.itemId, 1);
 
                 // ToDo: Someday, check if there's a hint for this item. If there is a hint, display it here...
                 // __result.description = "Text describing a hint for this item";
@@ -142,23 +140,13 @@ public class ResourceManagerPatch
         if (CropCosts is null) return;
         try
         {
-            DroneLib.Helpers.Reflection.GetStaticField(
-                typeof(ResourceManager),
-                "farmObjects",
-                BindingFlags.Static | BindingFlags.NonPublic,
-                (Dictionary<string, FarmObjectSO> farmObjects) =>
-                {
-                    foreach (KeyValuePair<string, List<string>> cropCost in CropCosts)
-                    {
-                        if (!farmObjects.TryGetValue(cropCost.Key, out FarmObjectSO so)) continue;
-                        ItemBlock cost = ItemBlock.CreateEmpty();
-                        cropCost.Value.ForEach(m => cost.AddItem(StringIds.GetItemId(m), 1));
-                        so.cost = cost;
-                    }
-
-                    return farmObjects;
-                }
-            );
+            foreach (KeyValuePair<string, List<string>> cropCost in CropCosts)
+            {
+                if (!ResourceManager.entitites.TryGetValue(cropCost.Key, out EntitySO so)) continue;
+                ItemBlock cost = ItemBlock.CreateEmpty();
+                cropCost.Value.ForEach(m => cost.AddItem(StringIds.GetItemId(m), 1));
+                so.cost = cost;
+            }
         }
         catch (Exception e)
         {
