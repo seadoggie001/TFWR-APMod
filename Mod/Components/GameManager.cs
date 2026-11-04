@@ -172,11 +172,8 @@ public class GameManager : BaseComponent
 
     public void Load() => Task.Run(() => { GameService.Load(DefaultSaveName()); });
 
-    public void SaveProgress() => Task.Run(() =>
-    {
-        GameService.SaveProgress(
+    public void SaveProgress() => GameService.SaveProgress(
             GoalManager.Instance?.UserStatsSave(),
             APManager.Instance?.APService.GetOptions(),
             DefaultSaveName());
-    });
 }
