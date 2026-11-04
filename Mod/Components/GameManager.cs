@@ -72,7 +72,6 @@ public class GameManager : BaseComponent
     // Disable the interprocess communication if the mod is loaded. Sorry, no tapping here.
     private static void OnGameLoaded(object sender, ModSaveGame saveGame)
     {
-        IpcPatch.SetRunning(saveGame is not null);
         if (saveGame?.Options?.CropCosts is not null)
             ResourceManagerPatch.ManipulateCropCosts(saveGame.Options.CropCosts);
     }
