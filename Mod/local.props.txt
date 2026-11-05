@@ -18,11 +18,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- These are the internal game files. They allow you to reference internal types and functions --> 
-        <Reference Include="$(ManagedPath)/Core.dll">
+        <!-- 
+            These are the internal game files. They allow you to reference internal types and functions
+            Use a publicizer and include the attribute Publicize="True" on the two dlls below to get 
+            the ability to reference internal types --> 
+        <Reference Include="$(ManagedPath)/Core.dll" Publicize="True">
             <Private>False</Private>
         </Reference>
-        <Reference Include="$(ManagedPath)/Utils.dll">
+        <Reference Include="$(ManagedPath)/Utils.dll" Publicize="True">
             <Private>False</Private>
         </Reference>
 
