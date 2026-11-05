@@ -1,4 +1,4 @@
-﻿# Archipelago + The Farmer Was Replaced
+# Archipelago + The Farmer Was Replaced
 
 This mod is an implementation of Archipelago in The Farmer Was Replaced. Archipelago is "is a cross-game modification system which randomizes different games, then uses the result to build a single unified multi-player game". To learn more about Archipelago, please see [their website](https://archipelago.gg/), especially their FAQ.
 
